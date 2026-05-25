@@ -1,15 +1,32 @@
 <?php
 
-use App\Http\Controllers\AdminAppointmentController;
-use App\Http\Controllers\AdminOrderController;
-use App\Http\Controllers\AdminPaymentController;
 use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
+use App\Livewire\Admin\Appointments\Index as AdminAppointmentsIndex;
+use App\Livewire\Admin\Dashboard as AdminDashboard;
+use App\Livewire\Admin\Orders\Index as AdminOrdersIndex;
+use App\Livewire\Admin\Orders\Show as AdminOrdersShow;
+use App\Livewire\Admin\Payments\Index as AdminPaymentsIndex;
+use App\Livewire\Admin\Queue\Index as AdminQueueIndex;
+use App\Livewire\Customer\Orders\Create as CustomerOrdersCreate;
+use App\Livewire\Customer\Orders\Index as CustomerOrdersIndex;
+use App\Livewire\Customer\Orders\Show as CustomerOrdersShow;
+use App\Livewire\Customer\Payments\Create as CustomerPaymentsCreate;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+})->name('home');
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // ──────────────────────────────────────────────────────────────
@@ -29,15 +46,18 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'customer'])->group(function () {
 
-    // ── Order Routes ─────────────────────────────────────────
-    Route::resource('orders', OrderController::class)
-        ->only(['index', 'create', 'store', 'show']);
+    // ── Order Routes (Livewire) ──────────────────────────────
+    Route::get('orders', CustomerOrdersIndex::class)
+        ->name('orders.index');
 
-    Route::post('orders/{order}/upload-design', [OrderController::class, 'uploadDesign'])
-        ->name('orders.upload-design');
+    Route::get('orders/create', CustomerOrdersCreate::class)
+        ->name('orders.create');
 
-    // ── Payment Routes ───────────────────────────────────────
-    Route::get('orders/{order}/payments/create', [PaymentController::class, 'create'])
+    Route::get('orders/{order}', CustomerOrdersShow::class)
+        ->name('orders.show');
+
+    // ── Payment Routes (Livewire) ────────────────────────────
+    Route::get('orders/{order}/payments/create', CustomerPaymentsCreate::class)
         ->name('orders.payments.create');
 
     Route::post('orders/{order}/payments', [PaymentController::class, 'store'])
@@ -57,37 +77,23 @@ Route::middleware(['auth', 'customer'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    // ── Order Routes ─────────────────────────────────────────
-    Route::resource('orders', AdminOrderController::class)
-        ->only(['index', 'show']);
+    Route::get('dashboard', AdminDashboard::class)
+        ->name('dashboard');
 
-    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])
-        ->name('orders.update-status');
+    Route::get('orders', AdminOrdersIndex::class)
+        ->name('orders.index');
 
-    Route::patch('orders/{order}/material', [AdminOrderController::class, 'updateMaterial'])
-        ->name('orders.update-material');
+    Route::get('orders/{order}', AdminOrdersShow::class)
+        ->name('orders.show');
 
-    // ── Payment Routes ───────────────────────────────────────
-    Route::get('payments', [AdminPaymentController::class, 'index'])
-        ->name('payments.index');
+    Route::get('queue', AdminQueueIndex::class)
+        ->name('queue.index');
 
-    Route::get('payments/{payment}/verify', [AdminPaymentController::class, 'verify'])
-        ->name('payments.verify');
-
-    Route::patch('payments/{payment}/approve', [AdminPaymentController::class, 'approve'])
-        ->name('payments.approve');
-
-    Route::patch('payments/{payment}/reject', [AdminPaymentController::class, 'reject'])
-        ->name('payments.reject');
-
-    // ── Appointment Routes ───────────────────────────────────
-    Route::get('appointments', [AdminAppointmentController::class, 'index'])
+    Route::get('appointments', AdminAppointmentsIndex::class)
         ->name('appointments.index');
 
-    Route::patch('appointments/{appointment}/confirm', [AdminAppointmentController::class, 'confirm'])
-        ->name('appointments.confirm');
-
-    Route::patch('appointments/{appointment}/complete', [AdminAppointmentController::class, 'complete'])
-        ->name('appointments.complete');
+    Route::get('payments', AdminPaymentsIndex::class)
+        ->name('payments.index');
 });
 
+require __DIR__.'/auth.php';

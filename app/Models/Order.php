@@ -25,6 +25,7 @@ class Order extends Model
         'estimated_price',
         'estimated_finish_date',
         'order_number',
+        'queue_position',
     ];
 
     /**
@@ -38,6 +39,7 @@ class Order extends Model
             'estimated_price' => 'decimal:2',
             'estimated_finish_date' => 'date',
             'quantity' => 'integer',
+            'queue_position' => 'integer',
         ];
     }
 
