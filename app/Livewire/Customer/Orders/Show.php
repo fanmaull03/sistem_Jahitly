@@ -82,6 +82,27 @@ class Show extends Component
     {
         return view('livewire.customer.orders.show', [
             'statusLogs' => $this->order->statusLogs->sortBy('created_at'),
+            'canCancel' => $this->canCancelOrder(),
         ])->layout('layouts.app');
+    }
+
+    /**
+     * Cek apakah order dapat dibatalkan
+     */
+    public function canCancelOrder(): bool
+    {
+        // Status yang tidak dapat dibatalkan
+        $nonCancellableStatuses = ['dijahit', 'finishing', 'selesai', 'dibatalkan'];
+
+        if (in_array($this->order->status, $nonCancellableStatuses)) {
+            return false;
+        }
+
+        // Jika ada pembayaran terverifikasi, tidak dapat dibatalkan
+        if ($this->order->payments->where('status', 'terverifikasi')->isNotEmpty()) {
+            return false;
+        }
+
+        return true;
     }
 }

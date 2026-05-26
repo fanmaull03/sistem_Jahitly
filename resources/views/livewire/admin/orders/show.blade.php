@@ -1,10 +1,10 @@
-<div class="space-y-6">
-    <div>
+<div class="page-enter space-y-6">
+    <div data-reveal>
         <h1 class="text-2xl font-bold">Detail Pesanan</h1>
         <p class="text-sm text-slate-500">Kontrol pesanan untuk customer {{ $order->customer->name }}.</p>
     </div>
 
-    <div class="flex flex-wrap items-center gap-2">
+    <div data-reveal data-reveal-delay="1" class="flex flex-wrap items-center gap-2">
         <div class="text-lg font-semibold text-slate-900">{{ $order->order_number }}</div>
         <x-status-badge :status="$order->status" />
         <x-status-badge type="payment_status" :status="$order->payment_status" />
@@ -12,7 +12,7 @@
 
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section data-reveal data-reveal-delay="2" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Informasi Pesanan</h2>
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
@@ -59,7 +59,7 @@
                 @endif
             </section>
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section data-reveal data-reveal-delay="3" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Timeline Status</h2>
                 <div class="mt-4 space-y-3">
                     @forelse ($statusLogs as $log)
@@ -79,7 +79,7 @@
                 </div>
             </section>
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section data-reveal data-reveal-delay="4" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Daftar Pembayaran</h2>
                 <div class="mt-4 space-y-3">
                     @forelse ($order->payments as $payment)
@@ -111,7 +111,7 @@
         </div>
 
         <aside class="space-y-6">
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section data-reveal data-reveal-delay="2" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Update Status Bahan</h2>
                 <div class="mt-4 space-y-3">
                     <div>
@@ -152,7 +152,7 @@
                 </div>
             </section>
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section data-reveal data-reveal-delay="3" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Update Status Pesanan</h2>
                 <div class="mt-4 space-y-3">
                     <div>
@@ -210,7 +210,7 @@
                 </div>
             </section>
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section data-reveal data-reveal-delay="4" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Preview Desain</h2>
                 <div class="mt-4 space-y-2">
                     @forelse ($order->designFiles as $file)
@@ -233,8 +233,8 @@
     </div>
 
     @if ($showDesignModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
-            <div class="w-full max-w-2xl rounded-2xl bg-white p-5 shadow-xl">
+        <div class="modal-backdrop-enter fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
+            <div class="modal-content-enter w-full max-w-2xl rounded-2xl bg-white p-5 shadow-xl">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold">{{ $designPreviewName }}</h3>
                     <button

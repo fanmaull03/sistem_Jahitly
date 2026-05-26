@@ -9,10 +9,13 @@ use App\Livewire\Admin\Orders\Index as AdminOrdersIndex;
 use App\Livewire\Admin\Orders\Show as AdminOrdersShow;
 use App\Livewire\Admin\Payments\Index as AdminPaymentsIndex;
 use App\Livewire\Admin\Queue\Index as AdminQueueIndex;
+use App\Livewire\Customer\Orders\CancelOrder as CustomerOrdersCancelOrder;
 use App\Livewire\Customer\Orders\Create as CustomerOrdersCreate;
 use App\Livewire\Customer\Orders\Index as CustomerOrdersIndex;
 use App\Livewire\Customer\Orders\Show as CustomerOrdersShow;
 use App\Livewire\Customer\Payments\Create as CustomerPaymentsCreate;
+use App\Livewire\Customer\Payments\History as CustomerPaymentsHistory;
+use App\Livewire\Customer\Payments\RejectedPaymentHandler as CustomerPaymentsRejectedPaymentHandler;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -56,12 +59,27 @@ Route::middleware(['auth', 'customer'])->group(function () {
     Route::get('orders/{order}', CustomerOrdersShow::class)
         ->name('orders.show');
 
+    Route::get('orders/{order}/cancel', CustomerOrdersCancelOrder::class)
+        ->name('orders.cancel');
+
     // ── Payment Routes (Livewire) ────────────────────────────
+    Route::get('payments', CustomerPaymentsHistory::class)
+        ->name('payments.index');
+
     Route::get('orders/{order}/payments/create', CustomerPaymentsCreate::class)
-        ->name('orders.payments.create');
+        ->name('payments.create');
+
+    Route::get('payments/history', CustomerPaymentsHistory::class)
+        ->name('payments.history');
+
+    Route::get('orders/{order}/payments/history', CustomerPaymentsHistory::class)
+        ->name('payments.history.order');
+
+    Route::get('payments/{payment}/rejected', CustomerPaymentsRejectedPaymentHandler::class)
+        ->name('payments.rejected');
 
     Route::post('orders/{order}/payments', [PaymentController::class, 'store'])
-        ->name('orders.payments.store');
+        ->name('payments.store');
 
     // ── Appointment Routes ───────────────────────────────────
     Route::get('orders/{order}/appointments/create', [AppointmentController::class, 'create'])

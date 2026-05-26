@@ -1,10 +1,10 @@
-<div class="space-y-6">
-    <div>
+<div class="page-enter space-y-6">
+    <div data-reveal>
         <h1 class="text-2xl font-bold">Jadwal Appointment</h1>
         <p class="text-sm text-slate-500">Kelola agenda konsultasi dan fitting.</p>
     </div>
 
-    <div class="max-w-sm">
+    <div data-reveal data-reveal-delay="1" class="max-w-sm">
         <label class="text-sm font-semibold text-slate-700">Filter Tanggal</label>
         <input
             type="date"
@@ -25,7 +25,7 @@
                 <h2 class="text-lg font-semibold text-slate-800">{{ $date }}</h2>
 
                 @foreach ($items as $appointment)
-                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <div class="text-base font-semibold text-slate-900">

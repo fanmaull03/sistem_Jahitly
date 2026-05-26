@@ -1,21 +1,21 @@
-@props(['title', 'value', 'helper' => null, 'accent' => 'slate'])
+@props(['title', 'value', 'helper' => null, 'accent' => 'blue'])
 
 @php
     $accents = [
-        'slate' => 'border-slate-200 text-slate-900',
-        'blue' => 'border-blue-200 text-blue-900',
-        'amber' => 'border-amber-200 text-amber-900',
-        'emerald' => 'border-emerald-200 text-emerald-900',
-        'violet' => 'border-violet-200 text-violet-900',
+        'blue' => 'border-l-blue-500',
+        'amber' => 'border-l-amber-500',
+        'emerald' => 'border-l-emerald-500',
+        'violet' => 'border-l-violet-500',
+        'slate' => 'border-l-slate-500',
     ];
 
-    $accentClass = $accents[$accent] ?? $accents['slate'];
+    $accentClass = $accents[$accent] ?? $accents['blue'];
 @endphp
 
-<div class="rounded-2xl border {{ $accentClass }} bg-white p-5 shadow-sm">
-    <div class="text-sm font-semibold text-slate-500">{{ $title }}</div>
-    <div class="mt-3 text-3xl font-bold">{{ $value }}</div>
+<div class="hover-lift rounded-2xl border border-stone-200 bg-white p-6 shadow-sm border-l-4 {{ $accentClass }}">
+    <div class="text-sm font-semibold text-stone-500">{{ $title }}</div>
+    <div class="mt-3 text-4xl font-bold text-stone-900 sm:text-5xl">{{ $value }}</div>
     @if ($helper)
-        <div class="mt-2 text-sm text-slate-500">{{ $helper }}</div>
+        <div class="mt-2 text-sm text-stone-500">{{ $helper }}</div>
     @endif
 </div>

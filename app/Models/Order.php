@@ -26,6 +26,8 @@ class Order extends Model
         'estimated_finish_date',
         'order_number',
         'queue_position',
+        'cancelled_at',
+        'cancellation_reason',
     ];
 
     /**
@@ -38,6 +40,7 @@ class Order extends Model
         return [
             'estimated_price' => 'decimal:2',
             'estimated_finish_date' => 'date',
+            'cancelled_at' => 'datetime',
             'quantity' => 'integer',
             'queue_position' => 'integer',
         ];

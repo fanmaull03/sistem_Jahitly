@@ -1,5 +1,5 @@
-<div class="space-y-6">
-    <div>
+<div class="page-enter space-y-6">
+    <div data-reveal>
         <h1 class="text-2xl font-bold">Antrian Produksi</h1>
         <p class="text-sm text-slate-500">Urutkan pesanan yang sedang dikerjakan.</p>
     </div>
@@ -27,7 +27,7 @@
                             : ($isNear ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700');
                     @endphp
 
-                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <div class="text-base font-semibold text-slate-900">{{ $order->order_number }}</div>

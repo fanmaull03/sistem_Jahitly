@@ -1,12 +1,12 @@
-<div class="space-y-6">
-    <div>
+<div class="page-enter space-y-6">
+    <div data-reveal>
         <h1 class="text-2xl font-bold">Verifikasi Pembayaran</h1>
         <p class="text-sm text-slate-500">Periksa bukti pembayaran customer.</p>
     </div>
 
-    <div class="space-y-4">
+    <div data-reveal data-reveal-delay="1" class="space-y-4">
         @forelse ($payments as $payment)
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div class="text-base font-semibold text-slate-900">
@@ -46,8 +46,8 @@
             $isImage = in_array($extension, ['jpg', 'jpeg', 'png'], true);
         @endphp
 
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
-            <div class="w-full max-w-3xl rounded-2xl bg-white p-5 shadow-xl">
+        <div class="modal-backdrop-enter fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
+            <div class="modal-content-enter w-full max-w-3xl rounded-2xl bg-white p-5 shadow-xl">
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="text-lg font-semibold">Bukti Pembayaran</div>

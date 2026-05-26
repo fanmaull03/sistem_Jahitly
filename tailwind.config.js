@@ -9,6 +9,16 @@ export default {
         './resources/views/**/*.blade.php',
     ],
 
+    safelist: [
+        'page-enter',
+        'hover-lift',
+        'press-scale',
+        'slide-in-right',
+        'modal-backdrop-enter',
+        'modal-content-enter',
+        'row-enter',
+    ],
+
     theme: {
         extend: {
             fontFamily: {

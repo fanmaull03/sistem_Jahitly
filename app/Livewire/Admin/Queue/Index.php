@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Queue;
 
 use App\Models\Order;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
 class Index extends Component
@@ -12,11 +13,19 @@ class Index extends Component
      * @var list<string>
      */
     public array $queueStatuses = ['diproses', 'dijahit', 'finishing'];
+    public bool $hasQueuePositionColumn = false;
 
     public function mount(): void
     {
         if (! auth()->check() || ! auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
+        $this->hasQueuePositionColumn = Schema::hasColumn('orders', 'queue_position');
+
+        if (! $this->hasQueuePositionColumn) {
+            session()->flash('error', 'Kolom antrian belum tersedia. Jalankan migrasi database terlebih dahulu.');
+            return;
         }
 
         $this->ensureQueuePositions();
@@ -27,13 +36,15 @@ class Index extends Component
      */
     public function getQueueGroupsProperty(): array
     {
-        $orders = Order::with(['customer', 'service'])
+        $query = Order::with(['customer', 'service'])
             ->whereIn('status', $this->queueStatuses)
-            ->orderBy('status')
-            ->orderBy('queue_position')
-            ->orderBy('created_at')
-            ->get()
-            ->groupBy('status');
+            ->orderBy('status');
+
+        if ($this->hasQueuePositionColumn) {
+            $query->orderBy('queue_position');
+        }
+
+        $orders = $query->orderBy('created_at')->get()->groupBy('status');
 
         $groups = [];
         foreach ($this->queueStatuses as $status) {
@@ -55,6 +66,11 @@ class Index extends Component
 
     private function swapQueuePosition(int $orderId, string $direction): void
     {
+        if (! $this->hasQueuePositionColumn) {
+            session()->flash('error', 'Kolom antrian belum tersedia. Jalankan migrasi database terlebih dahulu.');
+            return;
+        }
+
         $order = Order::findOrFail($orderId);
 
         if (! in_array($order->status, $this->queueStatuses, true)) {
@@ -84,6 +100,10 @@ class Index extends Component
 
     private function ensureQueuePositions(): void
     {
+        if (! $this->hasQueuePositionColumn) {
+            return;
+        }
+
         foreach ($this->queueStatuses as $status) {
             $this->ensureQueuePositionsForStatus($status);
         }
@@ -91,6 +111,10 @@ class Index extends Component
 
     private function ensureQueuePositionsForStatus(string $status): void
     {
+        if (! $this->hasQueuePositionColumn) {
+            return;
+        }
+
         $orders = Order::where('status', $status)
             ->orderBy('queue_position')
             ->orderBy('created_at')

@@ -1,10 +1,10 @@
-<div class="space-y-6">
-    <div>
+<div class="page-enter space-y-6">
+    <div data-reveal>
         <h1 class="text-2xl font-bold">Manajemen Pesanan</h1>
         <p class="text-sm text-slate-500">Cari dan filter pesanan dengan cepat.</p>
     </div>
 
-    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div data-reveal data-reveal-delay="1" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <div>
             <label class="text-sm font-semibold text-slate-700">Cari Pesanan</label>
             <input
@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div data-reveal data-reveal-delay="2" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead class="bg-slate-50 text-slate-600">
