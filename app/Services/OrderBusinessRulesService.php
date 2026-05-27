@@ -142,7 +142,7 @@ class OrderBusinessRulesService
      */
     public function calculateEstimation(Order $order): array
     {
-        $order->loadMissing('service');
+        $order->loadMissing(['service', 'fabric']);
 
         $service = $order->service;
 
@@ -164,8 +164,16 @@ class OrderBusinessRulesService
         // Tambahan hari karena antrian
         $queueDays = (int) ceil($activeOrderCount * $averageDuration);
 
-        // Tambahan 7 hari jika bahan PO
-        $poDays = ($order->material_status === 'po') ? 7 : 0;
+        // Tambahan hari jika bahan PO
+        // Prioritas: gunakan po_days dari fabric jika ada, fallback ke 7 hari
+        $poDays = 0;
+        if ($order->material_status === 'po') {
+            if ($order->fabric && $order->fabric->po_days) {
+                $poDays = $order->fabric->po_days;
+            } else {
+                $poDays = 7;
+            }
+        }
 
         $totalDays = $baseDuration + $queueDays + $poDays;
 

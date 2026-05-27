@@ -7,20 +7,21 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
-class AuthenticatedSessionController extends Controller
+class AdminAuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Display the admin login view.
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.admin-login');
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Handle an incoming authentication request for admin.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -28,20 +29,20 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        // Tolak jika admin mencoba login di form customer
-        if ($user && $user->isAdmin()) {
+        // Tolak jika bukan admin
+        if (!$user || !$user->isAdmin()) {
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'email' => trans('Silakan gunakan halaman login khusus Admin untuk masuk.'),
+            throw ValidationException::withMessages([
+                'email' => trans('Akses ditolak. Anda tidak memiliki hak akses admin.'),
             ]);
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('orders.index', absolute: false));
+        return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
     /**
@@ -55,6 +56,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/admin/login');
     }
 }

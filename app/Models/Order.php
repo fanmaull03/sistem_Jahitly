@@ -17,6 +17,7 @@ class Order extends Model
     protected $fillable = [
         'customer_id',
         'service_id',
+        'fabric_id',
         'status',
         'material_source',
         'material_status',
@@ -67,6 +68,14 @@ class Order extends Model
     }
 
     /**
+     * Order terkait dengan satu bahan kain (opsional).
+     */
+    public function fabric(): BelongsTo
+    {
+        return $this->belongsTo(Fabric::class);
+    }
+
+    /**
      * Order memiliki banyak status log.
      */
     public function statusLogs(): HasMany
@@ -96,6 +105,14 @@ class Order extends Model
     public function appointment(): HasOne
     {
         return $this->hasOne(Appointment::class);
+    }
+
+    /**
+     * Order memiliki satu testimonial.
+     */
+    public function testimonial(): HasOne
+    {
+        return $this->hasOne(Testimonial::class, 'order_id');
     }
 
     // ──────────────────────────────────────────────

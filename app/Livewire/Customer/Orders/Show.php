@@ -10,15 +10,15 @@ class Show extends Component
 {
     public Order $order;
     /**
-     * @var array<int, array{key: string, label: string}>
+     * @var array<int, array{key: string, label: string, description: string}>
      */
     public array $statusSteps = [
-        ['key' => 'menunggu_appointment', 'label' => 'Menunggu Appointment'],
-        ['key' => 'menunggu_bahan', 'label' => 'Menunggu Bahan'],
-        ['key' => 'diproses', 'label' => 'Diproses'],
-        ['key' => 'dijahit', 'label' => 'Dijahit'],
-        ['key' => 'finishing', 'label' => 'Finishing'],
-        ['key' => 'selesai', 'label' => 'Selesai'],
+        ['key' => 'menunggu_appointment', 'label' => 'Pesanan Diterima', 'description' => 'Pesanan Anda telah diterima dan sedang diproses.'],
+        ['key' => 'menunggu_bahan', 'label' => 'Fitting & Ukur', 'description' => 'Proses pengukuran dan fitting di studio.'],
+        ['key' => 'diproses', 'label' => 'Antrian Produksi', 'description' => 'Bahan disiapkan dan dipotong.'],
+        ['key' => 'dijahit', 'label' => 'Proses Jahit', 'description' => 'Pakaian Anda sedang ditangani oleh Penjahit Ahli kami.'],
+        ['key' => 'finishing', 'label' => 'Finishing & QC', 'description' => 'Pengecekan kualitas dan finishing akhir.'],
+        ['key' => 'selesai', 'label' => 'Siap Diambil', 'description' => 'Pesanan selesai dan siap untuk diambil.'],
     ];
     public int $currentStepIndex = 0;
     public int $progressPercent = 0;
@@ -34,7 +34,7 @@ class Show extends Component
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        $this->order = $order->load(['service', 'statusLogs.user', 'designFiles', 'payments']);
+        $this->order = $order->load(['service', 'fabric', 'statusLogs.user', 'designFiles', 'payments']);
         $this->hasPendingPayment = $this->order->payments
             ->where('status', 'menunggu_verifikasi')
             ->isNotEmpty();

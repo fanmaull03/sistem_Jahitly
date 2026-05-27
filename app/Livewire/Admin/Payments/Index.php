@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Payments;
 
 use App\Models\Payment;
+use App\Notifications\PaymentStatusUpdated;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -60,7 +61,7 @@ class Index extends Component
 
     public function approvePayment(int $paymentId): void
     {
-        $payment = Payment::with('order.payments')->findOrFail($paymentId);
+        $payment = Payment::with(['order.payments', 'customer'])->findOrFail($paymentId);
 
         if ($payment->status !== 'menunggu_verifikasi') {
             session()->flash('error', 'Pembayaran sudah diproses.');
@@ -73,6 +74,10 @@ class Index extends Component
             'verified_at' => now(),
             'rejection_note' => null,
         ]);
+
+        if ($payment->customer) {
+            $payment->customer->notify(new PaymentStatusUpdated($payment, $payment->status));
+        }
 
         $order = $payment->order;
         $totalVerified = $order->payments
@@ -104,7 +109,7 @@ class Index extends Component
             'rejectionNote.max' => 'Alasan penolakan maksimal 2000 karakter.',
         ]);
 
-        $payment = Payment::findOrFail($paymentId);
+        $payment = Payment::with(['order', 'customer'])->findOrFail($paymentId);
 
         if ($payment->status !== 'menunggu_verifikasi') {
             session()->flash('error', 'Pembayaran sudah diproses.');
@@ -117,6 +122,10 @@ class Index extends Component
             'verified_by' => auth()->id(),
             'verified_at' => now(),
         ]);
+
+        if ($payment->customer) {
+            $payment->customer->notify(new PaymentStatusUpdated($payment, $payment->status));
+        }
 
         $this->closeProof();
         session()->flash('success', 'Pembayaran ditolak. Customer akan melihat alasan penolakan.');

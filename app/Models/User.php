@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'profile_photo_path',
     ];
 
     /**
@@ -96,5 +97,13 @@ class User extends Authenticatable
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class, 'customer_id');
+    }
+
+    /**
+     * User memiliki banyak testimonial.
+     */
+    public function testimonials(): HasMany
+    {
+        return $this->hasMany(Testimonial::class, 'customer_id');
     }
 }

@@ -1,6 +1,13 @@
 @php
     $user = auth()->user();
     $isAdmin = $user && $user->isAdmin();
+    $notificationCount = $user ? $user->unreadNotifications()->count() : 0;
+    $latestNotifications = $user
+        ? $user->notifications()->latest()->take(5)->get()
+        : collect();
+    $profilePhotoUrl = $user && $user->profile_photo_path
+        ? asset('storage/' . $user->profile_photo_path)
+        : null;
     $navItems = $isAdmin
         ? [
             ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
@@ -16,7 +23,7 @@
     $homeRoute = $isAdmin ? 'admin.dashboard' : 'orders.index';
 @endphp
 
-<nav x-data="{ open: false, menuOpen: false, logoutConfirm: false, logoutTarget: null }" class="fixed inset-x-0 top-0 z-50">
+<nav x-data="{ open: false, menuOpen: false, logoutConfirm: false, logoutTarget: null, notifOpen: false }" class="fixed inset-x-0 top-0 z-50">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
         <div class="mt-4 flex items-center justify-between rounded-2xl border border-white/20 bg-white/80 px-4 py-3 shadow-sm backdrop-blur">
             <a href="{{ route($homeRoute) }}" class="text-lg font-bold tracking-tight text-stone-900">
@@ -35,17 +42,72 @@
             </div>
 
             <div class="hidden items-center gap-3 md:flex">
+                <div class="relative" @click.away="notifOpen = false">
+                    <button
+                        type="button"
+                        @click="notifOpen = !notifOpen"
+                        class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:text-stone-900"
+                        aria-label="Notifikasi"
+                    >
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a3 3 0 006 0" />
+                        </svg>
+                        @if ($notificationCount > 0)
+                            <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-amber-500"></span>
+                        @endif
+                    </button>
+
+                    <div
+                        x-cloak
+                        x-show="notifOpen"
+                        x-transition
+                        class="absolute right-0 mt-2 w-72 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
+                    >
+                        <div class="text-xs font-semibold uppercase tracking-wide text-stone-500">Notifikasi</div>
+                        <div class="mt-3 space-y-2">
+                            @forelse ($latestNotifications as $notification)
+                                @php
+                                    $url = $notification->data['url'] ?? null;
+                                @endphp
+                                <div class="rounded-xl border border-stone-100 bg-stone-50 p-3 text-xs text-stone-700">
+                                    @if ($url)
+                                        <a href="{{ $url }}" class="font-semibold text-stone-900 hover:text-blue-700">
+                                            {{ $notification->data['message'] ?? 'Notifikasi baru' }}
+                                        </a>
+                                    @else
+                                        <div class="font-semibold text-stone-900">
+                                            {{ $notification->data['message'] ?? 'Notifikasi baru' }}
+                                        </div>
+                                    @endif
+                                    <div class="mt-1 text-[11px] text-stone-400">
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="rounded-xl border border-stone-100 bg-stone-50 p-3 text-xs text-stone-600">
+                                    Belum ada notifikasi baru.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
                 <div class="relative" @click.away="menuOpen = false">
                     <button
                         type="button"
                         @click="menuOpen = !menuOpen"
-                        class="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:text-stone-900"
+                        class="inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-blue-600 text-blue-600 transition hover:bg-blue-50"
                         aria-label="User menu"
                     >
-                        <span class="max-w-[140px] truncate">{{ $user->name }}</span>
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
+                        @if ($profilePhotoUrl)
+                            <img src="{{ $profilePhotoUrl }}" alt="Foto profil" class="h-full w-full object-cover" />
+                        @else
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11a4 4 0 100-8 4 4 0 000 8z" />
+                            </svg>
+                        @endif
                     </button>
 
                     <div

@@ -57,6 +57,36 @@
                         <p class="mt-1">{{ $order->notes }}</p>
                     </div>
                 @endif
+                @if ($order->fabric)
+                    <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <div class="text-sm font-semibold text-slate-900">Bahan Kain Dipilih</div>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2 text-sm">
+                            <div>
+                                <span class="text-slate-500">Nama:</span>
+                                <span class="font-medium text-slate-900">{{ $order->fabric->name }}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500">Warna:</span>
+                                <span class="font-medium text-slate-900">{{ $order->fabric->color }}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500">Kategori:</span>
+                                <span class="font-medium text-slate-900">{{ $order->fabric->category_label }}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500">Harga:</span>
+                                <span class="font-medium text-slate-900">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}/m</span>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            @if ($order->fabric->stock_status === 'tersedia')
+                                <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Tersedia</span>
+                            @else
+                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">PO ~{{ $order->fabric->po_days }} hari</span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             </section>
 
             <section data-reveal data-reveal-delay="3" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

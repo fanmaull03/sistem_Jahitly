@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Orders;
 use App\Models\DesignFile;
 use App\Models\Order;
 use App\Models\OrderStatusLog;
+use App\Notifications\OrderStatusUpdated;
 use App\Services\OrderBusinessRulesService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -129,6 +130,13 @@ class Show extends Component
         $this->refreshOrder();
         $this->syncBlockingReasons();
 
+        $customer = $this->order->customer;
+        if ($customer) {
+            $message = 'Pesanan #' . $this->order->order_number
+                . ' status diperbarui menjadi ' . $this->order->status . '.';
+            $customer->notify(new OrderStatusUpdated($this->order, $message));
+        }
+
         session()->flash('success', 'Status pesanan berhasil diperbarui.');
     }
 
@@ -197,6 +205,7 @@ class Show extends Component
         $this->order = $this->order->fresh([
             'customer',
             'service',
+            'fabric',
             'statusLogs.user',
             'designFiles',
             'payments',

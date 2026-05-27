@@ -21,6 +21,7 @@
                     <nav class="hidden items-center gap-6 text-sm font-semibold text-stone-700 md:flex">
                         <a href="#layanan" class="hover:text-stone-900">Layanan</a>
                         <a href="#cara-kerja" class="hover:text-stone-900">Cara Kerja</a>
+                        <a href="#testimoni" class="hover:text-stone-900">Testimoni</a>
                         <a href="#faq" class="hover:text-stone-900">FAQ</a>
                     </nav>
                     <div class="hidden items-center gap-4 md:flex">
@@ -45,6 +46,7 @@
                     <nav class="flex flex-col gap-3 text-sm font-semibold text-stone-700">
                         <a href="#layanan" class="hover:text-stone-900">Layanan</a>
                         <a href="#cara-kerja" class="hover:text-stone-900">Cara Kerja</a>
+                        <a href="#testimoni" class="hover:text-stone-900">Testimoni</a>
                         <a href="#faq" class="hover:text-stone-900">FAQ</a>
                         <div class="flex items-center gap-3 pt-2">
                             <a href="{{ route('login') }}" class="text-sm font-semibold text-stone-700 hover:text-stone-900">Masuk</a>
@@ -234,6 +236,52 @@
             </div>
         </section>
 
+        <section id="testimoni" class="bg-amber-50/70 py-20">
+            <div data-reveal class="mx-auto max-w-6xl px-4 sm:px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold">Apa Kata Pelanggan Kami?</h2>
+                </div>
+
+                <div class="mt-12 grid gap-6 md:grid-cols-3">
+                    @foreach ([
+                        ['name' => 'Ibu Sari', 'desc' => 'Jahitannya sangat rapi dan tepat waktu. Paling suka karena bisa pantau dari HP!'],
+                        ['name' => 'Pak Budi', 'desc' => 'Vermak jas di sini hasilnya pas banget. Gak kelihatan kalau habis dipermak.'],
+                        ['name' => 'Maya Putri', 'desc' => 'Seragam kantor pesanan kami selesai lebih cepat dari jadwal. Sangat profesional!'],
+                    ] as $testimoni)
+                        <article data-reveal class="rounded-2xl border border-stone-200 bg-white p-6 text-center shadow-sm">
+                            <div class="flex items-center justify-center gap-1 text-amber-500">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
+                                </svg>
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
+                                </svg>
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
+                                </svg>
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
+                                </svg>
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
+                                </svg>
+                            </div>
+                            <p class="mt-4 text-sm italic text-stone-600">"{{ $testimoni['desc'] }}"</p>
+                            <div class="mt-6 flex flex-col items-center">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-stone-100 text-stone-500">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11a4 4 0 100-8 4 4 0 000 8z" />
+                                    </svg>
+                                </div>
+                                <div class="mt-3 text-sm font-semibold text-stone-900">{{ $testimoni['name'] }}</div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
         <section id="faq" class="bg-white py-20">
             <div data-reveal class="mx-auto max-w-4xl px-4 sm:px-6">
                 <div class="text-center">
@@ -264,6 +312,7 @@
                 </div>
             </div>
         </section>
+
 
         <footer class="bg-stone-900 py-10 text-stone-300">
             <div data-reveal class="mx-auto flex max-w-6xl flex-col gap-4 px-4 sm:px-6 md:flex-row md:items-center md:justify-between">

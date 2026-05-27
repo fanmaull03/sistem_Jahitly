@@ -10,7 +10,7 @@
     <!-- Header -->
     <div data-reveal class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-stone-900">Riwayat Pembayaran</h1>
+            <h1 class="text-3xl font-bold text-stone-900">Riwayat Pembayaran</h1>
             <p class="mt-1 text-sm text-stone-600">
                 @if ($order)
                     Pesanan #{{ $order->order_number }} - {{ $order->service->name }}
@@ -21,10 +21,13 @@
         </div>
         <a 
             href="{{ $order ? route('orders.show', $order) : route('orders.index') }}" 
-            class="text-sm font-semibold text-stone-500 hover:text-stone-900" 
+            class="inline-flex items-center gap-2 text-sm font-semibold text-stone-500 transition hover:text-stone-900 sm:pr-4" 
             wire:navigate
         >
-            &larr; Kembali
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Kembali
         </a>
     </div>
 
@@ -34,9 +37,9 @@
             <button
                 wire:click="$set('statusFilter', '{{ $value }}')"
                 @class([
-                    'rounded-full px-4 py-2 text-sm font-semibold transition',
-                    'bg-stone-900 text-white' => $statusFilter === $value,
-                    'border border-stone-300 text-stone-700 hover:border-stone-400 hover:bg-stone-50' => $statusFilter !== $value,
+                    'rounded-full px-5 py-1.5 text-sm font-semibold transition-all duration-200',
+                    'bg-[#F8A01A] text-stone-900 shadow-sm' => $statusFilter === $value,
+                    'bg-stone-200 text-stone-500 hover:bg-stone-300 hover:text-stone-700' => $statusFilter !== $value,
                 ])
             >
                 {{ $label }}
@@ -125,7 +128,7 @@
                                         <div class="flex gap-3">
                                             <button
                                                 onclick="document.getElementById('rejectionModal-{{ $payment->id }}').close()"
-                                                class="flex-1 rounded-lg border border-stone-300 px-4 py-2 font-semibold text-stone-700 hover:bg-stone-50"
+                                                class="flex-1 rounded-full border border-stone-300 px-4 py-2 font-semibold text-stone-700 hover:bg-stone-50"
                                             >
                                                 Tutup
                                             </button>
@@ -133,7 +136,7 @@
                                                 href="{{ route('orders.show', $payment->order) }}"
                                                 wire:navigate
                                                 onclick="document.getElementById('rejectionModal-{{ $payment->id }}').close()"
-                                                class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-center font-semibold text-white hover:bg-blue-700"
+                                                class="flex-1 rounded-full bg-blue-600 px-4 py-2 text-center font-semibold text-white hover:bg-blue-700"
                                             >
                                                 Bayar Ulang
                                             </a>
@@ -190,7 +193,7 @@
                                 <a
                                     href="{{ route('orders.show', $payment->order) }}"
                                     wire:navigate
-                                    class="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-blue-700"
+                                    class="flex-1 rounded-full bg-blue-600 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-blue-700"
                                 >
                                     Bayar Ulang
                                 </a>
@@ -198,7 +201,7 @@
                                 <a
                                     href="{{ Storage::url($payment->proof_file_path) }}"
                                     target="_blank"
-                                    class="flex-1 rounded-lg bg-stone-200 px-3 py-2 text-center text-xs font-semibold text-stone-800 hover:bg-stone-300"
+                                    class="flex-1 rounded-full bg-stone-200 px-3 py-2 text-center text-xs font-semibold text-stone-800 hover:bg-stone-300"
                                 >
                                     Unduh Bukti
                                 </a>
@@ -206,7 +209,7 @@
                             <a
                                 href="{{ route('orders.show', $payment->order) }}"
                                 wire:navigate
-                                class="flex-1 rounded-lg border border-stone-300 px-3 py-2 text-center text-xs font-semibold text-stone-700 hover:bg-stone-50"
+                                class="flex-1 rounded-full border border-stone-300 px-3 py-2 text-center text-xs font-semibold text-stone-700 hover:bg-stone-50"
                             >
                                 Pesanan
                             </a>

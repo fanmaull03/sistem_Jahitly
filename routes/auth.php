@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AdminAuthenticatedSessionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -12,6 +13,11 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
+    // Admin Auth
+    Route::get('admin/login', [AdminAuthenticatedSessionController::class, 'create'])
+        ->name('admin.login');
+        
+    Route::post('admin/login', [AdminAuthenticatedSessionController::class, 'store']);
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 

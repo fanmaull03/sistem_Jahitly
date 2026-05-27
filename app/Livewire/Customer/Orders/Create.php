@@ -3,11 +3,13 @@
 namespace App\Livewire\Customer\Orders;
 
 use App\Models\DesignFile;
+use App\Models\Fabric;
 use App\Models\Order;
 use App\Models\OrderStatusLog;
 use App\Models\Service;
 use App\Services\OrderBusinessRulesService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -17,12 +19,16 @@ class Create extends Component
 
     public $services;
     public ?int $service_id = null;
-    public int $quantity = 1;
+    public ?int $quantity = 1;
     public ?string $material_source = null;
     public ?string $material_status = null;
+    public ?int $fabric_id = null;
     public ?string $notes = null;
     public $design_file;
     public float $estimated_price = 0.0;
+
+    /** @var Collection<int, Fabric> */
+    public $fabrics;
 
     public function mount(): void
     {
@@ -31,6 +37,7 @@ class Create extends Component
         }
 
         $this->services = Service::query()->orderBy('name')->get();
+        $this->fabrics = collect();
         $this->syncEstimatedPrice();
     }
 
@@ -39,7 +46,7 @@ class Create extends Component
      */
     protected function rules(): array
     {
-        return [
+        $rules = [
             'service_id' => ['required', 'exists:services,id'],
             'quantity' => ['required', 'integer', 'min:1'],
             'notes' => ['nullable', 'string', 'max:2000'],
@@ -49,6 +56,15 @@ class Create extends Component
                 ? ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120']
                 : ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
         ];
+
+        // Jika sumber bahan dari penjahit, fabric_id wajib dipilih
+        if ($this->material_source === 'jasa') {
+            $rules['fabric_id'] = ['required', 'exists:fabrics,id'];
+        } else {
+            $rules['fabric_id'] = ['nullable'];
+        }
+
+        return $rules;
     }
 
     /**
@@ -65,6 +81,8 @@ class Create extends Component
             'notes.max' => 'Catatan maksimal 2000 karakter.',
             'material_source.in' => 'Sumber bahan harus "customer" atau "jasa".',
             'material_status.in' => 'Status bahan harus "ready" atau "po".',
+            'fabric_id.required' => 'Pilih bahan yang diinginkan dari daftar.',
+            'fabric_id.exists' => 'Bahan yang dipilih tidak valid.',
             'design_file.required' => 'File desain harus diunggah untuk layanan custom.',
             'design_file.file' => 'File desain harus berupa file yang valid.',
             'design_file.mimes' => 'File desain harus berformat JPG atau PNG.',
@@ -79,11 +97,49 @@ class Create extends Component
             $this->resetValidation('design_file');
         }
 
+        // Reset material source saat ganti layanan
+        if ($this->selectedServiceType() === 'vermak') {
+            $this->material_source = null;
+            $this->fabric_id = null;
+            $this->material_status = null;
+            $this->fabrics = collect();
+        }
+
         $this->syncEstimatedPrice();
     }
 
     public function updatedQuantity(): void
     {
+        $this->syncEstimatedPrice();
+    }
+
+    public function updatedMaterialSource(): void
+    {
+        $this->fabric_id = null;
+        $this->material_status = null;
+
+        if ($this->material_source === 'jasa') {
+            // Load semua bahan yang tersedia
+            $this->fabrics = Fabric::query()->orderBy('name')->orderBy('color')->get();
+        } else {
+            $this->fabrics = collect();
+        }
+
+        $this->syncEstimatedPrice();
+    }
+
+    public function updatedFabricId(): void
+    {
+        if ($this->fabric_id && $this->material_source === 'jasa') {
+            $fabric = $this->fabrics->firstWhere('id', $this->fabric_id);
+            if ($fabric) {
+                // Auto-set material_status berdasarkan stock_status bahan
+                $this->material_status = $fabric->stock_status === 'tersedia' ? 'ready' : 'po';
+            }
+        } else {
+            $this->material_status = null;
+        }
+
         $this->syncEstimatedPrice();
     }
 
@@ -108,6 +164,7 @@ class Create extends Component
         $order = Order::create([
             'customer_id' => auth()->id(),
             'service_id' => $validated['service_id'],
+            'fabric_id' => ($this->material_source === 'jasa') ? $validated['fabric_id'] : null,
             'order_number' => $orderNumber,
             'status' => $initialStatus,
             'quantity' => $validated['quantity'],
@@ -152,6 +209,12 @@ class Create extends Component
         return $service && $service->type === 'custom';
     }
 
+    private function selectedServiceType(): ?string
+    {
+        $service = $this->services?->firstWhere('id', $this->service_id);
+        return $service?->type;
+    }
+
     private function syncEstimatedPrice(): void
     {
         $service = $this->services?->firstWhere('id', $this->service_id);
@@ -167,10 +230,16 @@ class Create extends Component
 
     public function render(): View
     {
+        $selectedFabric = null;
+        if ($this->fabric_id && $this->fabrics->isNotEmpty()) {
+            $selectedFabric = $this->fabrics->firstWhere('id', $this->fabric_id);
+        }
+
         return view('livewire.customer.orders.create', [
             'services' => $this->services,
             'requiresDesignFile' => $this->requiresDesignFile(),
             'selectedService' => $this->services?->firstWhere('id', $this->service_id),
+            'selectedFabric' => $selectedFabric,
         ])->layout('layouts.app');
     }
 }

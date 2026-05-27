@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Appointments;
 
 use App\Models\Appointment;
 use App\Models\OrderStatusLog;
+use App\Notifications\OrderStatusUpdated;
 use App\Services\OrderBusinessRulesService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -56,7 +57,8 @@ class Index extends Component
 
     public function complete(int $appointmentId): void
     {
-        $appointment = Appointment::with(['order', 'order.payments', 'order.service'])->findOrFail($appointmentId);
+        $appointment = Appointment::with(['order', 'order.customer', 'order.payments', 'order.service'])
+            ->findOrFail($appointmentId);
 
         if ($appointment->status !== 'terkonfirmasi') {
             session()->flash('error', 'Hanya appointment berstatus terkonfirmasi yang dapat diselesaikan.');
@@ -79,6 +81,11 @@ class Index extends Component
                 'changed_by' => auth()->id(),
                 'notes' => 'Status otomatis berubah setelah appointment selesai dan semua syarat terpenuhi.',
             ]);
+
+            if ($order->customer) {
+                $message = 'Pesanan #' . $order->order_number . ' status diperbarui menjadi diproses.';
+                $order->customer->notify(new OrderStatusUpdated($order, $message));
+            }
 
             $message .= ' Pesanan ' . $order->order_number . ' otomatis diproses.';
         } else {

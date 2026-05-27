@@ -1,23 +1,53 @@
 <section>
     <header>
-        <h2 class="text-lg font-bold text-stone-900">
+        <h2 class="text-base font-semibold text-stone-900">
             Informasi Profil
         </h2>
-
-        <p class="mt-1 text-sm text-stone-500">
-            Perbarui informasi akun dan kontak Anda agar kami mudah menghubungi Anda terkait pesanan jahitan.
-        </p>
     </header>
+
+    @php
+        $profilePhotoUrl = $user->profile_photo_path
+            ? asset('storage/' . $user->profile_photo_path)
+            : null;
+        $profileInitial = strtoupper(substr($user->name ?? 'U', 0, 1));
+    @endphp
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-5">
+    <form
+        method="post"
+        action="{{ route('profile.update') }}"
+        enctype="multipart/form-data"
+        class="mt-6 grid gap-4 sm:grid-cols-2"
+    >
         @csrf
         @method('patch')
 
-        <div>
+        <div class="sm:col-span-2 flex flex-wrap items-center gap-4">
+            <div class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-stone-200 bg-stone-50">
+                @if ($profilePhotoUrl)
+                    <img src="{{ $profilePhotoUrl }}" alt="Foto profil" class="h-full w-full object-cover" />
+                @else
+                    <span class="text-lg font-semibold text-stone-500">{{ $profileInitial }}</span>
+                @endif
+            </div>
+            <div class="flex-1">
+                <x-input-label for="profile_photo" :value="__('Foto Profil')" class="text-sm font-semibold text-stone-700" />
+                <input
+                    id="profile_photo"
+                    name="profile_photo"
+                    type="file"
+                    accept="image/*"
+                    class="mt-2 block w-full rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm text-stone-700 file:mr-3 file:rounded-lg file:border-0 file:bg-stone-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-stone-700 hover:file:bg-stone-200"
+                />
+                <x-input-error class="mt-2" :messages="$errors->get('profile_photo')" />
+                <p class="mt-2 text-xs text-stone-500">PNG/JPG maksimal 2MB.</p>
+            </div>
+        </div>
+
+        <div class="sm:col-span-2">
             <x-input-label for="name" :value="__('Nama Lengkap')" class="text-sm font-semibold text-stone-700" />
             <x-text-input
                 id="name"
@@ -67,7 +97,7 @@
         </div>
 
         <div>
-            <x-input-label for="phone" :value="__('Nomor WhatsApp / Telepon')" class="text-sm font-semibold text-stone-700" />
+            <x-input-label for="phone" :value="__('Nomor WhatsApp')" class="text-sm font-semibold text-stone-700" />
             <x-text-input
                 id="phone"
                 name="phone"
@@ -75,12 +105,11 @@
                 class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 :value="old('phone', $user->phone ?? '')"
                 autocomplete="tel"
-                placeholder="Contoh: 0812 3456 7890"
+                placeholder="081234567890"
             />
-            <p class="mt-2 text-xs text-stone-500">Penting untuk konfirmasi fitting/bahan.</p>
         </div>
 
-        <div>
+        <div class="sm:col-span-2">
             <x-input-label for="address" :value="__('Alamat Lengkap')" class="text-sm font-semibold text-stone-700" />
             <textarea
                 id="address"
@@ -91,23 +120,23 @@
             >{{ old('address', $user->address ?? '') }}</textarea>
         </div>
 
-        <div class="flex items-center gap-4">
-            <button
-                type="submit"
-                class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-            >
-                Simpan Perubahan
-            </button>
-
+        <div class="sm:col-span-2 flex items-center justify-end gap-4">
             @if (session('status') === 'profile-updated')
                 <p
                     x-data="{ show: true }"
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-stone-500"
+                    class="text-xs text-stone-500"
                 >Berhasil disimpan.</p>
             @endif
+
+            <button
+                type="submit"
+                class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            >
+                Simpan Perubahan
+            </button>
         </div>
     </form>
 </section>

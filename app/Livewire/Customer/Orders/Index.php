@@ -31,11 +31,7 @@ class Index extends Component
     {
         return [
             'all' => 'Semua',
-            'menunggu_appointment' => 'Menunggu Appointment',
-            'menunggu_bahan' => 'Menunggu Bahan',
-            'diproses' => 'Diproses',
-            'dijahit' => 'Dijahit',
-            'finishing' => 'Finishing',
+            'proses' => 'Sedang Proses',
             'selesai' => 'Selesai',
         ];
     }
@@ -47,8 +43,10 @@ class Index extends Component
             ->with(['service', 'payments'])
             ->latest();
 
-        if ($this->statusFilter !== 'all') {
-            $query->where('status', $this->statusFilter);
+        if ($this->statusFilter === 'proses') {
+            $query->whereIn('status', ['menunggu_appointment', 'menunggu_bahan', 'diproses', 'dijahit', 'finishing']);
+        } elseif ($this->statusFilter === 'selesai') {
+            $query->where('status', 'selesai');
         }
 
         return $query->paginate(10);

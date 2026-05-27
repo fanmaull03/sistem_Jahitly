@@ -63,6 +63,12 @@
                         </svg>
                         Verifikasi Pembayaran
                     </a>
+                    <a href="{{ route('admin.fabrics.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-stone-800 {{ request()->routeIs('admin.fabrics.*') ? 'bg-stone-800 text-white' : '' }}" wire:navigate>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        Kelola Bahan
+                    </a>
                 </nav>
                 <div class="mt-auto border-t border-stone-800 px-4 py-4">
                     <form method="POST" action="{{ route('logout') }}" x-ref="logoutMobileForm">
@@ -115,6 +121,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
                             </svg>
                             Verifikasi Pembayaran
+                        </a>
+                        <a href="{{ route('admin.fabrics.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-stone-800 {{ request()->routeIs('admin.fabrics.*') ? 'bg-stone-800 text-white' : '' }}" wire:navigate>
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            Kelola Bahan
                         </a>
                     </nav>
                     <div class="mt-auto border-t border-stone-800 px-4 py-4">
