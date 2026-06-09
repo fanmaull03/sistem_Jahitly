@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Orders;
 
 use App\Models\Order;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -11,6 +12,7 @@ class Index extends Component
 {
     use WithPagination;
 
+    #[Url]
     public string $search = '';
     public string $statusFilter = 'all';
     public string $serviceTypeFilter = 'all';

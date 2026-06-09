@@ -163,8 +163,12 @@
                                     @endisset
                                 </div>
                             </div>
-                            <div class="hidden lg:block text-xs text-stone-500">
-                                Admin Panel
+                            <div class="hidden sm:block text-xs text-stone-500">
+                                @isset($actions)
+                                    {{ $actions }}
+                                @else
+                                    Admin Panel
+                                @endisset
                             </div>
                         </div>
                     </header>
