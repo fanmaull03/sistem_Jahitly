@@ -30,6 +30,7 @@ class Index extends Component
     public string $stock_status = 'tersedia';
     public ?int $po_days = null;
     public string $description = '';
+    public string $stock_meters = '0';
 
     public function mount(): void
     {
@@ -48,6 +49,7 @@ class Index extends Component
             'category' => ['required', 'in:katun,polyester,linen,sutra,denim,sifon,wol,lainnya'],
             'color' => ['required', 'string', 'max:100'],
             'price_per_meter' => ['required', 'numeric', 'min:0'],
+            'stock_meters' => ['required', 'numeric', 'min:0'],
             'stock_status' => ['required', 'in:tersedia,po'],
             'po_days' => ['nullable', 'integer', 'min:1', 'max:90'],
             'description' => ['nullable', 'string', 'max:2000'],
@@ -67,6 +69,9 @@ class Index extends Component
             'price_per_meter.required' => 'Harga per meter harus diisi.',
             'price_per_meter.numeric' => 'Harga harus berupa angka.',
             'price_per_meter.min' => 'Harga tidak boleh negatif.',
+            'stock_meters.required' => 'Stok meter harus diisi.',
+            'stock_meters.numeric' => 'Stok meter harus berupa angka.',
+            'stock_meters.min' => 'Stok meter tidak boleh negatif.',
             'stock_status.required' => 'Status stok harus dipilih.',
             'stock_status.in' => 'Status stok tidak valid.',
             'po_days.integer' => 'Hari PO harus berupa angka.',
@@ -111,6 +116,7 @@ class Index extends Component
         $this->category = $fabric->category;
         $this->color = $fabric->color;
         $this->price_per_meter = (string) $fabric->price_per_meter;
+        $this->stock_meters = (string) $fabric->stock_meters;
         $this->stock_status = $fabric->stock_status;
         $this->po_days = $fabric->po_days;
         $this->description = $fabric->description ?? '';
@@ -207,6 +213,7 @@ class Index extends Component
         $this->category = '';
         $this->color = '';
         $this->price_per_meter = '';
+        $this->stock_meters = '0';
         $this->stock_status = 'tersedia';
         $this->po_days = null;
         $this->description = '';

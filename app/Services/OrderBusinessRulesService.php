@@ -17,6 +17,19 @@ class OrderBusinessRulesService
      */
     private const REQUIRES_APPOINTMENT_TYPES = ['seragam', 'custom'];
 
+    /**
+     * Jam kerja workshop.
+     */
+    private const OPEN_HOUR = 8;   // 08:00
+    private const CLOSE_HOUR = 19; // 19:00
+    private const BREAK_START = 12; // 12:00
+    private const BREAK_END = 13;   // 13:00
+
+    /**
+     * Durasi satu appointment dalam jam.
+     */
+    private const APPOINTMENT_DURATION_HOURS = 1;
+
     // ──────────────────────────────────────────────────────────
     // 1. canMoveToProcessing
     // ──────────────────────────────────────────────────────────
@@ -135,7 +148,7 @@ class OrderBusinessRulesService
      *   + (7 hari tambahan jika material_status = "po")
      *
      * Formula harga:
-     *   base_price × quantity
+     *   base_price × quantity + (fabric price_per_meter × quantity jika ada)
      *
      * @param  Order  $order  Pesanan yang akan dihitung (relasi service harus tersedia)
      * @return array{estimated_price: float, estimated_finish_date: \Carbon\Carbon}
@@ -192,36 +205,144 @@ class OrderBusinessRulesService
     }
 
     // ──────────────────────────────────────────────────────────
-    // 4. isAppointmentSlotAvailable
+    // 4. Appointment Slot Management
     // ──────────────────────────────────────────────────────────
 
     /**
      * Mengecek apakah slot waktu appointment tersedia.
      *
-     * Setiap appointment diasumsikan memakan waktu 1 jam.
-     * Slot dianggap tidak tersedia jika ada appointment lain yang
-     * waktunya overlap (dalam rentang ±1 jam) dan belum dibatalkan.
+     * Setiap appointment memakan waktu 1 jam.
+     * Jam kerja: 08:00-19:00, istirahat: 12:00-13:00.
+     * Slot dianggap tidak tersedia jika ada appointment lain yang overlap.
      *
      * @param  \Carbon\Carbon  $datetime  Waktu yang ingin dicek ketersediaannya
      * @return bool  True jika slot tersedia, false jika bentrok
      */
     public function isAppointmentSlotAvailable(Carbon $datetime): bool
     {
+        $hour = (int) $datetime->format('H');
+
+        // Cek jam operasional (08:00 - 19:00)
+        if ($hour < self::OPEN_HOUR || $hour >= self::CLOSE_HOUR) {
+            return false;
+        }
+
+        // Cek jam istirahat (12:00 - 13:00)
+        if ($hour >= self::BREAK_START && $hour < self::BREAK_END) {
+            return false;
+        }
+
         $slotStart = $datetime->copy();
-        $slotEnd = $datetime->copy()->addHour();
+        $slotEnd = $datetime->copy()->addHours(self::APPOINTMENT_DURATION_HOURS);
 
         // Cek apakah ada appointment yang overlap dan tidak dibatalkan.
         // Overlap terjadi jika: existing_start < slot_end AND existing_end > slot_start
         $conflicting = Appointment::where('status', '!=', 'dibatalkan')
             ->where('appointment_date', '<', $slotEnd)
-            ->whereRaw('DATE_ADD(appointment_date, INTERVAL 1 HOUR) > ?', [$slotStart])
+            ->whereRaw('DATE_ADD(appointment_date, INTERVAL ? HOUR) > ?', [
+                self::APPOINTMENT_DURATION_HOURS,
+                $slotStart,
+            ])
             ->exists();
 
         return ! $conflicting;
     }
 
+    /**
+     * Mendapatkan semua slot jam yang tersedia pada tanggal tertentu.
+     *
+     * @param  Carbon  $date  Tanggal yang ingin dicek
+     * @return array<int, array{hour: int, time: string, available: bool, label: string}>
+     */
+    public function getAvailableSlots(Carbon $date): array
+    {
+        $slots = [];
+
+        for ($hour = self::OPEN_HOUR; $hour < self::CLOSE_HOUR; $hour++) {
+            $datetime = $date->copy()->setTime($hour, 0, 0);
+            $isBreak = ($hour >= self::BREAK_START && $hour < self::BREAK_END);
+
+            if ($isBreak) {
+                $slots[] = [
+                    'hour' => $hour,
+                    'time' => sprintf('%02d:00', $hour),
+                    'available' => false,
+                    'label' => 'Jam Istirahat',
+                ];
+                continue;
+            }
+
+            // Untuk waktu yang sudah lewat hari ini, tandai tidak tersedia
+            $isPast = $datetime->isPast();
+
+            $available = !$isPast && $this->isAppointmentSlotAvailable($datetime);
+
+            $label = 'Tersedia';
+            if ($isPast) {
+                $label = 'Sudah Lewat';
+            } elseif (!$available) {
+                $label = 'Sudah Terbooking';
+            }
+
+            $slots[] = [
+                'hour' => $hour,
+                'time' => sprintf('%02d:00', $hour),
+                'available' => $available,
+                'label' => $label,
+            ];
+        }
+
+        return $slots;
+    }
+
+    /**
+     * Mendapatkan daftar slot yang sudah di-booking pada tanggal tertentu.
+     *
+     * @param  Carbon  $date  Tanggal yang dicek
+     * @return array<int, array{hour: int, time: string, customer: string, status: string}>
+     */
+    public function getBookedSlots(Carbon $date): array
+    {
+        $appointments = Appointment::with('customer')
+            ->whereDate('appointment_date', $date)
+            ->where('status', '!=', 'dibatalkan')
+            ->orderBy('appointment_date')
+            ->get();
+
+        return $appointments->map(function ($appointment) {
+            return [
+                'hour' => (int) $appointment->appointment_date->format('H'),
+                'time' => $appointment->appointment_date->format('H:i'),
+                'customer' => $appointment->customer->name ?? 'Unknown',
+                'status' => $appointment->status,
+            ];
+        })->toArray();
+    }
+
     // ──────────────────────────────────────────────────────────
-    // 5. generateOrderNumber
+    // 5. Fabric Stock Deduction
+    // ──────────────────────────────────────────────────────────
+
+    /**
+     * Mengurangi stok bahan kain saat pesanan mulai diproses.
+     * Setiap item pesanan menggunakan 1 meter bahan.
+     *
+     * @param  Order  $order  Pesanan yang bahan-nya akan dikurangi
+     */
+    public function deductFabricStock(Order $order): void
+    {
+        $order->loadMissing('fabric');
+
+        if (! $order->fabric) {
+            return;
+        }
+
+        $metersUsed = max(1, (int) $order->quantity);
+        $order->fabric->deductStock($metersUsed);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // 6. generateOrderNumber
     // ──────────────────────────────────────────────────────────
 
     /**
@@ -242,5 +363,13 @@ class OrderBusinessRulesService
         } while (Order::where('order_number', $orderNumber)->exists());
 
         return $orderNumber;
+    }
+
+    /**
+     * Cek apakah layanan membutuhkan appointment.
+     */
+    public function requiresAppointment(string $serviceType): bool
+    {
+        return in_array($serviceType, self::REQUIRES_APPOINTMENT_TYPES, true);
     }
 }

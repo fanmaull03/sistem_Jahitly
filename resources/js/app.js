@@ -13,35 +13,29 @@ try {
 	console.warn('Alpine start failed:', e);
 }
 
-/* ── Reveal-on-scroll logic ── */
+/* ── Reveal-on-scroll logic (IntersectionObserver) ── */
+let revealObserver = null;
+
 function initReveal() {
-	const targets = document.querySelectorAll('[data-reveal]:not(.is-visible)');
-	if (!targets.length) return;
+	// Create observer once, reuse it
+	if (!revealObserver) {
+		revealObserver = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('is-visible');
+						revealObserver.unobserve(entry.target);
+					}
+				});
+			},
+			{ threshold: 0.05, rootMargin: '0px 0px 50px 0px' }
+		);
+	}
 
-	const checkReveal = () => {
-		// Trigger when the element's top is within 95% of the viewport height
-		const triggerBottom = window.innerHeight * 0.95; 
-		
-		targets.forEach((el) => {
-			if (el.classList.contains('is-visible')) return;
-			
-			const rect = el.getBoundingClientRect();
-			if (rect.top < triggerBottom) {
-				el.classList.add('is-visible');
-			}
-		});
-	};
-
-	// Check immediately
-	checkReveal();
-
-	// Check on scroll and resize
-	window.addEventListener('scroll', checkReveal, { passive: true });
-	window.addEventListener('resize', checkReveal, { passive: true });
-
-	// Fallbacks for layout shifts
-	setTimeout(checkReveal, 150);
-	setTimeout(checkReveal, 500);
+	// Observe all un-revealed elements
+	document.querySelectorAll('[data-reveal]:not(.is-visible)').forEach((el) => {
+		revealObserver.observe(el);
+	});
 }
 
 /* ── Table row stagger animation ── */

@@ -105,7 +105,7 @@ class Create extends Component
 
         $proofFilePath = null;
         if ($this->proof_file) {
-            $proofFilePath = $this->proof_file->store('payment-proofs', 'private');
+            $proofFilePath = $this->proof_file->store('payment-proofs', 'local');
         }
 
         Payment::create([

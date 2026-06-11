@@ -17,6 +17,7 @@ class Fabric extends Model
         'category',
         'color',
         'price_per_meter',
+        'stock_meters',
         'stock_status',
         'po_days',
         'description',
@@ -31,6 +32,7 @@ class Fabric extends Model
     {
         return [
             'price_per_meter' => 'decimal:2',
+            'stock_meters' => 'decimal:2',
             'po_days' => 'integer',
         ];
     }
@@ -57,6 +59,22 @@ class Fabric extends Model
     public function isAvailable(): bool
     {
         return $this->stock_status === 'tersedia';
+    }
+
+    /**
+     * Kurangi stok bahan dalam satuan meter.
+     * Jika stok habis, otomatis ubah status ke PO.
+     */
+    public function deductStock(float $meters): void
+    {
+        $this->stock_meters = max(0, (float) $this->stock_meters - $meters);
+
+        // Otomatis ubah status ke PO jika stok habis
+        if ($this->stock_meters <= 0) {
+            $this->stock_status = 'po';
+        }
+
+        $this->save();
     }
 
     /**

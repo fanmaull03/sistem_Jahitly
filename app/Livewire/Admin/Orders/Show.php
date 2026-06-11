@@ -26,6 +26,10 @@ class Show extends Component
     public ?string $designPreviewUrl = null;
     public ?string $designPreviewName = null;
 
+    // ── Price editing ────────────────────────────────────────
+    public string $editEstimatedPrice = '';
+    public bool $showPriceForm = false;
+
     public function mount(Order $order): void
     {
         if (! auth()->check() || ! auth()->user()->isAdmin()) {
@@ -115,16 +119,24 @@ class Show extends Component
             return;
         }
 
+        $oldStatus = $this->order->status;
+        $newStatus = $validated['status'];
+
         $this->order->update([
-            'status' => $validated['status'],
+            'status' => $newStatus,
         ]);
 
         OrderStatusLog::create([
             'order_id' => $this->order->id,
-            'status' => $validated['status'],
+            'status' => $newStatus,
             'changed_by' => auth()->id(),
             'notes' => $validated['notes'] ?? null,
         ]);
+
+        // Deduct fabric stock when order starts processing
+        if ($oldStatus !== 'diproses' && $newStatus === 'diproses') {
+            app(OrderBusinessRulesService::class)->deductFabricStock($this->order);
+        }
 
         $this->notes = null;
         $this->refreshOrder();
@@ -139,6 +151,56 @@ class Show extends Component
 
         session()->flash('success', 'Status pesanan berhasil diperbarui.');
     }
+
+    // ── Price Editing ─────────────────────────────────────────
+
+    public function openPriceForm(): void
+    {
+        $this->editEstimatedPrice = (string) (int) $this->order->estimated_price;
+        $this->showPriceForm = true;
+    }
+
+    public function closePriceForm(): void
+    {
+        $this->showPriceForm = false;
+        $this->editEstimatedPrice = '';
+        $this->resetValidation('editEstimatedPrice');
+    }
+
+    public function updatePrice(): void
+    {
+        $this->validate([
+            'editEstimatedPrice' => ['required', 'numeric', 'min:1000'],
+        ], [
+            'editEstimatedPrice.required' => 'Harga harus diisi.',
+            'editEstimatedPrice.numeric' => 'Harga harus berupa angka.',
+            'editEstimatedPrice.min' => 'Harga minimal Rp 1.000.',
+        ]);
+
+        $oldPrice = (float) $this->order->estimated_price;
+        $newPrice = (float) $this->editEstimatedPrice;
+
+        $this->order->update([
+            'estimated_price' => $newPrice,
+        ]);
+
+        $this->closePriceForm();
+        $this->refreshOrder();
+
+        // Notifikasi ke customer tentang update harga
+        $customer = $this->order->customer;
+        if ($customer) {
+            $message = 'Harga pesanan #' . $this->order->order_number
+                . ' telah diperbarui dari Rp ' . number_format($oldPrice, 0, ',', '.')
+                . ' menjadi Rp ' . number_format($newPrice, 0, ',', '.')
+                . '. Silakan lakukan pembayaran.';
+            $customer->notify(new OrderStatusUpdated($this->order, $message));
+        }
+
+        session()->flash('success', 'Harga pesanan berhasil diperbarui dan notifikasi telah dikirim ke customer.');
+    }
+
+    // ── Design Preview ────────────────────────────────────────
 
     public function previewDesign(int $designId): void
     {
@@ -173,6 +235,24 @@ class Show extends Component
     public function getCanUpdateStatusProperty(): bool
     {
         return empty($this->blockingReasons);
+    }
+
+    /**
+     * Cek apakah admin boleh mengedit harga.
+     * Hanya bisa edit setelah appointment selesai (untuk custom/seragam).
+     */
+    public function getCanEditPriceProperty(): bool
+    {
+        $serviceType = $this->order->service->type ?? '';
+
+        // Vermak: selalu bisa edit harga
+        if ($serviceType === 'vermak') {
+            return true;
+        }
+
+        // Custom & Seragam: hanya bisa edit setelah appointment selesai
+        return $this->order->appointment
+            && $this->order->appointment->status === 'selesai';
     }
 
     /**

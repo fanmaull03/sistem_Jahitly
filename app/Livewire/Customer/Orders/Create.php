@@ -203,6 +203,12 @@ class Create extends Component
 
         session()->flash('success', 'Pesanan berhasil dibuat dengan nomor ' . $orderNumber . '.');
 
+        // Custom & Seragam → buat appointment dulu
+        if (in_array($service->type, ['seragam', 'custom'], true)) {
+            return $this->redirectRoute('orders.appointments.create', $order, navigate: true);
+        }
+
+        // Vermak → langsung ke detail pesanan
         return $this->redirectRoute('orders.show', $order, navigate: true);
     }
 

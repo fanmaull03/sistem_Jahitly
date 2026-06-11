@@ -213,14 +213,42 @@ class Index extends Component
             'rescheduleTime' => 'required|date_format:H:i',
         ]);
 
+        $newDatetime = Carbon::parse($this->rescheduleDate . ' ' . $this->rescheduleTime);
+        $hour = (int) $newDatetime->format('H');
+
+        // Validasi jam operasional (08:00 - 19:00)
+        if ($hour < 8 || $hour >= 19) {
+            $this->addError('rescheduleTime', 'Jam appointment harus antara 08:00 - 19:00.');
+            return;
+        }
+
+        // Validasi jam istirahat (12:00 - 13:00)
+        if ($hour >= 12 && $hour < 13) {
+            $this->addError('rescheduleTime', 'Jam 12:00 - 13:00 adalah jam istirahat.');
+            return;
+        }
+
         $appointment = Appointment::findOrFail($this->rescheduleAppointmentId);
+
+        // Cek ketersediaan slot (exclude current appointment)
+        $conflicting = Appointment::where('status', '!=', 'dibatalkan')
+            ->where('id', '!=', $appointment->id)
+            ->where('appointment_date', '<', $newDatetime->copy()->addHour())
+            ->whereRaw('DATE_ADD(appointment_date, INTERVAL 1 HOUR) > ?', [$newDatetime])
+            ->exists();
+
+        if ($conflicting) {
+            $this->addError('rescheduleTime', 'Slot waktu ini sudah terisi. Pilih waktu lain.');
+            return;
+        }
+
         $appointment->update([
-            'appointment_date' => Carbon::parse($this->rescheduleDate . ' ' . $this->rescheduleTime),
-            'status' => 'menunggu', // Reset status if rescheduled? Or maybe keep it? Let's reset to menunggu if it's in the future.
+            'appointment_date' => $newDatetime,
+            'status' => 'menunggu',
         ]);
 
         $this->closeRescheduleModal();
-        session()->flash('success', 'Jadwal berhasil diubah.');
+        session()->flash('success', 'Jadwal berhasil diubah ke ' . $newDatetime->translatedFormat('l, d F Y H:i') . '.');
     }
 
     public function render(): View

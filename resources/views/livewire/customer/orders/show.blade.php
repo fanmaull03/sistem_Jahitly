@@ -287,6 +287,66 @@
                     </div>
                 </div>
             @endif
+            {{-- ── Appointment Info ── --}}
+            @if ($this->needsAppointment)
+                <div data-reveal data-reveal-delay="3" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">Appointment</h3>
+
+                    @if ($order->appointment)
+                        @php
+                            $apptBadge = match($order->appointment->status) {
+                                'menunggu' => ['label' => 'Menunggu Konfirmasi', 'class' => 'bg-amber-100 text-amber-700'],
+                                'terkonfirmasi' => ['label' => 'Terkonfirmasi', 'class' => 'bg-blue-100 text-blue-700'],
+                                'selesai' => ['label' => 'Selesai', 'class' => 'bg-emerald-100 text-emerald-700'],
+                                'dibatalkan' => ['label' => 'Dibatalkan', 'class' => 'bg-red-100 text-red-700'],
+                                default => ['label' => ucfirst($order->appointment->status), 'class' => 'bg-stone-100 text-stone-700'],
+                            };
+                        @endphp
+
+                        <div class="mt-3 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-stone-500">Jadwal</span>
+                                <span class="text-sm font-bold text-stone-900">
+                                    {{ $order->appointment->appointment_date->translatedFormat('l, d M Y H:i') }} WIB
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-stone-500">Status</span>
+                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold {{ $apptBadge['class'] }}">
+                                    {{ $apptBadge['label'] }}
+                                </span>
+                            </div>
+                            @if ($order->appointment->notes)
+                                <div class="mt-2 border-t border-stone-100 pt-2">
+                                    <span class="text-xs font-medium text-stone-500">Catatan:</span>
+                                    <p class="mt-0.5 text-sm text-stone-700">{{ $order->appointment->notes }}</p>
+                                </div>
+                            @endif
+                        </div>
+
+                        @if ($order->appointment->status === 'selesai' && !$this->canPay)
+                            <div class="mt-3 rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">
+                                Appointment selesai. Silakan lakukan pembayaran.
+                            </div>
+                        @endif
+                    @else
+                        <div class="mt-3 flex flex-col items-center text-center">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                </svg>
+                            </div>
+                            <p class="mt-2 text-sm font-semibold text-stone-700">Belum ada appointment</p>
+                            <p class="mt-1 text-xs text-stone-500">Buat appointment untuk konsultasi desain.</p>
+                            <a href="{{ route('orders.appointments.create', $order) }}"
+                               class="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#003399] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-blue-800"
+                               wire:navigate>
+                                Buat Appointment
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endif
         </aside>
     </div>
 
@@ -315,7 +375,7 @@
     </div>
 
     {{-- ── Floating Payment Bar ── --}}
-    @if ($order->payment_status !== 'lunas')
+    @if ($order->payment_status !== 'lunas' && $this->canPay)
         <div class="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 p-4 shadow-[0_-4px_16px_rgb(0,0,0,0.06)] backdrop-blur-sm lg:sticky lg:bottom-6 lg:mt-6 lg:rounded-2xl lg:border lg:p-6 lg:shadow-sm lg:backdrop-blur-0">
             <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
                 <div class="text-center sm:text-left">
@@ -336,6 +396,29 @@
                 >
                     Bayar Sekarang
                 </a>
+            </div>
+        </div>
+    @elseif ($order->payment_status !== 'lunas' && $this->needsAppointment && !$this->canPay)
+        {{-- Info bar: appointment belum selesai --}}
+        <div class="fixed inset-x-0 bottom-0 z-40 border-t border-amber-200 bg-amber-50/95 p-4 shadow-[0_-4px_16px_rgb(0,0,0,0.06)] backdrop-blur-sm lg:sticky lg:bottom-6 lg:mt-6 lg:rounded-2xl lg:border lg:p-6 lg:shadow-sm lg:backdrop-blur-0">
+            <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
+                <div class="text-center sm:text-left">
+                    <p class="text-sm font-bold text-amber-900">Pembayaran Belum Tersedia</p>
+                    <p class="mt-0.5 text-xs text-amber-700">
+                        @if (!$order->appointment)
+                            Buat appointment terlebih dahulu untuk konsultasi desain.
+                        @else
+                            Pembayaran dapat dilakukan setelah appointment selesai.
+                        @endif
+                    </p>
+                </div>
+                @if (!$order->appointment)
+                    <a href="{{ route('orders.appointments.create', $order) }}"
+                       class="w-full rounded-xl bg-amber-600 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-amber-700 sm:w-auto hover-lift shadow-md hover:shadow-lg"
+                       wire:navigate>
+                        Buat Appointment
+                    </a>
+                @endif
             </div>
         </div>
     @endif

@@ -34,12 +34,40 @@ class Show extends Component
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        $this->order = $order->load(['service', 'fabric', 'statusLogs.user', 'designFiles', 'payments']);
+        $this->order = $order->load(['service', 'fabric', 'statusLogs.user', 'designFiles', 'payments', 'appointment']);
         $this->hasPendingPayment = $this->order->payments
             ->where('status', 'menunggu_verifikasi')
             ->isNotEmpty();
 
         $this->syncProgress();
+    }
+
+    /**
+     * Cek apakah customer boleh membayar.
+     * - Vermak: langsung bisa bayar
+     * - Custom/Seragam: hanya bisa bayar setelah appointment selesai
+     */
+    public function getCanPayProperty(): bool
+    {
+        $serviceType = $this->order->service->type ?? '';
+
+        // Vermak tidak perlu appointment
+        if ($serviceType === 'vermak') {
+            return true;
+        }
+
+        // Custom & Seragam: cek appointment selesai
+        return $this->order->appointment
+            && $this->order->appointment->status === 'selesai';
+    }
+
+    /**
+     * Cek apakah pesanan ini membutuhkan appointment.
+     */
+    public function getNeedsAppointmentProperty(): bool
+    {
+        $serviceType = $this->order->service->type ?? '';
+        return in_array($serviceType, ['seragam', 'custom'], true);
     }
 
     public function getPaymentStatusLabelProperty(): string

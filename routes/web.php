@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Admin\Appointments\Index as AdminAppointmentsIndex;
@@ -10,6 +9,7 @@ use App\Livewire\Admin\Orders\Index as AdminOrdersIndex;
 use App\Livewire\Admin\Orders\Show as AdminOrdersShow;
 use App\Livewire\Admin\Payments\Index as AdminPaymentsIndex;
 use App\Livewire\Admin\Queue\Index as AdminQueueIndex;
+use App\Livewire\Customer\Appointments\Create as CustomerAppointmentsCreate;
 use App\Livewire\Customer\Orders\CancelOrder as CustomerOrdersCancelOrder;
 use App\Livewire\Customer\Orders\Create as CustomerOrdersCreate;
 use App\Livewire\Customer\Orders\Index as CustomerOrdersIndex;
@@ -83,12 +83,9 @@ Route::middleware(['auth', 'customer'])->group(function () {
     Route::post('orders/{order}/payments', [PaymentController::class, 'store'])
         ->name('payments.store');
 
-    // ── Appointment Routes ───────────────────────────────────
-    Route::get('orders/{order}/appointments/create', [AppointmentController::class, 'create'])
+    // ── Appointment Routes (Livewire) ────────────────────────
+    Route::get('orders/{order}/appointments/create', CustomerAppointmentsCreate::class)
         ->name('orders.appointments.create');
-
-    Route::post('orders/{order}/appointments', [AppointmentController::class, 'store'])
-        ->name('orders.appointments.store');
 });
 
 // ──────────────────────────────────────────────────────────────

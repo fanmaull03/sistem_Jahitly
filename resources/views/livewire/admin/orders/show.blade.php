@@ -182,6 +182,70 @@
                 </div>
             </section>
 
+            {{-- ── Edit Harga Pesanan ── --}}
+            @if ($this->canEditPrice)
+                <section data-reveal data-reveal-delay="2" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold">Edit Harga</h2>
+                        @if (!$showPriceForm)
+                            <button
+                                type="button"
+                                wire:click="openPriceForm"
+                                class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                            >
+                                Edit
+                            </button>
+                        @endif
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="text-sm text-slate-500">Harga Saat Ini</div>
+                        <div class="text-xl font-bold text-slate-900">
+                            Rp {{ number_format((float) $order->estimated_price, 0, ',', '.') }}
+                        </div>
+                    </div>
+
+                    @if ($showPriceForm)
+                        <div class="mt-4 space-y-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700">Harga Baru (Rp)</label>
+                                <div class="relative mt-2">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <span class="text-sm font-bold text-slate-500">Rp</span>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        min="1000"
+                                        wire:model="editEstimatedPrice"
+                                        class="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-base font-bold text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        placeholder="Masukkan harga baru"
+                                    />
+                                </div>
+                                @error('editEstimatedPrice')
+                                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    type="button"
+                                    wire:click="updatePrice"
+                                    class="flex-1 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                                >
+                                    Simpan & Notif Customer
+                                </button>
+                                <button
+                                    type="button"
+                                    wire:click="closePriceForm"
+                                    class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                                >
+                                    Batal
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+                </section>
+            @endif
+
             <section data-reveal data-reveal-delay="3" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Update Status Pesanan</h2>
                 <div class="mt-4 space-y-3">

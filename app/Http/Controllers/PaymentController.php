@@ -103,7 +103,7 @@ class PaymentController extends Controller
         $proofFilePath = null;
         if ($request->hasFile('proof_file')) {
             $proofFilePath = $request->file('proof_file')
-                ->store('payment-proofs', 'private');
+                ->store('payment-proofs', 'local');
         }
 
         // Status awal selalu menunggu_verifikasi

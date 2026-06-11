@@ -72,9 +72,14 @@
                 @endif
 
                 <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
-                    <div class="text-lg font-bold text-slate-900">
-                        Rp {{ number_format((float) $fabric->price_per_meter, 0, ',', '.') }}
-                        <span class="text-xs font-normal text-slate-500">/meter</span>
+                    <div>
+                        <div class="text-lg font-bold text-slate-900">
+                            Rp {{ number_format((float) $fabric->price_per_meter, 0, ',', '.') }}
+                            <span class="text-xs font-normal text-slate-500">/meter</span>
+                        </div>
+                        <div class="mt-1 text-xs font-semibold {{ (float)$fabric->stock_meters > 0 ? 'text-emerald-600' : 'text-red-500' }}">
+                            Stok: {{ number_format((float) $fabric->stock_meters, 1) }} meter
+                        </div>
                     </div>
                     <div class="flex items-center gap-2">
                         @if ($fabric->stock_status === 'po')
@@ -195,6 +200,20 @@
                     </div>
 
                     <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700">Stok (Meter)</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                wire:model="stock_meters"
+                                class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-slate-400 focus:outline-none"
+                                placeholder="50"
+                            />
+                            @error('stock_meters')
+                                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700">Status Stok</label>
                             <select
