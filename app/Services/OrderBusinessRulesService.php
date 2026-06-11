@@ -147,7 +147,13 @@ class OrderBusinessRulesService
         $service = $order->service;
 
         // ── Hitung estimasi harga ──────────────────────────────
-        $estimatedPrice = (float) $service->base_price * max(1, (int) $order->quantity);
+        $quantity = max(1, (int) $order->quantity);
+        $estimatedPrice = (float) $service->base_price * $quantity;
+
+        // Tambahkan harga bahan jika menggunakan bahan dari penjahit
+        if ($order->fabric) {
+            $estimatedPrice += (float) $order->fabric->price_per_meter * $quantity;
+        }
 
         // ── Hitung estimasi durasi ─────────────────────────────
         $baseDuration = (int) $service->base_duration_days;

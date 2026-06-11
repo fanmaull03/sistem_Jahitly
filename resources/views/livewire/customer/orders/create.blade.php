@@ -136,50 +136,19 @@
                     </div>
                     @endif
 
-                    {{-- Pilihan bahan dari customer (status bahan manual) --}}
+                    {{-- Info bahan dari customer: otomatis ready --}}
                     @if ($material_source === 'customer')
                         <div>
-                            <label class="block text-xs font-bold text-stone-800 mb-1.5">Status Bahan (Jika dari Anda)</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label @class([
-                                    'flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition hover:bg-stone-50',
-                                    'border-[#003399] bg-blue-50 text-[#003399]' => $material_status === 'ready',
-                                    'border-stone-300 bg-white text-stone-700' => $material_status !== 'ready',
-                                ])>
-                                    <div @class([
-                                        'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border',
-                                        'border-[#003399]' => $material_status === 'ready',
-                                        'border-stone-400' => $material_status !== 'ready',
-                                    ])>
-                                        @if($material_status === 'ready')
-                                            <div class="h-2.5 w-2.5 rounded-full bg-[#003399]"></div>
-                                        @endif
-                                    </div>
-                                    <input type="radio" name="material_status" wire:model="material_status" value="ready" class="sr-only">
-                                    <span class="text-sm">Sudah Ready</span>
-                                </label>
-
-                                <label @class([
-                                    'flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition hover:bg-stone-50',
-                                    'border-[#003399] bg-blue-50 text-[#003399]' => $material_status === 'po',
-                                    'border-stone-300 bg-white text-stone-700' => $material_status !== 'po',
-                                ])>
-                                    <div @class([
-                                        'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border',
-                                        'border-[#003399]' => $material_status === 'po',
-                                        'border-stone-400' => $material_status !== 'po',
-                                    ])>
-                                        @if($material_status === 'po')
-                                            <div class="h-2.5 w-2.5 rounded-full bg-[#003399]"></div>
-                                        @endif
-                                    </div>
-                                    <input type="radio" name="material_status" wire:model="material_status" value="po" class="sr-only">
-                                    <span class="text-sm">Menyusul / PO</span>
-                                </label>
+                            <label class="block text-xs font-bold text-stone-800 mb-1.5">Status Bahan</label>
+                            <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="text-sm font-semibold text-emerald-800">Bahan Siap (Ready)</span>
+                                </div>
+                                <p class="mt-1 text-xs text-emerald-600">Karena Anda membawa bahan sendiri, status otomatis dianggap siap.</p>
                             </div>
-                            @error('material_status')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     @endif
 
@@ -384,6 +353,10 @@
                     <div class="flex items-center justify-between">
                         <span class="text-stone-500">Bahan</span>
                         <span class="font-medium text-stone-900">{{ $selectedFabric->name }} ({{ $selectedFabric->color }})</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-stone-500">Harga Bahan</span>
+                        <span class="font-medium text-stone-900">Rp {{ number_format((float) $selectedFabric->price_per_meter, 0, ',', '.') }}/m × {{ $quantity }}</span>
                     </div>
                     @if ($selectedFabric->stock_status === 'po')
                         <div class="flex items-center justify-between">

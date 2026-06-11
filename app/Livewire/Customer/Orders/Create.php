@@ -121,6 +121,10 @@ class Create extends Component
         if ($this->material_source === 'jasa') {
             // Load semua bahan yang tersedia
             $this->fabrics = Fabric::query()->orderBy('name')->orderBy('color')->get();
+        } elseif ($this->material_source === 'customer') {
+            // Jika bawa sendiri, otomatis ready (tidak ada pilihan PO)
+            $this->material_status = 'ready';
+            $this->fabrics = collect();
         } else {
             $this->fabrics = collect();
         }
@@ -188,7 +192,7 @@ class Create extends Component
         ]);
 
         if ($this->design_file) {
-            $filePath = $this->design_file->store('designs', 'private');
+            $filePath = $this->design_file->store('designs', 'local');
 
             DesignFile::create([
                 'order_id' => $order->id,
@@ -225,7 +229,18 @@ class Create extends Component
         }
 
         $quantity = max(1, (int) $this->quantity);
-        $this->estimated_price = (float) $service->base_price * $quantity;
+        $baseTotal = (float) $service->base_price * $quantity;
+
+        // Tambahkan harga bahan jika memilih bahan dari penjahit
+        $fabricCost = 0.0;
+        if ($this->material_source === 'jasa' && $this->fabric_id && $this->fabrics->isNotEmpty()) {
+            $fabric = $this->fabrics->firstWhere('id', $this->fabric_id);
+            if ($fabric) {
+                $fabricCost = (float) $fabric->price_per_meter * $quantity;
+            }
+        }
+
+        $this->estimated_price = $baseTotal + $fabricCost;
     }
 
     public function render(): View
