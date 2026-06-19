@@ -1,17 +1,11 @@
 import './bootstrap';
 
-import Alpine from 'alpinejs';
+/* 
+ * AlpineJS is automatically injected and initialized by Livewire 3. 
+ * Do NOT manually import or start Alpine here, as it will cause conflicts 
+ * (breaking wire:click, wire:model, etc. especially on wire:navigate).
+ */
 
-window.Alpine = Alpine;
-
-try {
-	if (!window.alpineInitialized) {
-		window.alpineInitialized = true;
-		Alpine.start();
-	}
-} catch (e) {
-	console.warn('Alpine start failed:', e);
-}
 
 /* ── Reveal-on-scroll logic (IntersectionObserver) ── */
 let revealObserver = null;

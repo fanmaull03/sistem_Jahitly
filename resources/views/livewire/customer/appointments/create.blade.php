@@ -1,6 +1,6 @@
 <div class="page-enter mx-auto max-w-4xl space-y-6 px-4 pb-24 sm:px-6 lg:pb-10">
     {{-- Header --}}
-    <div data-reveal class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-400 transition hover:text-stone-700 mb-3" wire:navigate>
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -16,7 +16,7 @@
     </div>
 
     @if ($hasExistingAppointment)
-        <div data-reveal data-reveal-delay="1" class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
             <svg class="mx-auto h-12 w-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
             </svg>
@@ -31,7 +31,7 @@
     @else
         <form wire:submit.prevent="submit" class="space-y-6">
             {{-- Step 1: Pilih Tanggal --}}
-            <section data-reveal data-reveal-delay="1" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
                 <div class="mb-4 flex items-center gap-2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#003399] text-sm font-semibold text-white shadow-sm">1</span>
                     <h2 class="text-xl font-bold text-stone-900">Pilih Tanggal</h2>
@@ -53,7 +53,7 @@
 
             {{-- Step 2: Pilih Jam --}}
             @if ($selectedDate && count($availableSlots) > 0)
-                <section data-reveal data-reveal-delay="2" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+                <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
                     <div class="mb-2 flex items-center gap-2">
                         <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#003399] text-sm font-semibold text-white shadow-sm">2</span>
                         <h2 class="text-xl font-bold text-stone-900">Pilih Jam</h2>
@@ -144,7 +144,7 @@
 
             {{-- Step 3: Catatan --}}
             @if ($selectedHour)
-                <section data-reveal data-reveal-delay="3" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+                <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
                     <div class="mb-4 flex items-center gap-2">
                         <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#003399] text-sm font-semibold text-white shadow-sm">3</span>
                         <h2 class="text-xl font-bold text-stone-900">Catatan (Opsional)</h2>
@@ -161,7 +161,7 @@
                 </section>
 
                 {{-- Summary & Submit --}}
-                <section data-reveal data-reveal-delay="4" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+                <section class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
                     <div class="flex items-start gap-4">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

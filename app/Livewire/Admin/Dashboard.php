@@ -39,8 +39,14 @@ class Dashboard extends Component
 
     public function render(): View
     {
+        $todayAppointments = Appointment::with(['customer', 'order.service'])
+            ->whereDate('appointment_date', Carbon::today())
+            ->orderBy('appointment_date', 'asc')
+            ->get();
+
         return view('livewire.admin.dashboard', [
             'summary' => $this->summary,
+            'todayAppointments' => $todayAppointments,
         ])->layout('layouts.admin');
     }
 }

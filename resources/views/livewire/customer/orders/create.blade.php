@@ -1,5 +1,5 @@
 <div class="page-enter mx-auto max-w-6xl space-y-6 px-4 pb-32 sm:px-6 lg:pb-10">
-    <div data-reveal class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-3xl font-bold text-stone-900">Buat Pesanan Baru</h1>
             <p class="mt-1 text-sm text-stone-600">Pilih layanan, isi detail pesanan, dan lihat estimasi harga secara langsung.</p>
@@ -74,7 +74,7 @@
             </section>
 
             <!-- STEP 2: Detail Pesanan -->
-            <section class="mt-8">
+            <section class="mt-12">
                 <div class="space-y-5">
                     <div>
                         <label class="block text-xs font-bold text-stone-800 mb-1.5">Jumlah Item (Pcs)</label>
@@ -315,7 +315,7 @@
             @endif
 
             <!-- Form Actions -->
-            <hr class="my-8 border-stone-200">
+            <hr class="mt-12 mb-8 border-stone-200">
             <div class="flex items-center justify-end gap-6 pb-2">
                 <a href="{{ route('orders.index') }}" class="text-sm font-bold text-[#003399] hover:text-blue-800 transition" wire:navigate>Batal</a>
                 <button
@@ -323,7 +323,13 @@
                     class="inline-flex items-center gap-2 rounded-lg bg-[#003399] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-[#003399] focus:ring-offset-2 disabled:opacity-50"
                     wire:loading.attr="disabled"
                 >
-                    <span wire:loading.remove wire:target="submit">Lanjut ke Tahap Pembayaran</span>
+                    <span wire:loading.remove wire:target="submit">
+                        @if ($selectedService && in_array($selectedService->type, ['custom', 'seragam']))
+                            Atur Jadwal Fitting
+                        @else
+                            Lanjut ke Tahap Pembayaran
+                        @endif
+                    </span>
                     <span wire:loading wire:target="submit">Memproses...</span>
                     <svg wire:loading.remove wire:target="submit" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />

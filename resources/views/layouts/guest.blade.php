@@ -16,17 +16,18 @@
     </head>
     <body class="font-sans text-stone-900 antialiased bg-stone-50">
         <div class="relative min-h-screen px-4 py-12 sm:px-6">
-            <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-stone-50 via-stone-100/40 to-white"></div>
+            <div class="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('images/login-bg.png') }}');"></div>
+            <div class="pointer-events-none absolute inset-0 bg-stone-900/60 backdrop-blur-sm"></div>
 
             <div class="relative mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center gap-8">
                 <div data-reveal class="text-center">
-                    <a href="/" class="inline-flex items-center justify-center gap-2 text-lg font-bold tracking-tight text-stone-900">
+                    <a href="/" class="inline-flex items-center justify-center gap-2 text-2xl font-bold tracking-tight text-white drop-shadow-md">
                         Jahitly
                     </a>
-                    <p class="mt-2 text-sm text-stone-500">Solusi jahit modern untuk kebutuhan harian Anda.</p>
+                    <p class="mt-2 text-sm text-stone-200 drop-shadow">Solusi jahit modern untuk kebutuhan harian Anda.</p>
                 </div>
 
-                <div data-reveal data-reveal-delay="1" class="w-full max-w-md rounded-2xl border border-stone-200 bg-white/90 px-6 py-6 shadow-sm backdrop-blur">
+                <div data-reveal data-reveal-delay="1" class="w-full max-w-md rounded-2xl border border-stone-200 bg-white/95 px-6 py-6 shadow-xl backdrop-blur-md">
                     {{ $slot }}
                 </div>
             </div>
