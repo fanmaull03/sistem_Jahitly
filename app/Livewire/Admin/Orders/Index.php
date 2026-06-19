@@ -52,6 +52,7 @@ class Index extends Component
             'dijahit' => 'Dijahit',
             'finishing' => 'Finishing',
             'selesai' => 'Selesai',
+            'dibatalkan' => 'Dibatalkan',
         ];
     }
 

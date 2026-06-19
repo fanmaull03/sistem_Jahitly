@@ -18,7 +18,7 @@ class Create extends Component
     public array $availableSlots = [];
     public bool $hasExistingAppointment = false;
 
-    public function mount(Order $order): void
+    public function mount(Order $order)
     {
         if (! auth()->check() || ! auth()->user()->isCustomer()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
@@ -32,8 +32,7 @@ class Create extends Component
 
         // Cek apakah layanan membutuhkan appointment
         if (! in_array($order->service->type, ['seragam', 'custom'], true)) {
-            $this->redirect(route('orders.show', $order), navigate: true);
-            return;
+            return $this->redirect(route('orders.show', $order), navigate: true);
         }
 
         $this->order = $order;

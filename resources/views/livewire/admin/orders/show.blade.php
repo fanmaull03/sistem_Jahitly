@@ -1,10 +1,10 @@
 <div class="page-enter space-y-6">
-    <div data-reveal>
+    <div>
         <h1 class="text-2xl font-bold">Detail Pesanan</h1>
         <p class="text-sm text-slate-500">Kontrol pesanan untuk customer {{ $order->customer->name }}.</p>
     </div>
 
-    <div data-reveal data-reveal-delay="1" class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
         <div class="text-lg font-semibold text-slate-900">{{ $order->order_number }}</div>
         <x-status-badge :status="$order->status" />
         <x-status-badge type="payment_status" :status="$order->payment_status" />
@@ -12,7 +12,7 @@
 
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
-            <section data-reveal data-reveal-delay="2" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Informasi Pesanan</h2>
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
@@ -89,7 +89,7 @@
                 @endif
             </section>
 
-            <section data-reveal data-reveal-delay="3" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Timeline Status</h2>
                 <div class="mt-4 space-y-3">
                     @forelse ($statusLogs as $log)
@@ -109,7 +109,7 @@
                 </div>
             </section>
 
-            <section data-reveal data-reveal-delay="4" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Daftar Pembayaran</h2>
                 <div class="mt-4 space-y-3">
                     @forelse ($order->payments as $payment)
@@ -141,13 +141,13 @@
         </div>
 
         <aside class="space-y-6">
-            <section data-reveal data-reveal-delay="2" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Update Status Bahan</h2>
                 <div class="mt-4 space-y-3">
                     <div>
                         <label class="text-sm font-semibold text-slate-700">Sumber Bahan</label>
                         <select
-                            wire:model="material_source"
+                            wire:model.live="material_source"
                             class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-base"
                         >
                             <option value="">Pilih sumber</option>
@@ -161,7 +161,7 @@
                     <div>
                         <label class="text-sm font-semibold text-slate-700">Status Bahan</label>
                         <select
-                            wire:model="material_status"
+                            wire:model.live="material_status"
                             class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-base"
                         >
                             <option value="">Pilih status</option>
@@ -184,7 +184,7 @@
 
             {{-- ── Edit Harga Pesanan ── --}}
             @if ($this->canEditPrice)
-                <section data-reveal data-reveal-delay="2" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold">Edit Harga</h2>
                         @if (!$showPriceForm)
@@ -246,13 +246,13 @@
                 </section>
             @endif
 
-            <section data-reveal data-reveal-delay="3" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Update Status Pesanan</h2>
                 <div class="mt-4 space-y-3">
                     <div>
                         <label class="text-sm font-semibold text-slate-700">Status Pesanan</label>
                         <select
-                            wire:model="status"
+                            wire:model.live="status"
                             class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-base"
                         >
                             <option value="menunggu_appointment">Menunggu Appointment</option>
@@ -304,7 +304,7 @@
                 </div>
             </section>
 
-            <section data-reveal data-reveal-delay="4" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Preview Desain</h2>
                 <div class="mt-4 space-y-2">
                     @forelse ($order->designFiles as $file)

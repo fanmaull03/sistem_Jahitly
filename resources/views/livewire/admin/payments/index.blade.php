@@ -1,10 +1,10 @@
 <div class="page-enter space-y-6">
-    <div data-reveal>
+    <div>
         <h1 class="text-2xl font-bold">Verifikasi Pembayaran</h1>
         <p class="text-sm text-slate-500">Periksa bukti pembayaran customer.</p>
     </div>
 
-    <div data-reveal data-reveal-delay="1" class="space-y-4">
+    <div class="space-y-4">
         @forelse ($payments as $payment)
             <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -12,12 +12,12 @@
 </x-slot>
 
 <div class="page-enter space-y-6">
-    <div data-reveal>
+    <div>
         <h1 class="text-2xl font-bold text-stone-900">Halo, Penjahit!</h1>
         <p class="text-sm text-stone-600">Berikut ringkasan pekerjaan Anda hari ini.</p>
     </div>
 
-    <div data-reveal class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <x-summary-card
             title="Pesanan Aktif"
             :value="$summary['active_orders']"
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Daftar Fitting Hari Ini -->
-    <div data-reveal class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <div class="mb-5 flex items-center justify-between">
             <div>
                 <h2 class="text-lg font-bold text-stone-900">Jadwal Fitting Hari Ini</h2>

@@ -1,5 +1,5 @@
 <div class="page-enter space-y-6">
-    <div data-reveal class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold">Kelola Bahan</h1>
             <p class="text-sm text-slate-500">Kelola stok bahan kain yang tersedia di workshop.</p>
@@ -17,7 +17,7 @@
     </div>
 
     {{-- Filters --}}
-    <div data-reveal data-reveal-delay="1" class="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
             type="text"
             wire:model.live.debounce.300ms="search"
@@ -44,7 +44,7 @@
     </div>
 
     {{-- Fabric Grid --}}
-    <div data-reveal data-reveal-delay="2" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @forelse ($fabrics as $fabric)
             <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-start justify-between">

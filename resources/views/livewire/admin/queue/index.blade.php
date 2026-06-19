@@ -1,5 +1,5 @@
 <div class="page-enter space-y-6">
-    <div data-reveal>
+    <div>
         <h1 class="text-2xl font-bold">Antrian Produksi</h1>
         <p class="text-sm text-slate-500">Urutkan pesanan yang sedang dikerjakan.</p>
     </div>
