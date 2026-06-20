@@ -17,6 +17,7 @@ class Index extends Component
 
     public ?int $activePaymentId = null;
     public string $rejectionNote = '';
+    public bool $showRejectForm = false;
 
     public function mount(): void
     {
@@ -29,6 +30,7 @@ class Index extends Component
     {
         $this->activePaymentId = $paymentId;
         $this->rejectionNote = '';
+        $this->showRejectForm = false;
         $this->resetValidation();
     }
 
@@ -36,7 +38,20 @@ class Index extends Component
     {
         $this->activePaymentId = null;
         $this->rejectionNote = '';
+        $this->showRejectForm = false;
         $this->resetValidation();
+    }
+
+    public function startReject(): void
+    {
+        $this->showRejectForm = true;
+    }
+
+    public function cancelReject(): void
+    {
+        $this->showRejectForm = false;
+        $this->rejectionNote = '';
+        $this->resetValidation('rejectionNote');
     }
 
     public function approvePayment(int $paymentId): void

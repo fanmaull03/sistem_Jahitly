@@ -248,14 +248,15 @@ class Show extends Component
             'estimated_finish_date' => $estimation['estimated_finish_date'],
         ]);
 
+        if ($this->order->status === 'menunggu_bahan' && $this->material_status === 'ready') {
+            $this->processMoveToQueue('Bahan diatur menjadi Ready. Pesanan masuk antrian produksi otomatis.', 'Bahan untuk pesanan #%s sudah dikonfirmasi (Tersedia). Pesanan masuk antrian produksi.');
+        }
+
         $this->closeMaterialForm();
         $this->refreshOrder();
         session()->flash('success', 'Data bahan berhasil diperbarui.');
     }
 
-    /**
-     * Admin menandai bahan sudah tersedia (dari PO → ready).
-     */
     public function markMaterialReady(): void
     {
         if ($this->order->material_status !== 'po') {
@@ -263,8 +264,23 @@ class Show extends Component
         }
 
         $this->order->update(['material_status' => 'ready']);
+        $this->processMoveToQueue('Bahan ditandai tersedia. Pesanan masuk antrian produksi.', 'Bahan untuk pesanan #%s sudah tersedia. Pesanan masuk antrian produksi.');
+        $this->refreshOrder();
+        session()->flash('success', 'Bahan ditandai tersedia.');
+    }
 
-        // Cek apakah bisa masuk antrian
+    public function forceMoveToQueue(): void
+    {
+        if ($this->order->status !== 'menunggu_bahan' || $this->order->material_status !== 'ready') {
+            return;
+        }
+        $this->processMoveToQueue('Bahan sudah ready. Memasukkan pesanan ke antrian produksi secara manual.', 'Bahan untuk pesanan #%s sudah dikonfirmasi. Pesanan masuk antrian produksi.');
+        $this->refreshOrder();
+        session()->flash('success', 'Pesanan berhasil dimasukkan ke antrian produksi.');
+    }
+
+    private function processMoveToQueue(string $adminNote, string $customerMsgTemplate): void
+    {
         $check = app(OrderBusinessRulesService::class)->canMoveToQueue($this->order->fresh(['service', 'appointment', 'payments']));
 
         if ($check['can_proceed'] && $this->order->status === 'menunggu_bahan') {
@@ -274,19 +290,16 @@ class Show extends Component
                 'order_id' => $this->order->id,
                 'status' => 'dalam_antrian',
                 'changed_by' => auth()->id(),
-                'notes' => 'Bahan tersedia, pesanan masuk antrian produksi.',
+                'notes' => $adminNote,
             ]);
 
             if ($this->order->customer) {
                 $this->order->customer->notify(new OrderStatusUpdated(
                     $this->order,
-                    'Bahan untuk pesanan #' . $this->order->order_number . ' sudah tersedia. Pesanan masuk antrian produksi.'
+                    sprintf($customerMsgTemplate, $this->order->order_number)
                 ));
             }
         }
-
-        $this->refreshOrder();
-        session()->flash('success', 'Bahan ditandai tersedia.');
     }
 
     // ──────────────────────────────────────────────────────────
@@ -538,11 +551,6 @@ class Show extends Component
     // ──────────────────────────────────────────────────────────
     // Helpers
     // ──────────────────────────────────────────────────────────
-
-    public function getCanEditPriceProperty(): bool
-    {
-        return !in_array($this->order->status, ['siap_diambil', 'selesai', 'ditolak', 'dibatalkan']);
-    }
 
     private function refreshOrder(): void
     {

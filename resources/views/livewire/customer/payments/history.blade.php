@@ -106,9 +106,9 @@
                                         >
                                             {{ $payment->status === 'ditolak' ? 'Lihat Alasan' : 'Lihat Detail' }}
                                         </button>
-                                    @elseif ($payment->status === 'terverifikasi' && $payment->proof_file_path)
-                                        <a href="{{ Storage::url($payment->proof_file_path) }}" target="_blank" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
-                                            Unduh Bukti
+                                    @elseif ($payment->status === 'terverifikasi')
+                                        <a href="{{ route('payments.invoice', $payment) }}" target="_blank" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+                                            Unduh Invoice
                                         </a>
                                     @else
                                         <span class="text-sm text-stone-500">—</span>
@@ -197,13 +197,13 @@
                                 >
                                     Bayar Ulang
                                 </a>
-                            @elseif ($payment->status === 'terverifikasi' && $payment->proof_file_path)
+                            @elseif ($payment->status === 'terverifikasi')
                                 <a
-                                    href="{{ Storage::url($payment->proof_file_path) }}"
+                                    href="{{ route('payments.invoice', $payment) }}"
                                     target="_blank"
                                     class="flex-1 rounded-full bg-stone-200 px-3 py-2 text-center text-xs font-semibold text-stone-800 hover:bg-stone-300"
                                 >
-                                    Unduh Bukti
+                                    Unduh Invoice
                                 </a>
                             @endif
                             <a

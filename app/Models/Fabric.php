@@ -21,6 +21,7 @@ class Fabric extends Model
         'stock_status',
         'po_days',
         'description',
+        'image_path',
     ];
 
     /**

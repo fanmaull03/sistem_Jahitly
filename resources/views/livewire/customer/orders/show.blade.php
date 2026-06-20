@@ -61,6 +61,149 @@
         </div>
     </div>
 
+    @if (session('success'))
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-6">
+            <p class="text-sm font-semibold text-emerald-800">{{ session('success') }}</p>
+        </div>
+    @endif
+
+    {{-- ── Aksi Konfirmasi Selesai ── --}}
+    @if ($order->status === 'siap_diambil')
+        <div x-data="{ showConfirmModal: false }" class="mb-6 rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
+            <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                <div>
+                    <h2 class="text-lg font-bold text-blue-900">Pesanan Siap Diambil!</h2>
+                    <p class="mt-1 text-sm text-blue-800">Jika Anda sudah mengambil pesanan ini di workshop atau sudah menerima kiriman, silakan klik tombol konfirmasi.</p>
+                </div>
+                <button 
+                    type="button" 
+                    @click="showConfirmModal = true"
+                    class="w-full shrink-0 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700 sm:w-auto shadow-md hover-lift hover:shadow-lg"
+                >
+                    Konfirmasi Pesanan Selesai
+                </button>
+            </div>
+
+            {{-- ── Custom Confirm Modal ── --}}
+            <div 
+                x-show="showConfirmModal" 
+                style="display: none;"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm transition-opacity"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+            >
+                <div 
+                    @click.outside="showConfirmModal = false"
+                    class="w-full max-w-md transform overflow-hidden rounded-3xl bg-white p-6 shadow-2xl transition-all"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                >
+                    <div class="flex items-center justify-center mb-4 h-16 w-16 rounded-full bg-blue-50 mx-auto">
+                        <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    
+                    <h3 class="text-center text-xl font-extrabold text-slate-900">Konfirmasi Penyelesaian</h3>
+                    <p class="mt-2 text-center text-sm text-slate-500">
+                        Apakah Anda yakin pesanan sudah diambil dan selesai? Tindakan ini tidak dapat dibatalkan dan status pesanan akan menjadi "Selesai".
+                    </p>
+
+                    <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <button 
+                            type="button" 
+                            @click="showConfirmModal = false"
+                            class="w-full rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors"
+                        >
+                            Batal
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="markAsCompleted"
+                            @click="showConfirmModal = false"
+                            class="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700 sm:w-auto shadow-md transition-colors hover:shadow-lg"
+                        >
+                            Ya, Sudah Diambil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- ── Testimonial Form ── --}}
+    @if ($order->status === 'selesai' && !$order->testimonial)
+        <div class="mb-6 rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm">
+            <div class="mb-4">
+                <h2 class="text-lg font-bold text-orange-900">Beri Penilaian Pesanan</h2>
+                <p class="mt-1 text-sm text-orange-800">Bagaimana hasil jahitan kami? Penilaian Anda tidak wajib dan bisa dilakukan kapan saja, namun sangat berarti bagi kami!</p>
+            </div>
+            
+            <div class="flex flex-col gap-4 max-w-2xl">
+                <div>
+                    <label class="block text-sm font-medium text-orange-900 mb-2">Rating (Bintang)</label>
+                    <div class="flex items-center gap-2">
+                        @for ($i = 1; $i <= 5; $i++)
+                            <button 
+                                type="button" 
+                                wire:click="$set('rating', {{ $i }})"
+                                class="transition-transform hover:scale-110 focus:outline-none"
+                            >
+                                <svg class="h-8 w-8 {{ $rating >= $i ? 'text-amber-400' : 'text-orange-200 hover:text-amber-300' }}" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            </button>
+                        @endfor
+                    </div>
+                    @error('rating') <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-orange-900 mb-2">Ulasan Singkat</label>
+                    <textarea 
+                        wire:model="review" 
+                        rows="3" 
+                        class="w-full rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                        placeholder="Ceritakan pengalaman Anda dengan layanan kami..."
+                    ></textarea>
+                    @error('review') <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <button 
+                        type="button" 
+                        wire:click="submitTestimonial"
+                        class="rounded-xl bg-orange-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-orange-700 shadow-md hover-lift hover:shadow-lg"
+                    >
+                        Kirim Penilaian
+                    </button>
+                </div>
+            </div>
+        </div>
+    @elseif ($order->testimonial)
+        <div class="mb-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <h2 class="text-sm font-bold text-stone-900 mb-3">Penilaian Anda</h2>
+            <div class="flex items-center gap-1 mb-2">
+                @for ($i = 1; $i <= 5; $i++)
+                    <svg class="h-4 w-4 {{ $order->testimonial->rating >= $i ? 'text-amber-400' : 'text-stone-200' }}" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                @endfor
+            </div>
+            @if ($order->testimonial->review)
+                <p class="text-sm text-stone-600 italic">"{{ $order->testimonial->review }}"</p>
+            @endif
+        </div>
+    @endif
+
     {{-- ── Main Grid ── --}}
     <div class="grid gap-6 lg:grid-cols-5">
         {{-- ── Left: Status Produksi (3 cols) ── --}}
@@ -216,12 +359,18 @@
                     @endif
 
                     @if ($order->fabric)
-                        <div class="flex items-start gap-3 text-sm">
-                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
-                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                </svg>
-                            </div>
+                        <div class="flex items-start gap-4 text-sm mt-3">
+                            @if ($order->fabric->image_path)
+                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-stone-200">
+                                    <img src="{{ Storage::url($order->fabric->image_path) }}" class="h-full w-full object-cover" alt="{{ $order->fabric->name }}">
+                                </div>
+                            @else
+                                <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                </div>
+                            @endif
                             <div class="flex-1">
                                 <span class="block font-medium text-stone-500">Bahan Kain</span>
                                 <p class="mt-1 font-bold text-stone-800">{{ $order->fabric->name }} — {{ $order->fabric->color }}</p>
@@ -243,15 +392,41 @@
             {{-- ── Total Biaya ── --}}
             <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-stone-500">Total Biaya</span>
+                    <span class="text-sm font-medium text-stone-500">Total Biaya Keseluruhan</span>
                     <span class="text-xl font-bold text-stone-900">Rp {{ number_format((float) $order->estimated_price, 0, ',', '.') }}</span>
                 </div>
+
+                @if ($order->dp_amount)
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="text-sm font-medium text-stone-500">Tagihan DP</span>
+                        <span class="text-base font-semibold text-stone-700">Rp {{ number_format((float) $order->dp_amount, 0, ',', '.') }}</span>
+                    </div>
+                @endif
+                
+                @php
+                    $totalPaid = $order->payments->where('status', 'terverifikasi')->sum('amount');
+                    $remaining = max(0, (float) $order->estimated_price - $totalPaid);
+                @endphp
+
+                @if ($totalPaid > 0)
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="text-sm font-medium text-stone-500">Sudah Dibayar</span>
+                        <span class="text-base font-semibold text-emerald-600">Rp {{ number_format($totalPaid, 0, ',', '.') }}</span>
+                    </div>
+                @endif
+                
+                @if ($remaining > 0 && $order->payment_status !== 'belum_bayar')
+                    <div class="mt-2 flex items-center justify-between border-t border-stone-100 pt-2">
+                        <span class="text-sm font-medium text-stone-500">Sisa Pelunasan</span>
+                        <span class="text-base font-bold text-rose-600">Rp {{ number_format($remaining, 0, ',', '.') }}</span>
+                    </div>
+                @endif
 
                 @php
                     $paymentLabels = [
                         'belum_bayar' => 'Belum Lunas',
                         'menunggu'    => 'Menunggu Verifikasi',
-                        'dp'          => 'Lunas (DP + Pelunasan)',
+                        'dp'          => 'DP Terbayar',
                         'lunas'       => 'Lunas (DP + Pelunasan)',
                     ];
                     $paymentBadgeClass = match($order->payment_status) {
@@ -356,14 +531,16 @@
 
     {{-- ── Bottom Action Buttons ── --}}
     <div class="flex flex-col items-center justify-center gap-3 border-t border-stone-100 pt-6 sm:flex-row">
-        <a href="{{ route('payments.history.order', $order) }}"
-           class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50"
-           wire:navigate>
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-            </svg>
-            Lihat Invoice
-        </a>
+        @if ($order->status === 'selesai')
+            <a href="{{ route('orders.invoice', $order) }}"
+               class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50"
+               target="_blank">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+                Lihat Invoice
+            </a>
+        @endif
 
         @php
             $waNumber = config('services.whatsapp.number') ?? null;

@@ -80,6 +80,12 @@ Route::middleware(['auth', 'customer'])->group(function () {
     Route::get('payments/{payment}/rejected', CustomerPaymentsRejectedPaymentHandler::class)
         ->name('payments.rejected');
 
+    Route::get('orders/{order}/invoice', [\App\Http\Controllers\Customer\InvoiceController::class, 'show'])
+        ->name('orders.invoice');
+
+    Route::get('payments/{payment}/invoice', [\App\Http\Controllers\Customer\InvoiceController::class, 'showPayment'])
+        ->name('payments.invoice');
+
     Route::post('orders/{order}/payments', [PaymentController::class, 'store'])
         ->name('payments.store');
 

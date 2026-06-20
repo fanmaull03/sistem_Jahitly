@@ -174,9 +174,13 @@
         <aside class="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white p-4 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] lg:sticky lg:top-6 lg:z-auto lg:rounded-2xl lg:border lg:p-6 lg:shadow-sm">
             <h3 class="hidden text-xl font-bold text-stone-900 lg:block">Rincian Tagihan</h3>
 
+            @php
+                $billAmount = $paymentType === 'dp' ? $dpAmount : $remainingAmount;
+            @endphp
+
             <div class="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-center">
                 <p class="text-xs font-semibold text-blue-700">Total Tagihan</p>
-                <p class="mt-1 text-2xl font-black text-blue-700">Rp {{ number_format($remainingAmount, 0, ',', '.') }}</p>
+                <p class="mt-1 text-2xl font-black text-blue-700">Rp {{ number_format($billAmount, 0, ',', '.') }}</p>
                 <p class="mt-1 text-xs text-blue-600">{{ $paymentType === 'dp' ? 'Pembayaran DP' : 'Pelunasan' }}</p>
             </div>
             
@@ -193,14 +197,24 @@
                     <span class="text-stone-500">Sudah Dibayar</span>
                     <span class="font-medium text-emerald-600">Rp {{ number_format($totalPaid, 0, ',', '.') }}</span>
                 </div>
+                @if ($paymentType === 'dp')
+                    <div class="flex items-center justify-between">
+                        <span class="text-stone-500">Tagihan DP</span>
+                        <span class="font-bold text-stone-900">Rp {{ number_format($dpAmount, 0, ',', '.') }}</span>
+                    </div>
+                @endif
+                <div class="flex items-center justify-between text-stone-500 text-xs mt-2 pt-2 border-t border-stone-200">
+                    <span>Sisa Keseluruhan</span>
+                    <span>Rp {{ number_format($remainingAmount, 0, ',', '.') }}</span>
+                </div>
                 <div class="my-4 h-px bg-stone-200"></div>
             </div>
 
             <div class="flex items-center justify-between lg:flex-col lg:items-stretch lg:justify-start lg:gap-6">
                 <div>
-                    <p class="text-xs font-semibold text-stone-500 lg:text-sm">Sisa Tagihan</p>
+                    <p class="text-xs font-semibold text-stone-500 lg:text-sm">Nominal Yang Harus Dibayar</p>
                     <p class="text-xl font-black text-blue-600 lg:mt-1 lg:text-2xl">
-                        Rp {{ number_format($remainingAmount, 0, ',', '.') }}
+                        Rp {{ number_format($billAmount, 0, ',', '.') }}
                     </p>
                 </div>
                 

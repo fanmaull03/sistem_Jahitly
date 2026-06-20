@@ -200,7 +200,7 @@
                         <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
                             <p class="text-sm text-amber-800">
                                 Menunggu customer mengatur dan menyelesaikan jadwal fitting. <br>
-                                <a href="{{ route('orders.appointments.index') }}" class="font-semibold underline" wire:navigate>Lihat Jadwal Appointment</a>
+                                <a href="{{ route('admin.appointments.index') }}" class="font-semibold underline" wire:navigate>Lihat Jadwal Appointment</a>
                             </p>
                         </div>
 
@@ -308,6 +308,15 @@
                                     </p>
                                     <button type="button" wire:click="markMaterialReady" class="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
                                         Tandai Bahan Ready
+                                    </button>
+                                </div>
+                            @elseif ($order->material_status === 'ready')
+                                <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                                    <p class="text-sm text-emerald-800 mb-3">
+                                        Bahan sudah berstatus "Ready". Klik tombol di bawah untuk memasukkan pesanan ke antrian produksi.
+                                    </p>
+                                    <button type="button" wire:click="forceMoveToQueue" class="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                                        Masukkan ke Antrian Produksi
                                     </button>
                                 </div>
                             @endif

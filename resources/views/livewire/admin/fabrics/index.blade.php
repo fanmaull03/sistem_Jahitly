@@ -48,14 +48,27 @@
         @forelse ($fabrics as $fabric)
             <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <div class="text-base font-semibold text-slate-900">{{ $fabric->name }}</div>
-                        <div class="mt-1 flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center gap-1.5 text-sm text-slate-500">
-                                <span class="h-3 w-3 rounded-full border border-slate-300" style="background-color: {{ $fabric->color === 'Putih' ? '#fff' : ($fabric->color === 'Hitam' ? '#1a1a1a' : ($fabric->color === 'Navy' ? '#1e3a5f' : ($fabric->color === 'Biru Muda' ? '#87CEEB' : ($fabric->color === 'Khaki' ? '#C3B091' : ($fabric->color === 'Cream' ? '#FFFDD0' : ($fabric->color === 'Gold' ? '#FFD700' : ($fabric->color === 'Biru Tua' ? '#00008B' : ($fabric->color === 'Dusty Pink' ? '#DCAE96' : ($fabric->color === 'Abu-abu' ? '#808080' : ($fabric->color === 'Olive' ? '#808000' : '#ccc')))))))))) }};"></span>
-                                {{ $fabric->color }}
-                            </span>
-                            <span class="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{{ $fabric->category_label }}</span>
+                    <div class="flex items-start gap-4">
+                        @if ($fabric->image_path)
+                            <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-slate-200">
+                                <img src="{{ Storage::url($fabric->image_path) }}" class="h-full w-full object-cover" alt="{{ $fabric->name }}">
+                            </div>
+                        @else
+                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-400">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        @endif
+                        <div class="flex-1">
+                            <div class="text-base font-semibold text-slate-900">{{ $fabric->name }}</div>
+                            <div class="mt-1 flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center gap-1.5 text-sm text-slate-500">
+                                    <span class="h-3 w-3 rounded-full border border-slate-300" style="background-color: {{ $fabric->color === 'Putih' ? '#fff' : ($fabric->color === 'Hitam' ? '#1a1a1a' : ($fabric->color === 'Navy' ? '#1e3a5f' : ($fabric->color === 'Biru Muda' ? '#87CEEB' : ($fabric->color === 'Khaki' ? '#C3B091' : ($fabric->color === 'Cream' ? '#FFFDD0' : ($fabric->color === 'Gold' ? '#FFD700' : ($fabric->color === 'Biru Tua' ? '#00008B' : ($fabric->color === 'Dusty Pink' ? '#DCAE96' : ($fabric->color === 'Abu-abu' ? '#808080' : ($fabric->color === 'Olive' ? '#808000' : '#ccc')))))))))) }};"></span>
+                                    {{ $fabric->color }}
+                                </span>
+                                <span class="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{{ $fabric->category_label }}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5">
@@ -245,17 +258,51 @@
                         @endif
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700">Deskripsi (Opsional)</label>
-                        <textarea
-                            rows="3"
-                            wire:model="description"
-                            class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-slate-400 focus:outline-none"
-                            placeholder="Deskripsi singkat bahan..."
-                        ></textarea>
-                        @error('description')
-                            <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                        @enderror
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700">Gambar Bahan (Opsional)</label>
+                            <input
+                                type="file"
+                                wire:model="image"
+                                accept="image/*"
+                                class="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:rounded-full file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-200"
+                            />
+                            <div wire:loading wire:target="image" class="mt-1 text-xs text-blue-600">Mengunggah...</div>
+                            @error('image')
+                                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                            @enderror
+                            
+                            {{-- Image Preview --}}
+                            <div class="mt-3">
+                                @if ($image)
+                                    <div class="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200">
+                                        <img src="{{ $image->temporaryUrl() }}" class="h-full w-full object-cover" alt="Preview">
+                                    </div>
+                                @elseif ($editingFabricId)
+                                    @php
+                                        $currentFabric = \App\Models\Fabric::find($editingFabricId);
+                                    @endphp
+                                    @if ($currentFabric && $currentFabric->image_path)
+                                        <div class="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200">
+                                            <img src="{{ Storage::url($currentFabric->image_path) }}" class="h-full w-full object-cover" alt="Current Image">
+                                        </div>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700">Deskripsi (Opsional)</label>
+                            <textarea
+                                rows="3"
+                                wire:model="description"
+                                class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-slate-400 focus:outline-none"
+                                placeholder="Deskripsi singkat bahan..."
+                            ></textarea>
+                            @error('description')
+                                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-2">

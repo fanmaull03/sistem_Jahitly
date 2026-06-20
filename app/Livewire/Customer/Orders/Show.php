@@ -31,7 +31,7 @@ class Show extends Component
             abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
         }
 
-        $this->order = $order->load(['service', 'fabric', 'statusLogs.user', 'designFiles', 'payments', 'appointment']);
+        $this->order = $order->load(['service', 'fabric', 'statusLogs.user', 'designFiles', 'payments', 'appointment', 'testimonial']);
         $this->hasPendingPayment = $this->order->payments
             ->where('status', 'menunggu_verifikasi')
             ->isNotEmpty();
@@ -184,5 +184,51 @@ class Show extends Component
         }
 
         return true;
+    }
+
+    public function markAsCompleted(): void
+    {
+        if ($this->order->status !== 'siap_diambil') {
+            return;
+        }
+
+        $this->order->update(['status' => 'selesai']);
+
+        \App\Models\OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'selesai',
+            'changed_by' => auth()->id(),
+            'notes' => 'Customer mengonfirmasi pesanan telah diambil dan selesai.',
+        ]);
+
+        $this->syncProgress();
+        session()->flash('success', 'Terima kasih! Pesanan telah dikonfirmasi selesai.');
+    }
+
+    // Properti untuk Testimonial
+    public int $rating = 5;
+    public string $review = '';
+
+    public function submitTestimonial(): void
+    {
+        if ($this->order->status !== 'selesai' || $this->order->testimonial) {
+            return;
+        }
+
+        $this->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'nullable|string|max:1000',
+        ]);
+
+        \App\Models\Testimonial::create([
+            'order_id' => $this->order->id,
+            'customer_id' => auth()->id(),
+            'rating' => $this->rating,
+            'review' => $this->review,
+            'is_featured' => false,
+        ]);
+
+        $this->order->load('testimonial');
+        session()->flash('success', 'Terima kasih atas ulasan Anda!');
     }
 }
