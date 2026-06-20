@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Admin\Payments;
 
+use App\Models\OrderStatusLog;
 use App\Models\Payment;
+use App\Notifications\OrderStatusUpdated;
 use App\Notifications\PaymentStatusUpdated;
+use App\Services\OrderBusinessRulesService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,56 +15,33 @@ class Index extends Component
 {
     use WithPagination;
 
-    public bool $showProofModal = false;
     public ?int $activePaymentId = null;
-    public bool $showRejectForm = false;
     public string $rejectionNote = '';
 
     public function mount(): void
     {
-        if (! auth()->check() || ! auth()->user()->isAdmin()) {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
-    }
-
-    public function getPaymentsProperty()
-    {
-        return Payment::with(['order.service', 'customer'])
-            ->where('status', 'menunggu_verifikasi')
-            ->oldest()
-            ->paginate(15);
     }
 
     public function openProof(int $paymentId): void
     {
         $this->activePaymentId = $paymentId;
-        $this->showProofModal = true;
-        $this->showRejectForm = false;
         $this->rejectionNote = '';
+        $this->resetValidation();
     }
 
     public function closeProof(): void
     {
-        $this->showProofModal = false;
         $this->activePaymentId = null;
-        $this->showRejectForm = false;
         $this->rejectionNote = '';
-    }
-
-    public function startReject(): void
-    {
-        $this->showRejectForm = true;
-    }
-
-    public function cancelReject(): void
-    {
-        $this->showRejectForm = false;
-        $this->rejectionNote = '';
+        $this->resetValidation();
     }
 
     public function approvePayment(int $paymentId): void
     {
-        $payment = Payment::with(['order.payments', 'customer'])->findOrFail($paymentId);
+        $payment = Payment::with(['order.payments', 'order.service', 'customer'])->findOrFail($paymentId);
 
         if ($payment->status !== 'menunggu_verifikasi') {
             session()->flash('error', 'Pembayaran sudah diproses.');
@@ -80,9 +60,11 @@ class Index extends Component
         }
 
         $order = $payment->order;
-        $totalVerified = $order->payments
-            ->where('status', 'terverifikasi')
-            ->sum('amount');
+        $totalVerified = $order->payments->fresh()->where('status', 'terverifikasi')->sum('amount');
+
+        // Reload order to get fresh data
+        $order = $order->fresh(['payments', 'service', 'appointment']);
+        $totalVerified = $order->payments->where('status', 'terverifikasi')->sum('amount');
         $estimatedPrice = (float) $order->estimated_price;
 
         $message = 'Pembayaran berhasil diverifikasi.';
@@ -93,6 +75,75 @@ class Index extends Component
             $kekurangan = max(0, $estimatedPrice - $totalVerified);
             $message .= ' Sisa pembayaran pesanan ' . $order->order_number
                 . ': Rp ' . number_format($kekurangan, 0, ',', '.') . '.';
+        }
+
+        // ── Auto-advance logic berdasarkan payment type ──
+
+        // DP terverifikasi → cek apakah bisa masuk antrian
+        if ($payment->payment_type === 'dp') {
+            if (in_array($order->status, ['menunggu_dp', 'menunggu_fitting'])) {
+                // Cek bahan
+                if ($order->material_source === 'customer' || $order->material_status === 'ready') {
+                    // Bahan ready → masuk antrian
+                    $order->update([
+                        'status' => 'dalam_antrian',
+                        'material_status' => $order->material_status ?? 'ready',
+                    ]);
+
+                    OrderStatusLog::create([
+                        'order_id' => $order->id,
+                        'status' => 'dalam_antrian',
+                        'changed_by' => auth()->id(),
+                        'notes' => 'DP terverifikasi, bahan siap. Pesanan masuk antrian produksi.',
+                    ]);
+
+                    if ($order->customer) {
+                        $order->customer->notify(new OrderStatusUpdated(
+                            $order,
+                            'Pesanan #' . $order->order_number . ' masuk antrian produksi.'
+                        ));
+                    }
+
+                    $message .= ' Pesanan otomatis masuk antrian produksi.';
+                } else {
+                    // Bahan belum ready → menunggu bahan
+                    $order->update(['status' => 'menunggu_bahan']);
+
+                    OrderStatusLog::create([
+                        'order_id' => $order->id,
+                        'status' => 'menunggu_bahan',
+                        'changed_by' => auth()->id(),
+                        'notes' => 'DP terverifikasi. Menunggu kesiapan bahan.',
+                    ]);
+
+                    $message .= ' Pesanan menunggu kesiapan bahan.';
+                }
+            }
+        }
+
+        // Pelunasan terverifikasi → siap diambil
+        if ($payment->payment_type === 'pelunasan' && $order->status === 'selesai_produksi') {
+            $check = app(OrderBusinessRulesService::class)->canMarkReadyForPickup($order->fresh('payments'));
+
+            if ($check['can_proceed']) {
+                $order->update(['status' => 'siap_diambil']);
+
+                OrderStatusLog::create([
+                    'order_id' => $order->id,
+                    'status' => 'siap_diambil',
+                    'changed_by' => auth()->id(),
+                    'notes' => 'Pelunasan terverifikasi. Pesanan siap diambil.',
+                ]);
+
+                if ($order->customer) {
+                    $order->customer->notify(new OrderStatusUpdated(
+                        $order,
+                        'Pesanan #' . $order->order_number . ' siap untuk diambil!'
+                    ));
+                }
+
+                $message .= ' Pesanan siap diambil.';
+            }
         }
 
         $this->closeProof();
@@ -133,11 +184,18 @@ class Index extends Component
 
     public function getActivePaymentProperty(): ?Payment
     {
-        if (! $this->activePaymentId) {
+        if (!$this->activePaymentId) {
             return null;
         }
 
         return Payment::with(['order.service', 'customer'])->find($this->activePaymentId);
+    }
+
+    public function getPaymentsProperty()
+    {
+        return Payment::with(['order.service', 'customer'])
+            ->latest()
+            ->paginate(15);
     }
 
     public function render(): View

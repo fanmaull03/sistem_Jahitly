@@ -29,6 +29,12 @@ class Order extends Model
         'queue_position',
         'cancelled_at',
         'cancellation_reason',
+        'rejection_reason',
+        'dp_amount',
+        'production_days',
+        'po_days',
+        'production_started_at',
+        'production_finished_at',
     ];
 
     /**
@@ -40,10 +46,15 @@ class Order extends Model
     {
         return [
             'estimated_price' => 'decimal:2',
+            'dp_amount' => 'decimal:2',
             'estimated_finish_date' => 'date',
             'cancelled_at' => 'datetime',
+            'production_started_at' => 'datetime',
+            'production_finished_at' => 'datetime',
             'quantity' => 'integer',
             'queue_position' => 'integer',
+            'production_days' => 'integer',
+            'po_days' => 'integer',
         ];
     }
 
@@ -162,5 +173,21 @@ class Order extends Model
         }
 
         return 'belum_bayar';
+    }
+
+    /**
+     * Cek apakah pesanan membutuhkan fitting.
+     */
+    public function requiresFitting(): bool
+    {
+        return in_array($this->service?->type, ['custom', 'seragam'], true);
+    }
+
+    /**
+     * Cek apakah pesanan sedang aktif (belum selesai/ditolak/dibatalkan).
+     */
+    public function isActive(): bool
+    {
+        return !in_array($this->status, ['selesai', 'ditolak', 'dibatalkan'], true);
     }
 }

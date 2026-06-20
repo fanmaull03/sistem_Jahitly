@@ -3,12 +3,17 @@
 @php
     $labelMaps = [
         'order' => [
-            'menunggu_appointment' => 'Menunggu Appointment',
+            'menunggu_konfirmasi' => 'Menunggu Konfirmasi',
+            'ditolak' => 'Ditolak',
+            'menunggu_fitting' => 'Menunggu Fitting',
+            'menunggu_dp' => 'Menunggu DP',
             'menunggu_bahan' => 'Menunggu Bahan',
-            'diproses' => 'Diproses',
+            'dalam_antrian' => 'Dalam Antrian',
             'dijahit' => 'Dijahit',
-            'finishing' => 'Finishing',
+            'selesai_produksi' => 'Selesai Produksi',
+            'siap_diambil' => 'Siap Diambil',
             'selesai' => 'Selesai',
+            'dibatalkan' => 'Dibatalkan',
         ],
         'payment' => [
             'menunggu_verifikasi' => 'Menunggu Verifikasi',
@@ -35,12 +40,17 @@
 
     $classMaps = [
         'order' => [
-            'menunggu_appointment' => 'bg-amber-100 text-amber-800',
+            'menunggu_konfirmasi' => 'bg-yellow-100 text-yellow-800',
+            'ditolak' => 'bg-rose-100 text-rose-800',
+            'menunggu_fitting' => 'bg-amber-100 text-amber-800',
+            'menunggu_dp' => 'bg-orange-100 text-orange-800',
             'menunggu_bahan' => 'bg-sky-100 text-sky-800',
-            'diproses' => 'bg-blue-100 text-blue-800',
+            'dalam_antrian' => 'bg-blue-100 text-blue-800',
             'dijahit' => 'bg-indigo-100 text-indigo-800',
-            'finishing' => 'bg-purple-100 text-purple-800',
+            'selesai_produksi' => 'bg-purple-100 text-purple-800',
+            'siap_diambil' => 'bg-teal-100 text-teal-800',
             'selesai' => 'bg-green-100 text-green-800',
+            'dibatalkan' => 'bg-slate-200 text-slate-700',
         ],
         'payment' => [
             'menunggu_verifikasi' => 'bg-amber-100 text-amber-800',

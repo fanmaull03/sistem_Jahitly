@@ -31,8 +31,10 @@ class Index extends Component
     {
         return [
             'all' => 'Semua',
+            'menunggu' => 'Menunggu',
             'proses' => 'Sedang Proses',
             'selesai' => 'Selesai',
+            'ditolak' => 'Ditolak',
             'dibatalkan' => 'Dibatalkan',
         ];
     }
@@ -44,10 +46,14 @@ class Index extends Component
             ->with(['service', 'payments'])
             ->latest();
 
-        if ($this->statusFilter === 'proses') {
-            $query->whereIn('status', ['menunggu_appointment', 'menunggu_bahan', 'diproses', 'dijahit', 'finishing']);
+        if ($this->statusFilter === 'menunggu') {
+            $query->whereIn('status', ['menunggu_konfirmasi', 'menunggu_fitting', 'menunggu_dp', 'menunggu_bahan']);
+        } elseif ($this->statusFilter === 'proses') {
+            $query->whereIn('status', ['dalam_antrian', 'dijahit', 'selesai_produksi', 'siap_diambil']);
         } elseif ($this->statusFilter === 'selesai') {
             $query->where('status', 'selesai');
+        } elseif ($this->statusFilter === 'ditolak') {
+            $query->where('status', 'ditolak');
         } elseif ($this->statusFilter === 'dibatalkan') {
             $query->where('status', 'dibatalkan');
         }

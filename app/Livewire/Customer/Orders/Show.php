@@ -9,24 +9,21 @@ use Livewire\Component;
 class Show extends Component
 {
     public Order $order;
+
     /**
+     * Timeline status steps sesuai alur bisnis baru.
+     *
      * @var array<int, array{key: string, label: string, description: string}>
      */
-    public array $statusSteps = [
-        ['key' => 'menunggu_appointment', 'label' => 'Pesanan Diterima', 'description' => 'Pesanan Anda telah diterima dan sedang diproses.'],
-        ['key' => 'menunggu_bahan', 'label' => 'Fitting & Ukur', 'description' => 'Proses pengukuran dan fitting di studio.'],
-        ['key' => 'diproses', 'label' => 'Antrian Produksi', 'description' => 'Bahan disiapkan dan dipotong.'],
-        ['key' => 'dijahit', 'label' => 'Proses Jahit', 'description' => 'Pakaian Anda sedang ditangani oleh Penjahit Ahli kami.'],
-        ['key' => 'finishing', 'label' => 'Finishing & QC', 'description' => 'Pengecekan kualitas dan finishing akhir.'],
-        ['key' => 'selesai', 'label' => 'Siap Diambil', 'description' => 'Pesanan selesai dan siap untuk diambil.'],
-    ];
+    public array $statusSteps = [];
+
     public int $currentStepIndex = 0;
     public int $progressPercent = 0;
     public bool $hasPendingPayment = false;
 
     public function mount(Order $order): void
     {
-        if (! auth()->check() || ! auth()->user()->isCustomer()) {
+        if (!auth()->check() || !auth()->user()->isCustomer()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 
@@ -39,35 +36,74 @@ class Show extends Component
             ->where('status', 'menunggu_verifikasi')
             ->isNotEmpty();
 
+        $this->buildStatusSteps();
         $this->syncProgress();
     }
 
     /**
-     * Cek apakah customer boleh membayar.
-     * - Vermak: langsung bisa bayar
-     * - Custom/Seragam: hanya bisa bayar setelah appointment selesai
+     * Build status steps berdasarkan tipe layanan.
+     * Custom/Seragam punya fitting, Vermak langsung ke DP.
      */
-    public function getCanPayProperty(): bool
+    private function buildStatusSteps(): void
     {
-        $serviceType = $this->order->service->type ?? '';
+        $needsFitting = $this->order->requiresFitting();
 
-        // Vermak tidak perlu appointment
-        if ($serviceType === 'vermak') {
-            return true;
+        $steps = [
+            ['key' => 'menunggu_konfirmasi', 'label' => 'Pesanan Dikirim', 'description' => 'Pesanan Anda sedang ditinjau oleh admin.'],
+        ];
+
+        if ($needsFitting) {
+            $steps[] = ['key' => 'menunggu_fitting', 'label' => 'Jadwal Fitting', 'description' => 'Silakan atur jadwal fitting untuk pengukuran.'];
         }
 
-        // Custom & Seragam: cek appointment selesai
-        return $this->order->appointment
-            && $this->order->appointment->status === 'selesai';
+        $steps = array_merge($steps, [
+            ['key' => 'menunggu_dp', 'label' => 'Pembayaran DP', 'description' => 'Lakukan pembayaran DP sesuai nominal yang ditetapkan admin.'],
+            ['key' => 'menunggu_bahan', 'label' => 'Persiapan Bahan', 'description' => 'Bahan sedang dipersiapkan oleh penjahit.'],
+            ['key' => 'dalam_antrian', 'label' => 'Antrian Produksi', 'description' => 'Pesanan dalam antrian menunggu giliran pengerjaan.'],
+            ['key' => 'dijahit', 'label' => 'Proses Jahit', 'description' => 'Pakaian Anda sedang ditangani oleh Penjahit Ahli kami.'],
+            ['key' => 'selesai_produksi', 'label' => 'Selesai Produksi', 'description' => 'Produksi selesai. Silakan lakukan pelunasan pembayaran.'],
+            ['key' => 'siap_diambil', 'label' => 'Siap Diambil', 'description' => 'Pesanan siap untuk Anda ambil di workshop.'],
+            ['key' => 'selesai', 'label' => 'Selesai', 'description' => 'Pesanan telah selesai. Terima kasih!'],
+        ]);
+
+        $this->statusSteps = $steps;
     }
 
     /**
-     * Cek apakah pesanan ini membutuhkan appointment.
+     * Cek apakah customer boleh membayar.
+     * - DP: saat status menunggu_dp dan dp_amount sudah ditetapkan
+     * - Pelunasan: saat status selesai_produksi
+     */
+    public function getCanPayProperty(): bool
+    {
+        if ($this->order->status === 'menunggu_dp') {
+            return $this->order->dp_amount > 0;
+        }
+
+        if ($this->order->status === 'selesai_produksi') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Cek tipe pembayaran yang harus dilakukan.
+     */
+    public function getPaymentTypeProperty(): string
+    {
+        if ($this->order->status === 'menunggu_dp') {
+            return 'dp';
+        }
+        return 'pelunasan';
+    }
+
+    /**
+     * Cek apakah pesanan ini membutuhkan fitting.
      */
     public function getNeedsAppointmentProperty(): bool
     {
-        $serviceType = $this->order->service->type ?? '';
-        return in_array($serviceType, ['seragam', 'custom'], true);
+        return $this->order->requiresFitting();
     }
 
     public function getPaymentStatusLabelProperty(): string
@@ -93,9 +129,26 @@ class Show extends Component
     private function syncProgress(): void
     {
         $statusKeys = array_column($this->statusSteps, 'key');
-        $index = array_search($this->order->status, $statusKeys, true);
+        $currentStatus = $this->order->status;
 
-        $this->currentStepIndex = $index === false ? 0 : (int) $index;
+        // Untuk status terminal (ditolak, dibatalkan), set ke step 0
+        if (in_array($currentStatus, ['ditolak', 'dibatalkan'], true)) {
+            $this->currentStepIndex = -1;
+            $this->progressPercent = 0;
+            return;
+        }
+
+        // Jika Vermak dan status skip fitting step, cari match di steps
+        $index = array_search($currentStatus, $statusKeys, true);
+
+        // Handle: jika status tidak ada di steps (misal menunggu_bahan di-skip karena bahan ready)
+        if ($index === false) {
+            $this->currentStepIndex = 0;
+            $this->progressPercent = 0;
+            return;
+        }
+
+        $this->currentStepIndex = (int) $index;
 
         $stepCount = count($this->statusSteps);
         if ($stepCount === 0) {
@@ -119,8 +172,7 @@ class Show extends Component
      */
     public function canCancelOrder(): bool
     {
-        // Status yang tidak dapat dibatalkan
-        $nonCancellableStatuses = ['dijahit', 'finishing', 'selesai', 'dibatalkan'];
+        $nonCancellableStatuses = ['dijahit', 'selesai_produksi', 'siap_diambil', 'selesai', 'ditolak', 'dibatalkan'];
 
         if (in_array($this->order->status, $nonCancellableStatuses)) {
             return false;

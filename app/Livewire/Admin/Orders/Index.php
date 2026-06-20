@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin\Orders;
 
 use App\Models\Order;
+use App\Models\OrderStatusLog;
+use App\Notifications\OrderStatusUpdated;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -19,7 +21,7 @@ class Index extends Component
 
     public function mount(): void
     {
-        if (! auth()->check() || ! auth()->user()->isAdmin()) {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
     }
@@ -40,18 +42,56 @@ class Index extends Component
     }
 
     /**
+     * Quick accept order from list.
+     */
+    public function quickAccept(int $orderId): void
+    {
+        $order = Order::with(['service', 'customer'])->findOrFail($orderId);
+
+        if ($order->status !== 'menunggu_konfirmasi') {
+            session()->flash('error', 'Pesanan tidak sedang menunggu konfirmasi.');
+            return;
+        }
+
+        $requiresFitting = in_array($order->service->type, ['custom', 'seragam'], true);
+        $newStatus = $requiresFitting ? 'menunggu_fitting' : 'menunggu_dp';
+
+        $order->update(['status' => $newStatus]);
+
+        OrderStatusLog::create([
+            'order_id' => $order->id,
+            'status' => $newStatus,
+            'changed_by' => auth()->id(),
+            'notes' => 'Pesanan diterima oleh admin.',
+        ]);
+
+        if ($order->customer) {
+            $msg = $requiresFitting
+                ? 'Pesanan #' . $order->order_number . ' diterima. Silakan atur jadwal fitting.'
+                : 'Pesanan #' . $order->order_number . ' diterima. Silakan lakukan pembayaran DP.';
+            $order->customer->notify(new OrderStatusUpdated($order, $msg));
+        }
+
+        session()->flash('success', 'Pesanan #' . $order->order_number . ' berhasil diterima.');
+    }
+
+    /**
      * @return array<string, string>
      */
     public function getStatusesProperty(): array
     {
         return [
             'all' => 'Semua Status',
-            'menunggu_appointment' => 'Menunggu Appointment',
+            'menunggu_konfirmasi' => 'Menunggu Konfirmasi',
+            'menunggu_fitting' => 'Menunggu Fitting',
+            'menunggu_dp' => 'Menunggu DP',
             'menunggu_bahan' => 'Menunggu Bahan',
-            'diproses' => 'Diproses',
+            'dalam_antrian' => 'Dalam Antrian',
             'dijahit' => 'Dijahit',
-            'finishing' => 'Finishing',
+            'selesai_produksi' => 'Selesai Produksi',
+            'siap_diambil' => 'Siap Diambil',
             'selesai' => 'Selesai',
+            'ditolak' => 'Ditolak',
             'dibatalkan' => 'Dibatalkan',
         ];
     }
@@ -67,6 +107,11 @@ class Index extends Component
             'seragam' => 'Seragam',
             'custom' => 'Custom',
         ];
+    }
+
+    public function getPendingCountProperty(): int
+    {
+        return Order::where('status', 'menunggu_konfirmasi')->count();
     }
 
     public function getOrdersProperty()
@@ -102,6 +147,7 @@ class Index extends Component
             'orders' => $this->orders,
             'statuses' => $this->statuses,
             'serviceTypes' => $this->serviceTypes,
+            'pendingCount' => $this->pendingCount,
         ])->layout('layouts.admin');
     }
 }

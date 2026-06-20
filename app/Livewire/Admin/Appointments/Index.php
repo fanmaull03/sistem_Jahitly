@@ -161,29 +161,27 @@ class Index extends Component
         $appointment->update(['status' => 'selesai']);
 
         $order = $appointment->order;
-        $message = 'Appointment berhasil ditandai selesai.';
+        $message = 'Fitting berhasil ditandai selesai.';
 
-        $check = app(OrderBusinessRulesService::class)->canMoveToProcessing($order);
-
-        if ($check['can_proceed']) {
-            $order->update(['status' => 'diproses']);
+        // Pindahkan status order ke menunggu_dp
+        if ($order->status === 'menunggu_fitting') {
+            $order->update(['status' => 'menunggu_dp']);
 
             OrderStatusLog::create([
                 'order_id' => $order->id,
-                'status' => 'diproses',
+                'status' => 'menunggu_dp',
                 'changed_by' => auth()->id(),
-                'notes' => 'Status otomatis berubah setelah appointment selesai dan semua syarat terpenuhi.',
+                'notes' => 'Fitting selesai. Menunggu pembayaran DP.',
             ]);
 
             if ($order->customer) {
-                $message = 'Pesanan #' . $order->order_number . ' status diperbarui menjadi diproses.';
-                $order->customer->notify(new OrderStatusUpdated($order, $message));
+                $order->customer->notify(new OrderStatusUpdated(
+                    $order,
+                    'Fitting pesanan #' . $order->order_number . ' telah selesai. Silakan lakukan pembayaran DP.'
+                ));
             }
 
-            $message .= ' Pesanan ' . $order->order_number . ' otomatis diproses.';
-        } else {
-            $message .= ' Pesanan ' . $order->order_number
-                . ' belum bisa diproses: ' . implode(' ', $check['blocking_reasons']);
+            $message .= ' Pesanan ' . $order->order_number . ' menunggu pembayaran DP.';
         }
 
         session()->flash('success', $message);

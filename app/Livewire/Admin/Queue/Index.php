@@ -12,7 +12,7 @@ class Index extends Component
     /**
      * @var list<string>
      */
-    public array $queueStatuses = ['diproses', 'dijahit', 'finishing'];
+    public array $queueStatuses = ['dalam_antrian', 'dijahit'];
     public bool $hasQueuePositionColumn = false;
 
     public function mount(): void

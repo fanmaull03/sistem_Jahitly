@@ -36,7 +36,7 @@ class CancelOrder extends Component
     public function canCancelOrder(): bool
     {
         // Status yang tidak dapat dibatalkan
-        $nonCancellableStatuses = ['dijahit', 'finishing', 'selesai', 'dibatalkan'];
+        $nonCancellableStatuses = ['dijahit', 'selesai_produksi', 'siap_diambil', 'selesai', 'ditolak', 'dibatalkan'];
 
         if (in_array($this->order->status, $nonCancellableStatuses)) {
             return false;

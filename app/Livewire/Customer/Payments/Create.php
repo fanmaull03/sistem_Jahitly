@@ -19,11 +19,12 @@ class Create extends Component
     public string $paymentType = 'dp';
     public float $totalPaid = 0.0;
     public float $remainingAmount = 0.0;
+    public float $dpAmount = 0.0;
     public bool $hasPendingPayment = false;
 
     public function mount(Order $order): void
     {
-        if (! auth()->check() || ! auth()->user()->isCustomer()) {
+        if (!auth()->check() || !auth()->user()->isCustomer()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 
@@ -38,16 +39,28 @@ class Create extends Component
             ->where('status', 'terverifikasi')
             ->isNotEmpty();
 
-        $this->paymentType = $hasVerifiedDp ? 'pelunasan' : 'dp';
+        // Determine payment type based on order status
+        if ($this->order->status === 'selesai_produksi') {
+            $this->paymentType = 'pelunasan';
+        } elseif ($hasVerifiedDp) {
+            $this->paymentType = 'pelunasan';
+        } else {
+            $this->paymentType = 'dp';
+        }
+
         $this->totalPaid = (float) $this->order->payments
             ->where('status', 'terverifikasi')
             ->sum('amount');
         $this->remainingAmount = max(0, (float) $this->order->estimated_price - $this->totalPaid);
+        $this->dpAmount = (float) ($this->order->dp_amount ?? 0);
         $this->hasPendingPayment = $this->order->payments
             ->where('status', 'menunggu_verifikasi')
             ->isNotEmpty();
 
-        if ($this->paymentType === 'pelunasan') {
+        // Auto-fill amount
+        if ($this->paymentType === 'dp' && $this->dpAmount > 0) {
+            $this->amount = $this->dpAmount;
+        } elseif ($this->paymentType === 'pelunasan') {
             $this->amount = $this->remainingAmount;
         }
     }
@@ -88,7 +101,7 @@ class Create extends Component
 
     public function updatedPaymentMethod(): void
     {
-        if (! $this->requiresProofFile()) {
+        if (!$this->requiresProofFile()) {
             $this->proof_file = null;
             $this->resetValidation('proof_file');
         }

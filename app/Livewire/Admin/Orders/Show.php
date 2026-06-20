@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Orders;
 
-use App\Models\DesignFile;
+use App\Models\Fabric;
 use App\Models\Order;
 use App\Models\OrderStatusLog;
 use App\Notifications\OrderStatusUpdated;
@@ -13,146 +13,285 @@ use Livewire\Component;
 class Show extends Component
 {
     public Order $order;
+
+    // ── Rejection ────────────────────────────────────────────
+    public string $rejectionReason = '';
+    public bool $showRejectForm = false;
+
+    // ── DP Amount ────────────────────────────────────────────
+    public string $dpAmount = '';
+    public bool $showDpForm = false;
+
+    // ── Material Management ──────────────────────────────────
     public string $material_source = '';
     public string $material_status = '';
-    public string $status = '';
-    public ?string $notes = null;
-    /**
-     * @var list<string>
-     */
-    public array $blockingReasons = [];
-
-    public bool $showDesignModal = false;
-    public ?string $designPreviewUrl = null;
-    public ?string $designPreviewName = null;
+    public ?int $fabric_id = null;
+    public string $poDays = '';
+    public bool $showMaterialForm = false;
 
     // ── Price editing ────────────────────────────────────────
     public string $editEstimatedPrice = '';
     public bool $showPriceForm = false;
 
+    // ── Production ───────────────────────────────────────────
+    public string $productionDays = '';
+    public bool $showProductionForm = false;
+
+    // ── Status notes ─────────────────────────────────────────
+    public ?string $notes = null;
+
+    // ── Design Preview ───────────────────────────────────────
+    public bool $showDesignModal = false;
+    public ?string $designPreviewUrl = null;
+    public ?string $designPreviewName = null;
+
     public function mount(Order $order): void
     {
-        if (! auth()->check() || ! auth()->user()->isAdmin()) {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 
         $this->order = $order;
         $this->refreshOrder();
-        $this->syncBlockingReasons();
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    protected function materialRules(): array
+    // ──────────────────────────────────────────────────────────
+    // Action: Terima Pesanan
+    // ──────────────────────────────────────────────────────────
+
+    public function acceptOrder(): void
     {
-        return [
-            'material_source' => ['required', 'in:customer,jasa'],
-            'material_status' => ['required', 'in:ready,po'],
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    protected function statusRules(): array
-    {
-        return [
-            'status' => [
-                'required',
-                'in:menunggu_appointment,menunggu_bahan,diproses,dijahit,finishing,selesai',
-            ],
-            'notes' => ['nullable', 'string', 'max:2000'],
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    protected function messages(): array
-    {
-        return [
-            'material_source.required' => 'Sumber bahan harus diisi.',
-            'material_source.in' => 'Sumber bahan harus "customer" atau "jasa".',
-            'material_status.required' => 'Status bahan harus diisi.',
-            'material_status.in' => 'Status bahan harus "ready" atau "po".',
-            'status.required' => 'Status pesanan harus diisi.',
-            'status.in' => 'Status pesanan tidak valid.',
-            'notes.max' => 'Catatan maksimal 2000 karakter.',
-        ];
-    }
-
-    public function updatedStatus(): void
-    {
-        $this->syncBlockingReasons();
-    }
-
-    public function updateMaterial(): void
-    {
-        $validated = $this->validate($this->materialRules());
-
-        $this->order->update([
-            'material_source' => $validated['material_source'],
-            'material_status' => $validated['material_status'],
-        ]);
-
-        $estimation = app(OrderBusinessRulesService::class)->calculateEstimation($this->order);
-
-        $this->order->update([
-            'estimated_price' => $estimation['estimated_price'],
-            'estimated_finish_date' => $estimation['estimated_finish_date'],
-        ]);
-
-        $this->refreshOrder();
-        $this->syncBlockingReasons();
-
-        session()->flash('success', 'Data bahan pesanan berhasil diperbarui.');
-    }
-
-    public function updateStatus(): void
-    {
-        $validated = $this->validate($this->statusRules());
-
-        $this->syncBlockingReasons();
-
-        if (! empty($this->blockingReasons)) {
+        if ($this->order->status !== 'menunggu_konfirmasi') {
+            session()->flash('error', 'Pesanan ini tidak sedang menunggu konfirmasi.');
             return;
         }
 
-        $oldStatus = $this->order->status;
-        $newStatus = $validated['status'];
+        $serviceType = $this->order->service->type;
+        $newStatus = app(OrderBusinessRulesService::class)->requiresFitting($serviceType)
+            ? 'menunggu_fitting'
+            : 'menunggu_dp';
 
-        $this->order->update([
-            'status' => $newStatus,
-        ]);
+        $this->order->update(['status' => $newStatus]);
 
         OrderStatusLog::create([
             'order_id' => $this->order->id,
             'status' => $newStatus,
             'changed_by' => auth()->id(),
-            'notes' => $validated['notes'] ?? null,
+            'notes' => 'Pesanan diterima oleh admin.',
         ]);
-
-        // Deduct fabric stock when order starts processing
-        if ($oldStatus !== 'diproses' && $newStatus === 'diproses') {
-            app(OrderBusinessRulesService::class)->deductFabricStock($this->order);
-        }
-
-        $this->notes = null;
-        $this->refreshOrder();
-        $this->syncBlockingReasons();
 
         $customer = $this->order->customer;
         if ($customer) {
-            $message = 'Pesanan #' . $this->order->order_number
-                . ' status diperbarui menjadi ' . $this->order->status . '.';
-            $customer->notify(new OrderStatusUpdated($this->order, $message));
+            $msg = $newStatus === 'menunggu_fitting'
+                ? 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan atur jadwal fitting.'
+                : 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan lakukan pembayaran DP.';
+            $customer->notify(new OrderStatusUpdated($this->order, $msg));
         }
 
-        session()->flash('success', 'Status pesanan berhasil diperbarui.');
+        $this->refreshOrder();
+        session()->flash('success', 'Pesanan berhasil diterima.');
     }
 
-    // ── Price Editing ─────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────
+    // Action: Tolak Pesanan
+    // ──────────────────────────────────────────────────────────
+
+    public function openRejectForm(): void
+    {
+        $this->showRejectForm = true;
+    }
+
+    public function closeRejectForm(): void
+    {
+        $this->showRejectForm = false;
+        $this->rejectionReason = '';
+        $this->resetValidation('rejectionReason');
+    }
+
+    public function rejectOrder(): void
+    {
+        $this->validate([
+            'rejectionReason' => ['required', 'string', 'min:10', 'max:2000'],
+        ], [
+            'rejectionReason.required' => 'Alasan penolakan harus diisi.',
+            'rejectionReason.min' => 'Alasan penolakan minimal 10 karakter.',
+        ]);
+
+        if ($this->order->status !== 'menunggu_konfirmasi') {
+            session()->flash('error', 'Pesanan ini tidak sedang menunggu konfirmasi.');
+            return;
+        }
+
+        $this->order->update([
+            'status' => 'ditolak',
+            'rejection_reason' => $this->rejectionReason,
+        ]);
+
+        OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'ditolak',
+            'changed_by' => auth()->id(),
+            'notes' => 'Pesanan ditolak: ' . $this->rejectionReason,
+        ]);
+
+        $customer = $this->order->customer;
+        if ($customer) {
+            $customer->notify(new OrderStatusUpdated(
+                $this->order,
+                'Pesanan #' . $this->order->order_number . ' ditolak. Alasan: ' . $this->rejectionReason
+            ));
+        }
+
+        $this->closeRejectForm();
+        $this->refreshOrder();
+        session()->flash('success', 'Pesanan berhasil ditolak.');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Action: Set DP Amount
+    // ──────────────────────────────────────────────────────────
+
+    public function openDpForm(): void
+    {
+        $this->dpAmount = (string) (int) ($this->order->dp_amount ?? 0);
+        $this->showDpForm = true;
+    }
+
+    public function closeDpForm(): void
+    {
+        $this->showDpForm = false;
+        $this->dpAmount = '';
+        $this->resetValidation('dpAmount');
+    }
+
+    public function setDpAmount(): void
+    {
+        $this->validate([
+            'dpAmount' => ['required', 'numeric', 'min:1000'],
+        ], [
+            'dpAmount.required' => 'Nominal DP harus diisi.',
+            'dpAmount.numeric' => 'Nominal DP harus berupa angka.',
+            'dpAmount.min' => 'Nominal DP minimal Rp 1.000.',
+        ]);
+
+        $this->order->update(['dp_amount' => (float) $this->dpAmount]);
+
+        $customer = $this->order->customer;
+        if ($customer) {
+            $customer->notify(new OrderStatusUpdated(
+                $this->order,
+                'Admin telah menetapkan DP pesanan #' . $this->order->order_number . ' sebesar Rp ' . number_format((float) $this->dpAmount, 0, ',', '.') . '. Silakan lakukan pembayaran.'
+            ));
+        }
+
+        $this->closeDpForm();
+        $this->refreshOrder();
+        session()->flash('success', 'Nominal DP berhasil ditetapkan dan notifikasi dikirim ke customer.');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Action: Material Management
+    // ──────────────────────────────────────────────────────────
+
+    public function openMaterialForm(): void
+    {
+        $this->material_source = $this->order->material_source ?? '';
+        $this->material_status = $this->order->material_status ?? '';
+        $this->fabric_id = $this->order->fabric_id;
+        $this->poDays = (string) ($this->order->po_days ?? '');
+        $this->showMaterialForm = true;
+    }
+
+    public function closeMaterialForm(): void
+    {
+        $this->showMaterialForm = false;
+        $this->resetValidation();
+    }
+
+    public function updateMaterial(): void
+    {
+        $rules = [
+            'material_source' => ['required', 'in:customer,jasa'],
+            'material_status' => ['required', 'in:ready,po'],
+        ];
+
+        if ($this->material_source === 'jasa') {
+            $rules['fabric_id'] = ['required', 'exists:fabrics,id'];
+        }
+
+        if ($this->material_status === 'po') {
+            $rules['poDays'] = ['required', 'integer', 'min:3', 'max:7'];
+        }
+
+        $this->validate($rules, [
+            'material_source.required' => 'Sumber bahan harus dipilih.',
+            'material_status.required' => 'Status bahan harus dipilih.',
+            'fabric_id.required' => 'Pilih bahan kain.',
+            'poDays.required' => 'Durasi PO harus diisi.',
+            'poDays.min' => 'PO minimal 3 hari.',
+            'poDays.max' => 'PO maksimal 7 hari.',
+        ]);
+
+        $updateData = [
+            'material_source' => $this->material_source,
+            'material_status' => $this->material_status,
+            'fabric_id' => $this->material_source === 'jasa' ? $this->fabric_id : null,
+            'po_days' => $this->material_status === 'po' ? (int) $this->poDays : null,
+        ];
+
+        $this->order->update($updateData);
+
+        // Recalculate estimation
+        $estimation = app(OrderBusinessRulesService::class)->calculateEstimation($this->order);
+        $this->order->update([
+            'estimated_price' => $estimation['estimated_price'],
+            'estimated_finish_date' => $estimation['estimated_finish_date'],
+        ]);
+
+        $this->closeMaterialForm();
+        $this->refreshOrder();
+        session()->flash('success', 'Data bahan berhasil diperbarui.');
+    }
+
+    /**
+     * Admin menandai bahan sudah tersedia (dari PO → ready).
+     */
+    public function markMaterialReady(): void
+    {
+        if ($this->order->material_status !== 'po') {
+            return;
+        }
+
+        $this->order->update(['material_status' => 'ready']);
+
+        // Cek apakah bisa masuk antrian
+        $check = app(OrderBusinessRulesService::class)->canMoveToQueue($this->order->fresh(['service', 'appointment', 'payments']));
+
+        if ($check['can_proceed'] && $this->order->status === 'menunggu_bahan') {
+            $this->order->update(['status' => 'dalam_antrian']);
+
+            OrderStatusLog::create([
+                'order_id' => $this->order->id,
+                'status' => 'dalam_antrian',
+                'changed_by' => auth()->id(),
+                'notes' => 'Bahan tersedia, pesanan masuk antrian produksi.',
+            ]);
+
+            if ($this->order->customer) {
+                $this->order->customer->notify(new OrderStatusUpdated(
+                    $this->order,
+                    'Bahan untuk pesanan #' . $this->order->order_number . ' sudah tersedia. Pesanan masuk antrian produksi.'
+                ));
+            }
+        }
+
+        $this->refreshOrder();
+        session()->flash('success', 'Bahan ditandai tersedia.');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Action: Price Editing
+    // ──────────────────────────────────────────────────────────
 
     public function openPriceForm(): void
     {
@@ -180,34 +319,198 @@ class Show extends Component
         $oldPrice = (float) $this->order->estimated_price;
         $newPrice = (float) $this->editEstimatedPrice;
 
-        $this->order->update([
-            'estimated_price' => $newPrice,
-        ]);
+        $this->order->update(['estimated_price' => $newPrice]);
+
+        $customer = $this->order->customer;
+        if ($customer) {
+            $customer->notify(new OrderStatusUpdated(
+                $this->order,
+                'Harga pesanan #' . $this->order->order_number . ' diperbarui dari Rp ' . number_format($oldPrice, 0, ',', '.') . ' menjadi Rp ' . number_format($newPrice, 0, ',', '.') . '.'
+            ));
+        }
 
         $this->closePriceForm();
         $this->refreshOrder();
-
-        // Notifikasi ke customer tentang update harga
-        $customer = $this->order->customer;
-        if ($customer) {
-            $message = 'Harga pesanan #' . $this->order->order_number
-                . ' telah diperbarui dari Rp ' . number_format($oldPrice, 0, ',', '.')
-                . ' menjadi Rp ' . number_format($newPrice, 0, ',', '.')
-                . '. Silakan lakukan pembayaran.';
-            $customer->notify(new OrderStatusUpdated($this->order, $message));
-        }
-
-        session()->flash('success', 'Harga pesanan berhasil diperbarui dan notifikasi telah dikirim ke customer.');
+        session()->flash('success', 'Harga pesanan berhasil diperbarui.');
     }
 
-    // ── Design Preview ────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────
+    // Action: Start Production (dalam_antrian → dijahit)
+    // ──────────────────────────────────────────────────────────
+
+    public function openProductionForm(): void
+    {
+        $this->productionDays = (string) ($this->order->production_days ?? $this->order->service->base_duration_days ?? 7);
+        $this->showProductionForm = true;
+    }
+
+    public function closeProductionForm(): void
+    {
+        $this->showProductionForm = false;
+        $this->productionDays = '';
+        $this->resetValidation('productionDays');
+    }
+
+    public function startProduction(): void
+    {
+        $this->validate([
+            'productionDays' => ['required', 'integer', 'min:1', 'max:90'],
+        ], [
+            'productionDays.required' => 'Estimasi hari pengerjaan harus diisi.',
+            'productionDays.min' => 'Minimal 1 hari.',
+            'productionDays.max' => 'Maksimal 90 hari.',
+        ]);
+
+        if ($this->order->status !== 'dalam_antrian') {
+            session()->flash('error', 'Pesanan tidak dalam antrian.');
+            return;
+        }
+
+        $this->order->update([
+            'status' => 'dijahit',
+            'production_days' => (int) $this->productionDays,
+            'production_started_at' => now(),
+            'estimated_finish_date' => now()->addDays((int) $this->productionDays),
+        ]);
+
+        // Deduct fabric stock
+        app(OrderBusinessRulesService::class)->deductFabricStock($this->order);
+
+        OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'dijahit',
+            'changed_by' => auth()->id(),
+            'notes' => 'Produksi dimulai. Estimasi selesai: ' . $this->productionDays . ' hari.',
+        ]);
+
+        if ($this->order->customer) {
+            $this->order->customer->notify(new OrderStatusUpdated(
+                $this->order,
+                'Pesanan #' . $this->order->order_number . ' mulai dijahit. Estimasi selesai dalam ' . $this->productionDays . ' hari.'
+            ));
+        }
+
+        $this->closeProductionForm();
+        $this->refreshOrder();
+        session()->flash('success', 'Produksi dimulai.');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Action: Finish Production (dijahit → selesai_produksi)
+    // ──────────────────────────────────────────────────────────
+
+    public function finishProduction(): void
+    {
+        if ($this->order->status !== 'dijahit') {
+            session()->flash('error', 'Pesanan tidak sedang dalam proses jahit.');
+            return;
+        }
+
+        $this->order->update([
+            'status' => 'selesai_produksi',
+            'production_finished_at' => now(),
+        ]);
+
+        OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'selesai_produksi',
+            'changed_by' => auth()->id(),
+            'notes' => 'Produksi selesai. Menunggu pelunasan pembayaran.',
+        ]);
+
+        if ($this->order->customer) {
+            $totalPaid = $this->order->payments->where('status', 'terverifikasi')->sum('amount');
+            $remaining = max(0, (float) $this->order->estimated_price - $totalPaid);
+            $msg = 'Pesanan #' . $this->order->order_number . ' selesai diproduksi.';
+            if ($remaining > 0) {
+                $msg .= ' Silakan lakukan pelunasan sebesar Rp ' . number_format($remaining, 0, ',', '.') . ' untuk pengambilan.';
+            }
+            $this->order->customer->notify(new OrderStatusUpdated($this->order, $msg));
+        }
+
+        $this->refreshOrder();
+        session()->flash('success', 'Produksi ditandai selesai. Notifikasi pelunasan dikirim ke customer.');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Action: Mark Ready for Pickup (selesai_produksi → siap_diambil)
+    // ──────────────────────────────────────────────────────────
+
+    public function markReadyForPickup(): void
+    {
+        if ($this->order->status !== 'selesai_produksi') {
+            session()->flash('error', 'Pesanan belum selesai produksi.');
+            return;
+        }
+
+        $check = app(OrderBusinessRulesService::class)->canMarkReadyForPickup($this->order->fresh('payments'));
+
+        if (!$check['can_proceed']) {
+            session()->flash('error', implode(' ', $check['blocking_reasons']));
+            return;
+        }
+
+        $this->order->update(['status' => 'siap_diambil']);
+
+        OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'siap_diambil',
+            'changed_by' => auth()->id(),
+            'notes' => 'Pembayaran lunas. Pesanan siap diambil.',
+        ]);
+
+        if ($this->order->customer) {
+            $this->order->customer->notify(new OrderStatusUpdated(
+                $this->order,
+                'Pesanan #' . $this->order->order_number . ' siap untuk diambil! Silakan datang ke workshop kami.'
+            ));
+        }
+
+        $this->refreshOrder();
+        session()->flash('success', 'Pesanan ditandai siap diambil.');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Action: Mark Complete (siap_diambil → selesai)
+    // ──────────────────────────────────────────────────────────
+
+    public function markComplete(): void
+    {
+        if ($this->order->status !== 'siap_diambil') {
+            session()->flash('error', 'Pesanan belum siap diambil.');
+            return;
+        }
+
+        $this->order->update(['status' => 'selesai']);
+
+        OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'selesai',
+            'changed_by' => auth()->id(),
+            'notes' => 'Pesanan telah diambil oleh customer.',
+        ]);
+
+        if ($this->order->customer) {
+            $this->order->customer->notify(new OrderStatusUpdated(
+                $this->order,
+                'Pesanan #' . $this->order->order_number . ' telah selesai. Terima kasih telah menggunakan jasa Jahitly!'
+            ));
+        }
+
+        $this->refreshOrder();
+        session()->flash('success', 'Pesanan ditandai selesai.');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Design Preview
+    // ──────────────────────────────────────────────────────────
 
     public function previewDesign(int $designId): void
     {
-        $designFile = DesignFile::where('order_id', $this->order->id)->findOrFail($designId);
+        $designFile = \App\Models\DesignFile::where('order_id', $this->order->id)->findOrFail($designId);
         $filePath = storage_path('app/private/' . $designFile->file_path);
 
-        if (! file_exists($filePath)) {
+        if (!file_exists($filePath)) {
             session()->flash('error', 'File desain tidak ditemukan.');
             return;
         }
@@ -232,53 +535,9 @@ class Show extends Component
         $this->designPreviewName = null;
     }
 
-    public function getCanUpdateStatusProperty(): bool
-    {
-        return empty($this->blockingReasons);
-    }
-
-    /**
-     * Cek apakah admin boleh mengedit harga.
-     * Hanya bisa edit setelah appointment selesai (untuk custom/seragam).
-     */
-    public function getCanEditPriceProperty(): bool
-    {
-        $serviceType = $this->order->service->type ?? '';
-
-        // Vermak: selalu bisa edit harga
-        if ($serviceType === 'vermak') {
-            return true;
-        }
-
-        // Custom & Seragam: hanya bisa edit setelah appointment selesai
-        return $this->order->appointment
-            && $this->order->appointment->status === 'selesai';
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function getBlockingReasonsForStatus(string $status): array
-    {
-        if ($status === 'diproses') {
-            $order = $this->order->fresh(['service', 'appointment', 'payments']);
-            $check = app(OrderBusinessRulesService::class)->canMoveToProcessing($order);
-            return $check['blocking_reasons'];
-        }
-
-        if ($status === 'selesai') {
-            $order = $this->order->fresh(['payments']);
-            $check = app(OrderBusinessRulesService::class)->canMarkAsComplete($order);
-            return $check['blocking_reasons'];
-        }
-
-        return [];
-    }
-
-    private function syncBlockingReasons(): void
-    {
-        $this->blockingReasons = $this->getBlockingReasonsForStatus($this->status);
-    }
+    // ──────────────────────────────────────────────────────────
+    // Helpers
+    // ──────────────────────────────────────────────────────────
 
     private function refreshOrder(): void
     {
@@ -291,16 +550,15 @@ class Show extends Component
             'payments',
             'appointment',
         ]);
-
-        $this->material_source = $this->order->material_source ?? '';
-        $this->material_status = $this->order->material_status ?? '';
-        $this->status = $this->order->status;
     }
 
     public function render(): View
     {
+        $fabrics = Fabric::query()->orderBy('name')->orderBy('color')->get();
+
         return view('livewire.admin.orders.show', [
             'statusLogs' => $this->order->statusLogs->sortByDesc('created_at'),
+            'fabrics' => $fabrics,
         ])->layout('layouts.admin');
     }
 }

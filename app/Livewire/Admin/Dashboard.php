@@ -28,7 +28,8 @@ class Dashboard extends Component
         $monthEnd = $now->copy()->endOfMonth();
 
         return [
-            'active_orders' => Order::where('status', '!=', 'selesai')->count(),
+            'pending_orders' => Order::where('status', 'menunggu_konfirmasi')->count(),
+            'active_orders' => Order::whereNotIn('status', ['selesai', 'ditolak', 'dibatalkan', 'menunggu_konfirmasi'])->count(),
             'pending_payments' => Payment::where('status', 'menunggu_verifikasi')->count(),
             'today_appointments' => Appointment::whereDate('appointment_date', $now->toDateString())->count(),
             'monthly_revenue' => Payment::where('status', 'terverifikasi')

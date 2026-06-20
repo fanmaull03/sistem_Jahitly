@@ -3,7 +3,6 @@
 namespace App\Livewire\Customer\Orders;
 
 use App\Models\DesignFile;
-use App\Models\Fabric;
 use App\Models\Order;
 use App\Models\OrderStatusLog;
 use App\Models\Service;
@@ -20,21 +19,16 @@ class Create extends Component
     public Collection $services;
     public ?int $service_id = null;
     public ?int $quantity = 1;
-    public ?string $material_source = null;
-    public ?string $material_status = null;
-    public ?int $fabric_id = null;
     public ?string $notes = null;
     public $design_file;
-    public float $estimated_price = 0.0;
 
     public function mount(): void
     {
-        if (! auth()->check() || ! auth()->user()->isCustomer()) {
+        if (!auth()->check() || !auth()->user()->isCustomer()) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 
         $this->services = Service::query()->orderBy('name')->get();
-        $this->syncEstimatedPrice();
     }
 
     /**
@@ -42,7 +36,7 @@ class Create extends Component
      */
     protected function rules(): array
     {
-        $rules = [
+        return [
             'service_id' => ['required', 'exists:services,id'],
             'quantity' => ['required', 'integer', 'min:1'],
             'notes' => ['nullable', 'string', 'max:2000'],
@@ -50,26 +44,6 @@ class Create extends Component
                 ? ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120']
                 : ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
         ];
-
-        // Jika layanan adalah vermak, sumber bahan tidak diperlukan
-        if ($this->selectedServiceType() === 'vermak') {
-            $rules['material_source'] = ['nullable'];
-            $rules['material_status'] = ['nullable'];
-            $rules['fabric_id'] = ['nullable'];
-        } else {
-            // Untuk layanan lain, sumber bahan wajib dipilih
-            $rules['material_source'] = ['required', 'in:customer,jasa'];
-            $rules['material_status'] = ['required', 'in:ready,po'];
-            
-            // Jika memilih bahan dari penjahit, wajib pilih bahan
-            if ($this->material_source === 'jasa') {
-                $rules['fabric_id'] = ['required', 'exists:fabrics,id'];
-            } else {
-                $rules['fabric_id'] = ['nullable'];
-            }
-        }
-
-        return $rules;
     }
 
     /**
@@ -84,12 +58,6 @@ class Create extends Component
             'quantity.integer' => 'Jumlah harus berupa angka.',
             'quantity.min' => 'Jumlah minimal adalah 1.',
             'notes.max' => 'Catatan maksimal 2000 karakter.',
-            'material_source.required' => 'Sumber bahan harus dipilih (bawa sendiri atau beli di penjahit).',
-            'material_source.in' => 'Sumber bahan harus "customer" atau "jasa".',
-            'material_status.required' => 'Status bahan tidak valid.',
-            'material_status.in' => 'Status bahan harus "ready" atau "po".',
-            'fabric_id.required' => 'Pilih bahan yang diinginkan dari daftar.',
-            'fabric_id.exists' => 'Bahan yang dipilih tidak valid.',
             'design_file.required' => 'File desain harus diunggah untuk layanan custom.',
             'design_file.file' => 'File desain harus berupa file yang valid.',
             'design_file.mimes' => 'File desain harus berformat JPG atau PNG.',
@@ -99,52 +67,10 @@ class Create extends Component
 
     public function updatedServiceId(): void
     {
-        if (! $this->requiresDesignFile()) {
+        if (!$this->requiresDesignFile()) {
             $this->design_file = null;
             $this->resetValidation('design_file');
         }
-
-        // Reset material source saat ganti layanan
-        if ($this->selectedServiceType() === 'vermak') {
-            $this->material_source = null;
-            $this->fabric_id = null;
-            $this->material_status = null;
-        }
-
-        $this->syncEstimatedPrice();
-    }
-
-    public function updatedQuantity(): void
-    {
-        $this->syncEstimatedPrice();
-    }
-
-    public function updatedMaterialSource(): void
-    {
-        $this->fabric_id = null;
-        $this->material_status = null;
-
-        if ($this->material_source === 'customer') {
-            // Jika bawa sendiri, otomatis ready (tidak ada pilihan PO)
-            $this->material_status = 'ready';
-        }
-
-        $this->syncEstimatedPrice();
-    }
-
-    public function updatedFabricId(): void
-    {
-        if ($this->fabric_id && $this->material_source === 'jasa') {
-            $fabric = Fabric::find($this->fabric_id);
-            if ($fabric) {
-                // Auto-set material_status berdasarkan stock_status bahan
-                $this->material_status = $fabric->stock_status === 'tersedia' ? 'ready' : 'po';
-            }
-        } else {
-            $this->material_status = null;
-        }
-
-        $this->syncEstimatedPrice();
     }
 
     public function updatedDesignFile(): void
@@ -161,24 +87,18 @@ class Create extends Component
         $orderRules = app(OrderBusinessRulesService::class);
         $orderNumber = $orderRules->generateOrderNumber();
 
-        $initialStatus = in_array($service->type, ['seragam', 'custom'], true)
-            ? 'menunggu_appointment'
-            : 'menunggu_bahan';
-
+        // Semua pesanan baru masuk ke menunggu_konfirmasi
         $order = Order::create([
             'customer_id' => auth()->id(),
             'service_id' => $validated['service_id'],
-            'fabric_id' => ($this->material_source === 'jasa') ? ($validated['fabric_id'] ?? null) : null,
             'order_number' => $orderNumber,
-            'status' => $initialStatus,
+            'status' => 'menunggu_konfirmasi',
             'quantity' => $validated['quantity'],
             'notes' => $validated['notes'] ?? null,
-            'material_source' => $validated['material_source'] ?? null,
-            'material_status' => $validated['material_status'] ?? null,
         ]);
 
+        // Estimasi awal berdasarkan layanan
         $estimation = $orderRules->calculateEstimation($order);
-
         $order->update([
             'estimated_price' => $estimation['estimated_price'],
             'estimated_finish_date' => $estimation['estimated_finish_date'],
@@ -186,9 +106,9 @@ class Create extends Component
 
         OrderStatusLog::create([
             'order_id' => $order->id,
-            'status' => $initialStatus,
+            'status' => 'menunggu_konfirmasi',
             'changed_by' => auth()->id(),
-            'notes' => 'Pesanan baru dibuat.',
+            'notes' => 'Pesanan baru dibuat. Menunggu konfirmasi admin.',
         ]);
 
         if ($this->design_file) {
@@ -201,21 +121,14 @@ class Create extends Component
             ]);
         }
 
-        session()->flash('success', 'Pesanan berhasil dibuat dengan nomor ' . $orderNumber . '.');
+        session()->flash('success', 'Pesanan berhasil dibuat dengan nomor ' . $orderNumber . '. Menunggu konfirmasi admin.');
 
-        // Custom & Seragam → buat appointment dulu
-        if (in_array($service->type, ['seragam', 'custom'], true)) {
-            return $this->redirectRoute('orders.appointments.create', $order, navigate: true);
-        }
-
-        // Vermak → langsung ke detail pesanan
         return $this->redirectRoute('orders.show', $order, navigate: true);
     }
 
     private function requiresDesignFile(): bool
     {
         $service = $this->services?->firstWhere('id', $this->service_id);
-
         return $service && $service->type === 'custom';
     }
 
@@ -225,47 +138,12 @@ class Create extends Component
         return $service?->type;
     }
 
-    private function syncEstimatedPrice(): void
-    {
-        $service = $this->services?->firstWhere('id', $this->service_id);
-
-        if (! $service) {
-            $this->estimated_price = 0.0;
-            return;
-        }
-
-        $quantity = max(1, (int) $this->quantity);
-        $baseTotal = (float) $service->base_price * $quantity;
-
-        // Tambahkan harga bahan jika memilih bahan dari penjahit
-        $fabricCost = 0.0;
-        if ($this->material_source === 'jasa' && $this->fabric_id) {
-            $fabric = Fabric::find($this->fabric_id);
-            if ($fabric) {
-                $fabricCost = (float) $fabric->price_per_meter * $quantity;
-            }
-        }
-
-        $this->estimated_price = $baseTotal + $fabricCost;
-    }
-
     public function render(): View
     {
-        $selectedFabric = null;
-        if ($this->fabric_id) {
-            $selectedFabric = Fabric::find($this->fabric_id);
-        }
-        
-        $fabricsList = $this->material_source === 'jasa' 
-            ? Fabric::query()->orderBy('name')->orderBy('color')->get() 
-            : collect();
-
         return view('livewire.customer.orders.create', [
             'services' => $this->services,
-            'fabrics' => $fabricsList,
             'requiresDesignFile' => $this->requiresDesignFile(),
             'selectedService' => $this->services?->firstWhere('id', $this->service_id),
-            'selectedFabric' => $selectedFabric,
         ])->layout('layouts.app');
     }
 }
