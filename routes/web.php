@@ -120,6 +120,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('fabrics', AdminFabricsIndex::class)
         ->name('fabrics.index');
+
+    Route::get('vermaks', \App\Livewire\Admin\Vermaks\Index::class)
+        ->name('vermaks.index');
 });
 
 require __DIR__.'/auth.php';

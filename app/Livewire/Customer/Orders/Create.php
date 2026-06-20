@@ -17,10 +17,13 @@ class Create extends Component
     use WithFileUploads;
 
     public Collection $services;
+    public Collection $alterationOptions;
+    
     public ?int $service_id = null;
     public ?int $quantity = 1;
     public ?string $notes = null;
     public $design_file;
+    public array $selected_alterations = [];
 
     public function mount(): void
     {
@@ -29,6 +32,7 @@ class Create extends Component
         }
 
         $this->services = Service::query()->orderBy('name')->get();
+        $this->alterationOptions = \App\Models\AlterationOption::orderBy('name')->get();
     }
 
     /**
@@ -36,7 +40,7 @@ class Create extends Component
      */
     protected function rules(): array
     {
-        return [
+        $rules = [
             'service_id' => ['required', 'exists:services,id'],
             'quantity' => ['required', 'integer', 'min:1'],
             'notes' => ['nullable', 'string', 'max:2000'],
@@ -44,6 +48,13 @@ class Create extends Component
                 ? ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120']
                 : ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
         ];
+
+        if ($this->selectedServiceType() === 'vermak') {
+            $rules['selected_alterations'] = ['required', 'array', 'min:1'];
+            $rules['selected_alterations.*'] = ['exists:alteration_options,id'];
+        }
+
+        return $rules;
     }
 
     /**
@@ -62,6 +73,8 @@ class Create extends Component
             'design_file.file' => 'File desain harus berupa file yang valid.',
             'design_file.mimes' => 'File desain harus berformat JPG atau PNG.',
             'design_file.max' => 'Ukuran file desain maksimal 5MB.',
+            'selected_alterations.required' => 'Pilih minimal satu opsi vermak.',
+            'selected_alterations.min' => 'Pilih minimal satu opsi vermak.',
         ];
     }
 
@@ -70,6 +83,11 @@ class Create extends Component
         if (!$this->requiresDesignFile()) {
             $this->design_file = null;
             $this->resetValidation('design_file');
+        }
+        
+        if ($this->selectedServiceType() !== 'vermak') {
+            $this->selected_alterations = [];
+            $this->resetValidation('selected_alterations');
         }
     }
 
@@ -99,9 +117,33 @@ class Create extends Component
 
         // Estimasi awal berdasarkan layanan
         $estimation = $orderRules->calculateEstimation($order);
+        $estimatedPrice = $estimation['estimated_price'];
+        
+        $alterationDetails = null;
+
+        if ($this->selectedServiceType() === 'vermak' && !empty($this->selected_alterations)) {
+            $options = \App\Models\AlterationOption::whereIn('id', $this->selected_alterations)->get();
+            $details = [];
+            $vermakPrice = 0;
+            
+            foreach ($options as $opt) {
+                $details[] = [
+                    'id' => $opt->id,
+                    'name' => $opt->name,
+                    'price' => (float) $opt->price,
+                ];
+                $vermakPrice += (float) $opt->price;
+            }
+            
+            // Multiply total vermak price by quantity
+            $estimatedPrice += ($vermakPrice * $order->quantity);
+            $alterationDetails = json_encode($details);
+        }
+
         $order->update([
-            'estimated_price' => $estimation['estimated_price'],
+            'estimated_price' => $estimatedPrice,
             'estimated_finish_date' => $estimation['estimated_finish_date'],
+            'alteration_details' => $alterationDetails,
         ]);
 
         OrderStatusLog::create([
@@ -142,6 +184,7 @@ class Create extends Component
     {
         return view('livewire.customer.orders.create', [
             'services' => $this->services,
+            'alterationOptions' => $this->alterationOptions,
             'requiresDesignFile' => $this->requiresDesignFile(),
             'selectedService' => $this->services?->firstWhere('id', $this->service_id),
         ])->layout('layouts.app');

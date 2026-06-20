@@ -37,12 +37,14 @@
                             Rp {{ number_format((float) $order->estimated_price, 0, ',', '.') }}
                         </div>
                     </div>
+                    @if ($order->service->type !== 'vermak')
                     <div>
                         <div class="text-sm text-slate-500">DP (Ditetapkan Admin)</div>
                         <div class="text-base font-semibold text-orange-600">
                             {{ $order->dp_amount ? 'Rp ' . number_format((float) $order->dp_amount, 0, ',', '.') : 'Belum ditetapkan' }}
                         </div>
                     </div>
+                    @endif
                     <div>
                         <div class="text-sm text-slate-500">Appointment</div>
                         <div class="text-base font-semibold">
@@ -64,51 +66,72 @@
                     </div>
                 @endif
                 
-                <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
-                    <div class="text-sm font-semibold text-slate-900">Informasi Bahan</div>
-                    <div class="mt-2 grid gap-2 sm:grid-cols-2 text-sm">
-                        <div>
-                            <span class="text-slate-500">Sumber Bahan:</span>
-                            <span class="font-medium text-slate-900">
-                                {{ $order->material_source === 'customer' ? 'Bawa Sendiri' : ($order->material_source === 'jasa' ? 'Beli di Penjahit' : 'Belum ditentukan') }}
-                            </span>
-                        </div>
-                        <div>
-                            <span class="text-slate-500">Status Bahan:</span>
-                            <span class="font-medium text-slate-900">
-                                @if($order->material_status)
-                                    <x-status-badge type="material" :status="$order->material_status" />
-                                @else
-                                    Belum ditentukan
-                                @endif
-                            </span>
-                        </div>
+                @if ($order->service->type === 'vermak')
+                    <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <div class="text-sm font-semibold text-slate-900 mb-2">Rincian Vermak</div>
+                        @php
+                            $vermakDetails = json_decode($order->alteration_details, true) ?? [];
+                        @endphp
+                        @if (count($vermakDetails) > 0)
+                            <ul class="space-y-1 text-sm text-slate-700">
+                                @foreach ($vermakDetails as $detail)
+                                    <li class="flex justify-between">
+                                        <span>- {{ $detail['name'] ?? 'Vermak' }}</span>
+                                        <span class="font-medium">+Rp {{ number_format($detail['price'] ?? 0, 0, ',', '.') }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-sm text-slate-500">Tidak ada rincian vermak tersimpan.</p>
+                        @endif
                     </div>
-
-                    @if ($order->fabric)
-                        <div class="mt-3 border-t border-slate-200 pt-3">
-                            <div class="text-xs font-semibold text-slate-500 mb-2">DETAIL KAIN:</div>
-                            <div class="grid gap-2 sm:grid-cols-2 text-sm">
-                                <div>
-                                    <span class="text-slate-500">Nama:</span>
-                                    <span class="font-medium text-slate-900">{{ $order->fabric->name }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-slate-500">Warna:</span>
-                                    <span class="font-medium text-slate-900">{{ $order->fabric->color }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-slate-500">Kategori:</span>
-                                    <span class="font-medium text-slate-900">{{ $order->fabric->category_label }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-slate-500">Harga:</span>
-                                    <span class="font-medium text-slate-900">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}/m</span>
-                                </div>
+                @else
+                    <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <div class="text-sm font-semibold text-slate-900">Informasi Bahan</div>
+                        <div class="mt-2 grid gap-2 sm:grid-cols-2 text-sm">
+                            <div>
+                                <span class="text-slate-500">Sumber Bahan:</span>
+                                <span class="font-medium text-slate-900">
+                                    {{ $order->material_source === 'customer' ? 'Bawa Sendiri' : ($order->material_source === 'jasa' ? 'Beli di Penjahit' : 'Belum ditentukan') }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500">Status Bahan:</span>
+                                <span class="font-medium text-slate-900">
+                                    @if($order->material_status)
+                                        <x-status-badge type="material" :status="$order->material_status" />
+                                    @else
+                                        Belum ditentukan
+                                    @endif
+                                </span>
                             </div>
                         </div>
-                    @endif
-                </div>
+
+                        @if ($order->fabric)
+                            <div class="mt-3 border-t border-slate-200 pt-3">
+                                <div class="text-xs font-semibold text-slate-500 mb-2">DETAIL KAIN:</div>
+                                <div class="grid gap-2 sm:grid-cols-2 text-sm">
+                                    <div>
+                                        <span class="text-slate-500">Nama:</span>
+                                        <span class="font-medium text-slate-900">{{ $order->fabric->name }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500">Warna:</span>
+                                        <span class="font-medium text-slate-900">{{ $order->fabric->color }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500">Kategori:</span>
+                                        <span class="font-medium text-slate-900">{{ $order->fabric->category_label }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500">Harga:</span>
+                                        <span class="font-medium text-slate-900">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}/m</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </section>
 
             <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -195,6 +218,27 @@
                             @endif
                         </div>
                         
+                    {{-- 1.5. Menunggu Pakaian Dikirim (Vermak) --}}
+                    @elseif ($order->status === 'menunggu_pakaian_dikirim')
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                            <p class="text-sm text-amber-800">
+                                Menunggu customer mengantar atau mengirimkan pakaian yang akan divermak.
+                            </p>
+                        </div>
+
+                    {{-- 1.6. Pakaian Dikirim (Vermak) --}}
+                    @elseif ($order->status === 'pakaian_dikirim')
+                        <div class="space-y-4">
+                            <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                                <p class="text-sm text-blue-800 mb-3">
+                                    Customer telah mengonfirmasi bahwa pakaian sudah dikirim/diantar. Jika pakaian sudah Anda terima, silakan konfirmasi untuk memasukkan pesanan ke antrian produksi.
+                                </p>
+                                <button type="button" wire:click="markClothesReceived" class="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                                    Konfirmasi Pakaian Diterima
+                                </button>
+                            </div>
+                        </div>
+
                     {{-- 2. Menunggu Fitting --}}
                     @elseif ($order->status === 'menunggu_fitting')
                         <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
@@ -206,41 +250,54 @@
 
                     {{-- 3. Menunggu DP --}}
                     @elseif ($order->status === 'menunggu_dp')
-                        <div class="space-y-4">
-                            @if (!$order->dp_amount)
-                                <div class="rounded-xl border border-orange-200 bg-orange-50 p-4">
-                                    <p class="text-sm text-orange-800 mb-3">
-                                        Silakan tetapkan nominal DP yang harus dibayar customer.
+                        @if($order->service->type === 'vermak')
+                            <div class="space-y-4">
+                                <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                                    <p class="text-sm text-blue-800 mb-3">
+                                        Layanan vermak tidak memerlukan DP. Anda dapat langsung memasukkan pesanan ini ke antrian produksi.
                                     </p>
-                                    <button type="button" wire:click="openDpForm" class="w-full rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700">
-                                        Set Nominal DP
+                                    <button type="button" wire:click="forceMoveToQueue" class="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                                        Lanjut ke Antrian Produksi
                                     </button>
                                 </div>
-                            @else
-                                <div class="rounded-xl border border-sky-200 bg-sky-50 p-4">
-                                    <p class="text-sm text-sky-800">
-                                        DP ditetapkan sebesar <strong>Rp {{ number_format($order->dp_amount, 0, ',', '.') }}</strong>.<br>
-                                        Menunggu customer melakukan pembayaran.
-                                    </p>
-                                    <button type="button" wire:click="openDpForm" class="mt-3 w-full rounded-xl border border-sky-300 px-4 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-100">
-                                        Ubah Nominal DP
-                                    </button>
-                                </div>
-                            @endif
-
-                            @if ($showDpForm)
-                                <div class="rounded-xl border border-slate-200 p-4">
-                                    <label class="text-sm font-semibold text-slate-700">Nominal DP (Rp)</label>
-                                    <input type="number" wire:model="dpAmount" class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
-                                    @error('dpAmount') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-                                    
-                                    <div class="mt-3 flex gap-2">
-                                        <button type="button" wire:click="setDpAmount" class="flex-1 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800">Simpan DP</button>
-                                        <button type="button" wire:click="closeDpForm" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+                            </div>
+                        @else
+                            <div class="space-y-4">
+                                @if (!$order->dp_amount)
+                                    <div class="rounded-xl border border-orange-200 bg-orange-50 p-4">
+                                        <p class="text-sm text-orange-800 mb-3">
+                                            Silakan tetapkan nominal DP yang harus dibayar customer.
+                                        </p>
+                                        <button type="button" wire:click="openDpForm" class="w-full rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700">
+                                            Set Nominal DP
+                                        </button>
                                     </div>
-                                </div>
-                            @endif
-                        </div>
+                                @else
+                                    <div class="rounded-xl border border-sky-200 bg-sky-50 p-4">
+                                        <p class="text-sm text-sky-800">
+                                            DP ditetapkan sebesar <strong>Rp {{ number_format($order->dp_amount, 0, ',', '.') }}</strong>.<br>
+                                            Menunggu customer melakukan pembayaran.
+                                        </p>
+                                        <button type="button" wire:click="openDpForm" class="mt-3 w-full rounded-xl border border-sky-300 px-4 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-100">
+                                            Ubah Nominal DP
+                                        </button>
+                                    </div>
+                                @endif
+
+                                @if ($showDpForm)
+                                    <div class="rounded-xl border border-slate-200 p-4">
+                                        <label class="text-sm font-semibold text-slate-700">Nominal DP (Rp)</label>
+                                        <input type="number" wire:model="dpAmount" class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                                        @error('dpAmount') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                                        
+                                        <div class="mt-3 flex gap-2">
+                                            <button type="button" wire:click="setDpAmount" class="flex-1 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800">Simpan DP</button>
+                                            <button type="button" wire:click="closeDpForm" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
 
                     {{-- 4. Menunggu Bahan --}}
                     @elseif ($order->status === 'menunggu_bahan')
@@ -436,25 +493,27 @@
                 </section>
             @endif
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 class="text-lg font-semibold">Preview Desain</h2>
-                <div class="mt-4 space-y-2">
-                    @forelse ($order->designFiles as $file)
-                        <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
-                            <div class="text-sm text-slate-700">{{ $file->original_filename }}</div>
-                            <button
-                                type="button"
-                                wire:click="previewDesign({{ $file->id }})"
-                                class="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 hover:border-slate-300"
-                            >
-                                Lihat
-                            </button>
-                        </div>
-                    @empty
-                        <div class="text-sm text-slate-500">Belum ada file desain.</div>
-                    @endforelse
-                </div>
-            </section>
+            @if ($order->service->type !== 'vermak')
+                <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h2 class="text-lg font-semibold">Preview Desain</h2>
+                    <div class="mt-4 space-y-2">
+                        @forelse ($order->designFiles as $file)
+                            <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                                <div class="text-sm text-slate-700">{{ $file->original_filename }}</div>
+                                <button
+                                    type="button"
+                                    wire:click="previewDesign({{ $file->id }})"
+                                    class="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 hover:border-slate-300"
+                                >
+                                    Lihat
+                                </button>
+                            </div>
+                        @empty
+                            <div class="text-sm text-slate-500">Belum ada file desain.</div>
+                        @endforelse
+                    </div>
+                </section>
+            @endif
         </aside>
     </div>
 

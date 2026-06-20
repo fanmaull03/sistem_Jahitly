@@ -67,9 +67,13 @@ class Show extends Component
         }
 
         $serviceType = $this->order->service->type;
-        $newStatus = app(OrderBusinessRulesService::class)->requiresFitting($serviceType)
-            ? 'menunggu_fitting'
-            : 'menunggu_dp';
+        if ($serviceType === 'vermak') {
+            $newStatus = 'menunggu_pakaian_dikirim';
+        } else {
+            $newStatus = app(OrderBusinessRulesService::class)->requiresFitting($serviceType)
+                ? 'menunggu_fitting'
+                : 'menunggu_dp';
+        }
 
         $this->order->update(['status' => $newStatus]);
 
@@ -82,9 +86,11 @@ class Show extends Component
 
         $customer = $this->order->customer;
         if ($customer) {
-            $msg = $newStatus === 'menunggu_fitting'
-                ? 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan atur jadwal fitting.'
-                : 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan lakukan pembayaran DP.';
+            $msg = match($newStatus) {
+                'menunggu_fitting' => 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan atur jadwal fitting.',
+                'menunggu_pakaian_dikirim' => 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan kirim/antar pakaian Anda ke workshop kami.',
+                default => 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan lakukan pembayaran DP.'
+            };
             $customer->notify(new OrderStatusUpdated($this->order, $msg));
         }
 
@@ -551,6 +557,29 @@ class Show extends Component
     // ──────────────────────────────────────────────────────────
     // Helpers
     // ──────────────────────────────────────────────────────────
+
+    // ──────────────────────────────────────────────────────────
+    // Action: Penerimaan Pakaian (Vermak)
+    // ──────────────────────────────────────────────────────────
+
+    public function markClothesReceived(): void
+    {
+        if ($this->order->status !== 'pakaian_dikirim') {
+            return;
+        }
+
+        $this->order->update(['status' => 'dalam_antrian']);
+
+        OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'dalam_antrian',
+            'changed_by' => auth()->id(),
+            'notes' => 'Pakaian telah diterima oleh admin dan dimasukkan ke antrian produksi.',
+        ]);
+
+        $this->refreshOrder();
+        session()->flash('success', 'Pakaian berhasil dikonfirmasi dan pesanan masuk antrian produksi.');
+    }
 
     private function refreshOrder(): void
     {

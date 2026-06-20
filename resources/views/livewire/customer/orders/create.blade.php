@@ -159,6 +159,46 @@
                 </section>
             @endif
 
+            <!-- STEP 3: Rincian Vermak -->
+            @if ($this->selectedServiceType() === 'vermak')
+                <section class="mt-8">
+                    <div class="mb-2">
+                        <h2 class="text-lg font-bold text-stone-900">Rincian Vermak</h2>
+                        <p class="text-sm text-stone-500">Pilih opsi perbaikan pakaian yang Anda butuhkan (bisa lebih dari satu).</p>
+                    </div>
+                    <hr class="my-5 border-stone-200">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        @forelse ($alterationOptions as $option)
+                            <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm hover:border-blue-500 hover:bg-blue-50 transition">
+                                <div class="flex h-5 items-center mt-0.5">
+                                    <input 
+                                        type="checkbox" 
+                                        wire:model="selected_alterations" 
+                                        value="{{ $option->id }}" 
+                                        class="h-4 w-4 rounded border-stone-300 text-blue-600 focus:ring-blue-600"
+                                    >
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-bold text-stone-900 text-sm">{{ $option->name }}</span>
+                                        <span class="font-semibold text-blue-700 text-xs bg-blue-100 px-2 py-0.5 rounded-full">+Rp {{ number_format($option->price, 0, ',', '.') }}</span>
+                                    </div>
+                                    @if($option->description)
+                                        <p class="text-xs text-stone-500">{{ $option->description }}</p>
+                                    @endif
+                                </div>
+                            </label>
+                        @empty
+                            <p class="text-sm text-stone-500 col-span-2">Belum ada opsi vermak tersedia. Silakan hubungi admin.</p>
+                        @endforelse
+                    </div>
+                    @error('selected_alterations')
+                        <p class="mt-2 text-sm font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </section>
+            @endif
+
             <!-- Form Actions -->
             <hr class="mt-12 mb-8 border-stone-200">
             <div class="flex items-center justify-end gap-6 pb-2">

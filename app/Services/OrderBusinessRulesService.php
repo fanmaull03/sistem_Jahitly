@@ -41,8 +41,10 @@ class OrderBusinessRulesService
     public function getAllowedTransitions(): array
     {
         return [
-            'menunggu_konfirmasi' => ['ditolak', 'menunggu_fitting', 'menunggu_dp'],
-            'menunggu_fitting'   => ['menunggu_dp', 'dibatalkan'],
+            'menunggu_konfirmasi' => ['ditolak', 'menunggu_pakaian_dikirim', 'menunggu_fitting', 'menunggu_dp', 'dalam_antrian'],
+            'menunggu_pakaian_dikirim' => ['pakaian_dikirim', 'dibatalkan'],
+            'pakaian_dikirim'    => ['dalam_antrian'],
+            'menunggu_fitting'   => ['menunggu_dp', 'dalam_antrian', 'dibatalkan'],
             'menunggu_dp'        => ['menunggu_bahan', 'dalam_antrian', 'dibatalkan'],
             'menunggu_bahan'     => ['dalam_antrian', 'dibatalkan'],
             'dalam_antrian'      => ['dijahit'],
@@ -92,7 +94,7 @@ class OrderBusinessRulesService
         $blockingReasons = [];
         $order->loadMissing(['service', 'appointment', 'payments']);
 
-        // Cek fitting selesai (untuk custom/seragam)
+        // Cek fitting selesai (untuk custom/seragam/vermak)
         if ($this->requiresFitting($order->service->type)) {
             $fittingDone = $order->appointment && $order->appointment->status === 'selesai';
             if (!$fittingDone) {
@@ -100,19 +102,21 @@ class OrderBusinessRulesService
             }
         }
 
-        // Cek DP terverifikasi
-        $hasDpVerified = $order->payments
-            ->where('payment_type', 'dp')
-            ->where('status', 'terverifikasi')
-            ->isNotEmpty();
+        if ($order->service->type !== 'vermak') {
+            // Cek DP terverifikasi
+            $hasDpVerified = $order->payments
+                ->where('payment_type', 'dp')
+                ->where('status', 'terverifikasi')
+                ->isNotEmpty();
 
-        if (!$hasDpVerified) {
-            $blockingReasons[] = 'Pembayaran DP belum terverifikasi.';
-        }
+            if (!$hasDpVerified) {
+                $blockingReasons[] = 'Pembayaran DP belum terverifikasi.';
+            }
 
-        // Cek material ready
-        if ($order->material_status !== 'ready') {
-            $blockingReasons[] = 'Bahan belum siap (status: ' . ($order->material_status ?? 'belum ditentukan') . ').';
+            // Cek material ready
+            if ($order->material_status !== 'ready') {
+                $blockingReasons[] = 'Bahan belum siap (status: ' . ($order->material_status ?? 'belum ditentukan') . ').';
+            }
         }
 
         return [

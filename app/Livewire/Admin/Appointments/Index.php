@@ -163,25 +163,44 @@ class Index extends Component
         $order = $appointment->order;
         $message = 'Fitting berhasil ditandai selesai.';
 
-        // Pindahkan status order ke menunggu_dp
+        // Pindahkan status order
         if ($order->status === 'menunggu_fitting') {
-            $order->update(['status' => 'menunggu_dp']);
+            if ($order->service->type === 'vermak') {
+                $order->update(['status' => 'dalam_antrian']);
+                
+                OrderStatusLog::create([
+                    'order_id' => $order->id,
+                    'status' => 'dalam_antrian',
+                    'changed_by' => auth()->id(),
+                    'notes' => 'Fitting selesai. Pesanan vermak masuk antrean produksi.',
+                ]);
+                
+                if ($order->customer) {
+                    $order->customer->notify(new OrderStatusUpdated(
+                        $order,
+                        'Fitting pesanan #' . $order->order_number . ' telah selesai. Pesanan vermak Anda sekarang masuk antrean produksi.'
+                    ));
+                }
+                $message .= ' Pesanan ' . $order->order_number . ' masuk antrean produksi.';
+            } else {
+                $order->update(['status' => 'menunggu_dp']);
 
-            OrderStatusLog::create([
-                'order_id' => $order->id,
-                'status' => 'menunggu_dp',
-                'changed_by' => auth()->id(),
-                'notes' => 'Fitting selesai. Menunggu pembayaran DP.',
-            ]);
+                OrderStatusLog::create([
+                    'order_id' => $order->id,
+                    'status' => 'menunggu_dp',
+                    'changed_by' => auth()->id(),
+                    'notes' => 'Fitting selesai. Menunggu pembayaran DP.',
+                ]);
 
-            if ($order->customer) {
-                $order->customer->notify(new OrderStatusUpdated(
-                    $order,
-                    'Fitting pesanan #' . $order->order_number . ' telah selesai. Silakan lakukan pembayaran DP.'
-                ));
+                if ($order->customer) {
+                    $order->customer->notify(new OrderStatusUpdated(
+                        $order,
+                        'Fitting pesanan #' . $order->order_number . ' telah selesai. Silakan lakukan pembayaran DP.'
+                    ));
+                }
+
+                $message .= ' Pesanan ' . $order->order_number . ' menunggu pembayaran DP.';
             }
-
-            $message .= ' Pesanan ' . $order->order_number . ' menunggu pembayaran DP.';
         }
 
         session()->flash('success', $message);

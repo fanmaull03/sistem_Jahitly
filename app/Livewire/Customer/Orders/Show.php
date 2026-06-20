@@ -56,9 +56,19 @@ class Show extends Component
             $steps[] = ['key' => 'menunggu_fitting', 'label' => 'Jadwal Fitting', 'description' => 'Silakan atur jadwal fitting untuk pengukuran.'];
         }
 
+        if ($this->order->service->type !== 'vermak') {
+            $steps = array_merge($steps, [
+                ['key' => 'menunggu_dp', 'label' => 'Pembayaran DP', 'description' => 'Lakukan pembayaran DP sesuai nominal yang ditetapkan admin.'],
+                ['key' => 'menunggu_bahan', 'label' => 'Persiapan Bahan', 'description' => 'Bahan sedang dipersiapkan oleh penjahit.'],
+            ]);
+        } else {
+            $steps = array_merge($steps, [
+                ['key' => 'menunggu_pakaian_dikirim', 'label' => 'Pengiriman Pakaian', 'description' => 'Kirim atau antar pakaian Anda ke workshop kami.'],
+                ['key' => 'pakaian_dikirim', 'label' => 'Pakaian Dikirim', 'description' => 'Menunggu admin mengonfirmasi penerimaan pakaian.'],
+            ]);
+        }
+
         $steps = array_merge($steps, [
-            ['key' => 'menunggu_dp', 'label' => 'Pembayaran DP', 'description' => 'Lakukan pembayaran DP sesuai nominal yang ditetapkan admin.'],
-            ['key' => 'menunggu_bahan', 'label' => 'Persiapan Bahan', 'description' => 'Bahan sedang dipersiapkan oleh penjahit.'],
             ['key' => 'dalam_antrian', 'label' => 'Antrian Produksi', 'description' => 'Pesanan dalam antrian menunggu giliran pengerjaan.'],
             ['key' => 'dijahit', 'label' => 'Proses Jahit', 'description' => 'Pakaian Anda sedang ditangani oleh Penjahit Ahli kami.'],
             ['key' => 'selesai_produksi', 'label' => 'Selesai Produksi', 'description' => 'Produksi selesai. Silakan lakukan pelunasan pembayaran.'],
@@ -203,6 +213,25 @@ class Show extends Component
 
         $this->syncProgress();
         session()->flash('success', 'Terima kasih! Pesanan telah dikonfirmasi selesai.');
+    }
+
+    public function confirmClothesSent(): void
+    {
+        if ($this->order->status !== 'menunggu_pakaian_dikirim') {
+            return;
+        }
+
+        $this->order->update(['status' => 'pakaian_dikirim']);
+
+        \App\Models\OrderStatusLog::create([
+            'order_id' => $this->order->id,
+            'status' => 'pakaian_dikirim',
+            'changed_by' => auth()->id(),
+            'notes' => 'Customer mengonfirmasi telah mengirim/menyerahkan pakaian ke tempat jahit.',
+        ]);
+
+        $this->syncProgress();
+        session()->flash('success', 'Status pakaian berhasil diperbarui! Menunggu konfirmasi penerimaan dari admin.');
     }
 
     // Properti untuk Testimonial

@@ -74,7 +74,7 @@
             </div>
 
             <!-- Cancellation Reason Form -->
-            <form wire:submit.prevent="submitCancellation" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <form wire:submit.prevent="submitCancellation" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm" x-data="{ showCancelModal: false }">
                 <h2 class="mb-4 text-lg font-bold text-stone-900">Alasan Pembatalan</h2>
                 
                 <div class="space-y-4">
@@ -117,7 +117,8 @@
                         Batal
                     </button>
                     <button
-                        type="submit"
+                        type="button"
+                        @click="showCancelModal = true"
                         class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-center font-bold text-white hover:bg-red-700 transition"
                     >
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,6 +126,44 @@
                         </svg>
                         Batalkan Pesanan
                     </button>
+                </div>
+
+                {{-- Modal Konfirmasi --}}
+                <div 
+                    x-show="showCancelModal" 
+                    style="display: none;"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm transition-opacity"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                >
+                    <div 
+                        @click.outside="showCancelModal = false"
+                        class="w-full max-w-md transform overflow-hidden rounded-3xl bg-white p-6 shadow-2xl transition-all"
+                        x-transition:enter="ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave="ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    >
+                        <div class="flex items-center justify-center mb-4 h-16 w-16 rounded-full bg-red-50 mx-auto">
+                            <svg class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-center text-xl font-extrabold text-slate-900">Konfirmasi Pembatalan</h3>
+                        <p class="mt-2 text-center text-sm text-slate-500">
+                            Apakah Anda yakin ingin membatalkan pesanan ini? Tindakan ini tidak dapat dikembalikan.
+                        </p>
+                        <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <button type="button" @click="showCancelModal = false" class="w-full rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors">Batal</button>
+                            <button type="button" wire:click="submitCancellation" @click="showCancelModal = false" class="w-full rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700 sm:w-auto shadow-md transition-colors hover:shadow-lg">Ya, Batalkan Pesanan</button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

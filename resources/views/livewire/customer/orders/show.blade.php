@@ -67,6 +67,25 @@
         </div>
     @endif
 
+    {{-- ── Aksi Konfirmasi Pengiriman Pakaian (Vermak) ── --}}
+    @if ($order->status === 'menunggu_pakaian_dikirim')
+        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
+            <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                <div>
+                    <h2 class="text-lg font-bold text-amber-900">Menunggu Pakaian Dikirim</h2>
+                    <p class="mt-1 text-sm text-amber-800">Silakan kirim atau antar langsung pakaian yang akan divermak ke workshop kami. Klik tombol di samping jika Anda sudah menyerahkannya.</p>
+                </div>
+                <button 
+                    type="button" 
+                    wire:click="confirmClothesSent"
+                    class="w-full shrink-0 rounded-xl bg-amber-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-amber-700 sm:w-auto shadow-md hover-lift hover:shadow-lg"
+                >
+                    Konfirmasi Pakaian Dikirim
+                </button>
+            </div>
+        </div>
+    @endif
+
     {{-- ── Aksi Konfirmasi Selesai ── --}}
     @if ($order->status === 'siap_diambil')
         <div x-data="{ showConfirmModal: false }" class="mb-6 rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
@@ -326,67 +345,97 @@
                     </div>
                 </div>
 
-                {{-- Material info --}}
-                <div class="mt-4 space-y-3 border-t border-stone-100 pt-4">
-                    <div class="flex items-start gap-3 text-sm">
-                        <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
-                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <span class="font-medium text-stone-500">Sumber Bahan</span>
-                                <span class="font-bold text-stone-800 text-right">
-                                    {{ $order->material_source === 'customer' ? 'Bawa Sendiri' : ($order->material_source === 'jasa' ? 'Beli di Penjahit' : '-') }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if ($order->notes)
+                @if ($order->service->type === 'vermak')
+                    <div class="mt-4 space-y-3 border-t border-stone-100 pt-4">
                         <div class="flex items-start gap-3 text-sm">
                             <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
                                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 14.25l-2.25 2.25m-4.5 0L5.25 14.25M12 12l2.25-2.25m0-4.5l-4.5 4.5M12 12V3" />
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <span class="block font-medium text-stone-500">Catatan Tambahan</span>
-                                <p class="mt-1 font-bold text-stone-800">{{ $order->notes }}</p>
+                                <span class="font-medium text-stone-500">Rincian Vermak</span>
+                                @php
+                                    $vermakDetails = json_decode($order->alteration_details, true) ?? [];
+                                @endphp
+                                @if (count($vermakDetails) > 0)
+                                    <ul class="mt-1 space-y-1">
+                                        @foreach ($vermakDetails as $detail)
+                                            <li class="flex justify-between font-bold text-stone-800 text-xs">
+                                                <span>- {{ $detail['name'] ?? 'Vermak' }}</span>
+                                                <span class="text-blue-700">+Rp {{ number_format($detail['price'] ?? 0, 0, ',', '.') }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <p class="mt-1 font-bold text-stone-800">-</p>
+                                @endif
                             </div>
                         </div>
-                    @endif
-
-                    @if ($order->fabric)
-                        <div class="flex items-start gap-4 text-sm mt-3">
-                            @if ($order->fabric->image_path)
-                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-stone-200">
-                                    <img src="{{ Storage::url($order->fabric->image_path) }}" class="h-full w-full object-cover" alt="{{ $order->fabric->name }}">
+                    </div>
+                @else
+                    {{-- Material info --}}
+                    <div class="mt-4 space-y-3 border-t border-stone-100 pt-4">
+                        <div class="flex items-start gap-3 text-sm">
+                            <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between">
+                                    <span class="font-medium text-stone-500">Sumber Bahan</span>
+                                    <span class="font-bold text-stone-800 text-right">
+                                        {{ $order->material_source === 'customer' ? 'Bawa Sendiri' : ($order->material_source === 'jasa' ? 'Beli di Penjahit' : '-') }}
+                                    </span>
                                 </div>
-                            @else
-                                <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </div>
+                        </div>
+
+                        @if ($order->notes)
+                            <div class="flex items-start gap-3 text-sm">
+                                <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                     </svg>
                                 </div>
-                            @endif
-                            <div class="flex-1">
-                                <span class="block font-medium text-stone-500">Bahan Kain</span>
-                                <p class="mt-1 font-bold text-stone-800">{{ $order->fabric->name }} — {{ $order->fabric->color }}</p>
-                                <div class="mt-1 flex flex-wrap items-center gap-1.5">
-                                    <span class="rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-medium text-stone-600">{{ $order->fabric->category_label }}</span>
-                                    <span class="text-[10px] text-stone-400">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}/m</span>
-                                    @if ($order->fabric->stock_status === 'tersedia')
-                                        <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Ready</span>
-                                    @else
-                                        <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">PO ~{{ $order->fabric->po_days }} hari</span>
-                                    @endif
+                                <div class="flex-1">
+                                    <span class="block font-medium text-stone-500">Catatan Tambahan</span>
+                                    <p class="mt-1 font-bold text-stone-800">{{ $order->notes }}</p>
                                 </div>
                             </div>
-                        </div>
-                    @endif
-                </div>
+                        @endif
+
+                        @if ($order->fabric)
+                            <div class="flex items-start gap-4 text-sm mt-3">
+                                @if ($order->fabric->image_path)
+                                    <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-stone-200">
+                                        <img src="{{ Storage::url($order->fabric->image_path) }}" class="h-full w-full object-cover" alt="{{ $order->fabric->name }}">
+                                    </div>
+                                @else
+                                    <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="flex-1">
+                                    <span class="block font-medium text-stone-500">Bahan Kain</span>
+                                    <p class="mt-1 font-bold text-stone-800">{{ $order->fabric->name }} — {{ $order->fabric->color }}</p>
+                                    <div class="mt-1 flex flex-wrap items-center gap-1.5">
+                                        <span class="rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-medium text-stone-600">{{ $order->fabric->category_label }}</span>
+                                        <span class="text-[10px] text-stone-400">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}/m</span>
+                                        @if ($order->fabric->stock_status === 'tersedia')
+                                            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Ready</span>
+                                        @else
+                                            <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">PO ~{{ $order->fabric->po_days }} hari</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </div>
 
             {{-- ── Total Biaya ── --}}
@@ -396,7 +445,7 @@
                     <span class="text-xl font-bold text-stone-900">Rp {{ number_format((float) $order->estimated_price, 0, ',', '.') }}</span>
                 </div>
 
-                @if ($order->dp_amount)
+                @if ($order->dp_amount && $order->service->type !== 'vermak')
                     <div class="mt-2 flex items-center justify-between">
                         <span class="text-sm font-medium text-stone-500">Tagihan DP</span>
                         <span class="text-base font-semibold text-stone-700">Rp {{ number_format((float) $order->dp_amount, 0, ',', '.') }}</span>
@@ -427,7 +476,7 @@
                         'belum_bayar' => 'Belum Lunas',
                         'menunggu'    => 'Menunggu Verifikasi',
                         'dp'          => 'DP Terbayar',
-                        'lunas'       => 'Lunas (DP + Pelunasan)',
+                        'lunas'       => $order->service->type === 'vermak' ? 'Lunas' : 'Lunas (DP + Pelunasan)',
                     ];
                     $paymentBadgeClass = match($order->payment_status) {
                         'lunas'       => 'text-emerald-700 bg-emerald-50',

@@ -102,19 +102,44 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         {{-- Row Layanan --}}
+                        @if ($serviceTotal > 0)
                         <tr>
                             <td class="py-4 text-slate-700">Layanan Jahit - {{ $order->service->name }}</td>
                             <td class="py-4 text-center text-slate-700">{{ $order->quantity }}</td>
                             <td class="py-4 text-right text-slate-700">Rp {{ number_format((float) $order->service->base_price, 0, ',', '.') }}</td>
                             <td class="py-4 text-right text-slate-700">Rp {{ number_format($serviceTotal, 0, ',', '.') }}</td>
                         </tr>
+                        @endif
                         {{-- Row Bahan --}}
-                        @if ($order->fabric)
+                        @if ($order->fabric && $order->service->type !== 'vermak')
                         <tr>
                             <td class="py-4 text-slate-700">Bahan - {{ $order->fabric->name }} ({{ $order->fabric->color }})</td>
                             <td class="py-4 text-center text-slate-700">{{ $order->quantity }}</td>
                             <td class="py-4 text-right text-slate-700">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}</td>
                             <td class="py-4 text-right text-slate-700">Rp {{ number_format($fabricTotal, 0, ',', '.') }}</td>
+                        </tr>
+                        @endif
+                        {{-- Row Vermak --}}
+                        @if ($order->service->type === 'vermak' && $order->alteration_details)
+                            @php
+                                $details = json_decode($order->alteration_details, true) ?? [];
+                            @endphp
+                            @foreach ($details as $detail)
+                                <tr>
+                                    <td class="py-4 text-slate-700">Vermak - {{ $detail['name'] ?? 'Lainnya' }}</td>
+                                    <td class="py-4 text-center text-slate-700">{{ $order->quantity }}</td>
+                                    <td class="py-4 text-right text-slate-700">Rp {{ number_format((float) ($detail['price'] ?? 0), 0, ',', '.') }}</td>
+                                    <td class="py-4 text-right text-slate-700">Rp {{ number_format(((float) ($detail['price'] ?? 0)) * $order->quantity, 0, ',', '.') }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
+                        {{-- Row Penyesuaian Harga --}}
+                        @if ($adjustment != 0)
+                        <tr>
+                            <td class="py-4 text-slate-700">Penyesuaian Harga (Admin)</td>
+                            <td class="py-4 text-center text-slate-700">-</td>
+                            <td class="py-4 text-right text-slate-700">-</td>
+                            <td class="py-4 text-right text-slate-700">Rp {{ number_format($adjustment, 0, ',', '.') }}</td>
                         </tr>
                         @endif
                     </tbody>
@@ -142,8 +167,18 @@
                 {{-- Right Side: Calculation --}}
                 <div class="mt-8 sm:mt-0 w-full sm:w-1/2 max-w-sm">
                     <div class="flex items-center justify-between py-2 text-sm text-slate-700">
-                        <span>Total Nilai Pesanan</span>
+                        <span>Subtotal Item</span>
                         <span class="font-medium">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                    </div>
+                    @if ($adjustment != 0)
+                    <div class="flex items-center justify-between py-2 text-sm text-slate-700">
+                        <span>Penyesuaian Harga</span>
+                        <span class="font-medium">Rp {{ number_format($adjustment, 0, ',', '.') }}</span>
+                    </div>
+                    @endif
+                    <div class="flex items-center justify-between py-2 text-sm text-slate-900 font-semibold border-b border-slate-200">
+                        <span>Total Nilai Pesanan</span>
+                        <span>Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                     </div>
                     @if (isset($payment))
                         <div class="flex items-center justify-between py-2 text-sm text-slate-700 border-t border-slate-100">
@@ -161,7 +196,7 @@
                         </div>
                         <div class="mt-4 flex items-center justify-between bg-blue-50 px-4 py-3 text-lg font-bold text-blue-900 rounded-lg">
                             <span>Total Keseluruhan</span>
-                            <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                            <span>Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                         </div>
                     @endif
                 </div>
