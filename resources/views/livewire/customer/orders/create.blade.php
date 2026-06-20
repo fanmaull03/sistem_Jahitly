@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-3xl font-bold text-stone-900">Buat Pesanan Baru</h1>
-            <p class="mt-1 text-sm text-stone-600">Pilih layanan, isi detail pesanan, dan lihat estimasi harga secara langsung.</p>
+            <p class="mt-1 text-sm text-stone-600">Pilih layanan dan isi detail pesanan Anda. Admin akan mengkonfirmasi pesanan ini.</p>
         </div>
         <a href="{{ route('orders.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-500 transition hover:text-stone-900" wire:navigate>
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -90,161 +90,6 @@
                         @enderror
                     </div>
                     
-                    @if (! $selectedService || $selectedService->type !== 'vermak')
-                    <div>
-                        <label class="block text-xs font-bold text-stone-800 mb-1.5">Sumber Bahan</label>
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <label @class([
-                                'flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition hover:bg-stone-50',
-                                'border-[#003399] bg-blue-50 text-[#003399]' => $material_source === 'customer',
-                                'border-stone-300 bg-white text-stone-700' => $material_source !== 'customer',
-                            ])>
-                                <div @class([
-                                    'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border',
-                                    'border-[#003399]' => $material_source === 'customer',
-                                    'border-stone-400' => $material_source !== 'customer',
-                                ])>
-                                    @if($material_source === 'customer')
-                                        <div class="h-2.5 w-2.5 rounded-full bg-[#003399]"></div>
-                                    @endif
-                                </div>
-                                <input type="radio" name="material_source" wire:model.live="material_source" value="customer" class="sr-only">
-                                <span class="text-sm">Bawa Sendiri</span>
-                            </label>
-
-                            <label @class([
-                                'flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition hover:bg-stone-50',
-                                'border-[#003399] bg-blue-50 text-[#003399]' => $material_source === 'jasa',
-                                'border-stone-300 bg-white text-stone-700' => $material_source !== 'jasa',
-                            ])>
-                                <div @class([
-                                    'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border',
-                                    'border-[#003399]' => $material_source === 'jasa',
-                                    'border-stone-400' => $material_source !== 'jasa',
-                                ])>
-                                    @if($material_source === 'jasa')
-                                        <div class="h-2.5 w-2.5 rounded-full bg-[#003399]"></div>
-                                    @endif
-                                </div>
-                                <input type="radio" name="material_source" wire:model.live="material_source" value="jasa" class="sr-only">
-                                <span class="text-sm">Beli di Penjahit</span>
-                            </label>
-                        </div>
-                        @error('material_source')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    @endif
-
-                    {{-- Info bahan dari customer: otomatis ready --}}
-                    @if ($material_source === 'customer')
-                        <div>
-                            <label class="block text-xs font-bold text-stone-800 mb-1.5">Status Bahan</label>
-                            <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
-                                <div class="flex items-center gap-2">
-                                    <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-sm font-semibold text-emerald-800">Bahan Siap (Ready)</span>
-                                </div>
-                                <p class="mt-1 text-xs text-emerald-600">Karena Anda membawa bahan sendiri, status otomatis dianggap siap.</p>
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Pilihan bahan dari penjahit --}}
-                    @if ($material_source === 'jasa' && $fabrics->isNotEmpty())
-                        <div>
-                            <label class="block text-xs font-bold text-stone-800 mb-1.5">Pilih Bahan</label>
-                            <p class="text-xs text-stone-500 mb-3">Pilih bahan kain yang tersedia di workshop kami.</p>
-                            
-                            <div class="grid gap-3 sm:grid-cols-2">
-                                @foreach ($fabrics as $fabric)
-                                    <button
-                                        type="button"
-                                        wire:click="$set('fabric_id', {{ $fabric->id }})"
-                                        @class([
-                                            'relative flex flex-col rounded-lg border p-4 text-left transition focus:outline-none',
-                                            'border-2 border-[#003399] bg-blue-50/30' => $fabric_id === $fabric->id,
-                                            'border-stone-200 bg-white hover:border-stone-300' => $fabric_id !== $fabric->id,
-                                        ])
-                                    >
-                                        @if ($fabric_id === $fabric->id)
-                                            <div class="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#003399] text-white">
-                                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </div>
-                                        @endif
-
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-sm font-semibold text-stone-900">{{ $fabric->name }}</span>
-                                            <span class="rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-medium text-stone-600">{{ $fabric->category_label }}</span>
-                                        </div>
-
-                                        <div class="mt-1.5 flex items-center gap-2">
-                                            <span class="inline-flex items-center gap-1 text-xs text-stone-500">
-                                                <span class="h-2.5 w-2.5 rounded-full border border-stone-300" style="background-color: {{ $fabric->color === 'Putih' ? '#fff' : ($fabric->color === 'Hitam' ? '#1a1a1a' : ($fabric->color === 'Navy' ? '#1e3a5f' : ($fabric->color === 'Biru Muda' ? '#87CEEB' : ($fabric->color === 'Khaki' ? '#C3B091' : ($fabric->color === 'Cream' ? '#FFFDD0' : ($fabric->color === 'Gold' ? '#FFD700' : ($fabric->color === 'Biru Tua' ? '#00008B' : ($fabric->color === 'Dusty Pink' ? '#DCAE96' : ($fabric->color === 'Abu-abu' ? '#808080' : ($fabric->color === 'Olive' ? '#808000' : '#ccc')))))))))) }};"></span>
-                                                {{ $fabric->color }}
-                                            </span>
-                                            <span class="text-xs text-stone-400">·</span>
-                                            <span class="text-xs font-medium text-stone-700">Rp {{ number_format((float) $fabric->price_per_meter, 0, ',', '.') }}/m</span>
-                                        </div>
-
-                                        <div class="mt-2">
-                                            @if ($fabric->stock_status === 'tersedia')
-                                                <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                                                    <svg class="mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    Stok Ready
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                                                    <svg class="mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    PO ~{{ $fabric->po_days }} hari
-                                                </span>
-                                            @endif
-                                        </div>
-
-                                        @if ($fabric->description)
-                                            <p class="mt-2 text-[11px] text-stone-400 line-clamp-2">{{ $fabric->description }}</p>
-                                        @endif
-                                    </button>
-                                @endforeach
-                            </div>
-
-                            @error('fabric_id')
-                                <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-
-                            {{-- Info bahan terpilih --}}
-                            @if ($selectedFabric)
-                                <div class="mt-3 rounded-lg border p-3 {{ $selectedFabric->stock_status === 'po' ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50' }}">
-                                    <div class="flex items-center gap-2">
-                                        @if ($selectedFabric->stock_status === 'po')
-                                            <svg class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                                            </svg>
-                                            <span class="text-xs font-semibold text-amber-800">
-                                                Bahan ini perlu Pre-Order (PO) ~{{ $selectedFabric->po_days }} hari. Admin akan mengkonfirmasi saat bahan sudah siap.
-                                            </span>
-                                        @else
-                                            <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <span class="text-xs font-semibold text-emerald-800">
-                                                Bahan tersedia dan siap digunakan langsung.
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    @endif
-                    
                     <div>
                         <label class="block text-xs font-bold text-stone-800 mb-1.5">Catatan Tambahan (Opsional)</label>
                         <textarea
@@ -324,11 +169,7 @@
                     wire:loading.attr="disabled"
                 >
                     <span wire:loading.remove wire:target="submit">
-                        @if ($selectedService && in_array($selectedService->type, ['custom', 'seragam']))
-                            Atur Jadwal Fitting
-                        @else
-                            Lanjut ke Tahap Pembayaran
-                        @endif
+                        Buat Pesanan Baru
                     </span>
                     <span wire:loading wire:target="submit">Memproses...</span>
                     <svg wire:loading.remove wire:target="submit" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -338,53 +179,12 @@
             </div>
         </div>
 
-        <!-- Sticky Footer / Side Panel (Price Summary) -->
+        <!-- Sticky Footer / Side Panel (Info) -->
         <aside class="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white p-4 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] lg:sticky lg:top-0 lg:z-auto lg:rounded-xl lg:border lg:p-6 lg:shadow-sm h-fit">
-            <h3 class="hidden text-xl font-bold text-stone-900 lg:block">Ringkasan Pesanan</h3>
+            <h3 class="hidden text-xl font-bold text-stone-900 lg:block">Informasi Pesanan</h3>
             
-            @php
-                $basePrice = $selectedService ? (float) $selectedService->base_price : 0;
-            @endphp
-            
-            <div class="hidden lg:block lg:mt-6 lg:space-y-3 lg:text-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-stone-500">Harga Dasar</span>
-                    <span class="font-medium text-stone-900">Rp {{ number_format($basePrice, 0, ',', '.') }}</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-stone-500">Jumlah</span>
-                    <span class="font-medium text-stone-900">{{ $quantity }} pcs</span>
-                </div>
-                @if ($selectedFabric)
-                    <div class="flex items-center justify-between">
-                        <span class="text-stone-500">Bahan</span>
-                        <span class="font-medium text-stone-900">{{ $selectedFabric->name }} ({{ $selectedFabric->color }})</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-stone-500">Harga Bahan</span>
-                        <span class="font-medium text-stone-900">Rp {{ number_format((float) $selectedFabric->price_per_meter, 0, ',', '.') }}/m × {{ $quantity }}</span>
-                    </div>
-                    @if ($selectedFabric->stock_status === 'po')
-                        <div class="flex items-center justify-between">
-                            <span class="text-stone-500">Status Bahan</span>
-                            <span class="font-medium text-amber-600">PO ~{{ $selectedFabric->po_days }} hari</span>
-                        </div>
-                    @endif
-                @endif
-                <div class="my-4 h-px bg-stone-200"></div>
-            </div>
-
-            <div class="flex items-center justify-between lg:flex-col lg:items-stretch lg:justify-start lg:gap-2">
-                <div>
-                    <p class="text-xs font-semibold text-stone-500 lg:text-sm">Total Estimasi Harga</p>
-                    <p class="text-xl font-black text-[#003399] lg:mt-1 lg:text-2xl">
-                        Rp {{ number_format($estimated_price, 0, ',', '.') }}
-                    </p>
-                </div>
-            </div>
-            
-            <p class="hidden mt-4 text-center text-xs text-stone-400 lg:block">
-                Estimasi harga ini bisa berubah setelah proses konsultasi/fitting.
+            <p class="mt-4 text-sm text-stone-600">
+                Pemilihan bahan dan detail lainnya akan ditentukan saat admin menerima pesanan Anda dan/atau setelah sesi fitting (pengukuran).
             </p>
         </aside>
     </form>

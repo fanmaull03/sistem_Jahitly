@@ -539,6 +539,11 @@ class Show extends Component
     // Helpers
     // ──────────────────────────────────────────────────────────
 
+    public function getCanEditPriceProperty(): bool
+    {
+        return !in_array($this->order->status, ['siap_diambil', 'selesai', 'ditolak', 'dibatalkan']);
+    }
+
     private function refreshOrder(): void
     {
         $this->order = $this->order->fresh([

@@ -19,21 +19,25 @@
         <div class="flex flex-wrap items-center gap-2">
             @php
                 $statusBadge = match(true) {
-                    in_array($order->status, ['menunggu_appointment', 'menunggu_bahan']) => [
+                    in_array($order->status, ['menunggu_konfirmasi', 'menunggu_fitting', 'menunggu_dp', 'menunggu_bahan']) => [
                         'label' => 'MENUNGGU',
                         'class' => 'bg-gradient-to-r from-amber-400 to-orange-500 text-white',
                     ],
-                    in_array($order->status, ['diproses', 'dijahit']) => [
+                    in_array($order->status, ['dalam_antrian', 'dijahit']) => [
                         'label' => 'SEDANG DIKERJAKAN',
                         'class' => 'bg-gradient-to-r from-blue-500 to-blue-600 text-white',
                     ],
-                    $order->status === 'finishing' => [
-                        'label' => 'FINISHING',
-                        'class' => 'bg-gradient-to-r from-purple-500 to-purple-600 text-white',
+                    in_array($order->status, ['selesai_produksi', 'siap_diambil']) => [
+                        'label' => 'SIAP DIAMBIL / LUNASI',
+                        'class' => 'bg-gradient-to-r from-teal-500 to-teal-600 text-white',
                     ],
                     $order->status === 'selesai' => [
                         'label' => 'SELESAI',
                         'class' => 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white',
+                    ],
+                    in_array($order->status, ['ditolak', 'dibatalkan']) => [
+                        'label' => strtoupper($order->status),
+                        'class' => 'bg-gradient-to-r from-red-500 to-red-600 text-white',
                     ],
                     default => [
                         'label' => strtoupper(str_replace('_', ' ', $order->status)),

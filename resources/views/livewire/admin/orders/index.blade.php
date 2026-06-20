@@ -75,13 +75,22 @@
                             <td class="px-4 py-4">
                                 <x-status-badge type="payment_status" :status="$order->payment_status" />
                             </td>
-                            <td class="px-4 py-4 text-right">
+                            <td class="px-4 py-4 text-right flex gap-2 justify-end">
+                                @if ($order->status === 'menunggu_konfirmasi')
+                                    <button
+                                        type="button"
+                                        wire:click="quickAccept({{ $order->id }})"
+                                        class="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                                    >
+                                        Terima
+                                    </button>
+                                @endif
                                 <a
                                     href="{{ route('admin.orders.show', $order) }}"
                                     class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-slate-300"
                                     wire:navigate
                                 >
-                                    Lihat Detail
+                                    Detail
                                 </a>
                             </td>
                         </tr>

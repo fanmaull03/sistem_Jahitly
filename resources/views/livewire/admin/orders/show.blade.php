@@ -38,6 +38,12 @@
                         </div>
                     </div>
                     <div>
+                        <div class="text-sm text-slate-500">DP (Ditetapkan Admin)</div>
+                        <div class="text-base font-semibold text-orange-600">
+                            {{ $order->dp_amount ? 'Rp ' . number_format((float) $order->dp_amount, 0, ',', '.') : 'Belum ditetapkan' }}
+                        </div>
+                    </div>
+                    <div>
                         <div class="text-sm text-slate-500">Appointment</div>
                         <div class="text-base font-semibold">
                             {{ $order->appointment?->appointment_date?->format('d M Y H:i') ?? '-' }}
@@ -57,36 +63,52 @@
                         <p class="mt-1">{{ $order->notes }}</p>
                     </div>
                 @endif
-                @if ($order->fabric)
-                    <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
-                        <div class="text-sm font-semibold text-slate-900">Bahan Kain Dipilih</div>
-                        <div class="mt-2 grid gap-2 sm:grid-cols-2 text-sm">
-                            <div>
-                                <span class="text-slate-500">Nama:</span>
-                                <span class="font-medium text-slate-900">{{ $order->fabric->name }}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500">Warna:</span>
-                                <span class="font-medium text-slate-900">{{ $order->fabric->color }}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500">Kategori:</span>
-                                <span class="font-medium text-slate-900">{{ $order->fabric->category_label }}</span>
-                            </div>
-                            <div>
-                                <span class="text-slate-500">Harga:</span>
-                                <span class="font-medium text-slate-900">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}/m</span>
-                            </div>
+                
+                <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <div class="text-sm font-semibold text-slate-900">Informasi Bahan</div>
+                    <div class="mt-2 grid gap-2 sm:grid-cols-2 text-sm">
+                        <div>
+                            <span class="text-slate-500">Sumber Bahan:</span>
+                            <span class="font-medium text-slate-900">
+                                {{ $order->material_source === 'customer' ? 'Bawa Sendiri' : ($order->material_source === 'jasa' ? 'Beli di Penjahit' : 'Belum ditentukan') }}
+                            </span>
                         </div>
-                        <div class="mt-2">
-                            @if ($order->fabric->stock_status === 'tersedia')
-                                <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Tersedia</span>
-                            @else
-                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">PO ~{{ $order->fabric->po_days }} hari</span>
-                            @endif
+                        <div>
+                            <span class="text-slate-500">Status Bahan:</span>
+                            <span class="font-medium text-slate-900">
+                                @if($order->material_status)
+                                    <x-status-badge type="material" :status="$order->material_status" />
+                                @else
+                                    Belum ditentukan
+                                @endif
+                            </span>
                         </div>
                     </div>
-                @endif
+
+                    @if ($order->fabric)
+                        <div class="mt-3 border-t border-slate-200 pt-3">
+                            <div class="text-xs font-semibold text-slate-500 mb-2">DETAIL KAIN:</div>
+                            <div class="grid gap-2 sm:grid-cols-2 text-sm">
+                                <div>
+                                    <span class="text-slate-500">Nama:</span>
+                                    <span class="font-medium text-slate-900">{{ $order->fabric->name }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500">Warna:</span>
+                                    <span class="font-medium text-slate-900">{{ $order->fabric->color }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500">Kategori:</span>
+                                    <span class="font-medium text-slate-900">{{ $order->fabric->category_label }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500">Harga:</span>
+                                    <span class="font-medium text-slate-900">Rp {{ number_format((float) $order->fabric->price_per_meter, 0, ',', '.') }}/m</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </section>
 
             <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -141,58 +163,242 @@
         </div>
 
         <aside class="space-y-6">
+            {{-- ── Panel Aksi Admin berdasarkan Status ── --}}
             <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 class="text-lg font-semibold">Update Status Bahan</h2>
-                <div class="mt-4 space-y-3">
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Sumber Bahan</label>
-                        <select
-                            wire:model.live="material_source"
-                            class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-base"
-                        >
-                            <option value="">Pilih sumber</option>
-                            <option value="customer">Customer</option>
-                            <option value="jasa">Jasa</option>
-                        </select>
-                        @error('material_source')
-                            <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Status Bahan</label>
-                        <select
-                            wire:model.live="material_status"
-                            class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-base"
-                        >
-                            <option value="">Pilih status</option>
-                            <option value="ready">Ready</option>
-                            <option value="po">PO</option>
-                        </select>
-                        @error('material_status')
-                            <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <button
-                        type="button"
-                        wire:click="updateMaterial"
-                        class="w-full rounded-xl bg-slate-900 px-4 py-2 text-base font-semibold text-white hover:bg-slate-800"
-                    >
-                        Simpan Status Bahan
-                    </button>
+                <h2 class="text-lg font-semibold">Aksi Admin</h2>
+                
+                <div class="mt-4">
+                    {{-- 1. Menunggu Konfirmasi --}}
+                    @if ($order->status === 'menunggu_konfirmasi')
+                        <div class="space-y-3">
+                            <p class="text-sm text-slate-600">Pesanan baru. Silakan terima atau tolak.</p>
+                            <div class="flex gap-2">
+                                <button type="button" wire:click="acceptOrder" class="flex-1 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                                    Terima Pesanan
+                                </button>
+                                <button type="button" wire:click="openRejectForm" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100">
+                                    Tolak
+                                </button>
+                            </div>
+
+                            @if ($showRejectForm)
+                                <div class="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-4">
+                                    <label class="text-sm font-semibold text-slate-700">Alasan Penolakan</label>
+                                    <textarea wire:model="rejectionReason" rows="3" class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"></textarea>
+                                    @error('rejectionReason') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                                    
+                                    <div class="mt-3 flex gap-2">
+                                        <button type="button" wire:click="rejectOrder" class="flex-1 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700">Konfirmasi Tolak</button>
+                                        <button type="button" wire:click="closeRejectForm" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-white">Batal</button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        
+                    {{-- 2. Menunggu Fitting --}}
+                    @elseif ($order->status === 'menunggu_fitting')
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                            <p class="text-sm text-amber-800">
+                                Menunggu customer mengatur dan menyelesaikan jadwal fitting. <br>
+                                <a href="{{ route('orders.appointments.index') }}" class="font-semibold underline" wire:navigate>Lihat Jadwal Appointment</a>
+                            </p>
+                        </div>
+
+                    {{-- 3. Menunggu DP --}}
+                    @elseif ($order->status === 'menunggu_dp')
+                        <div class="space-y-4">
+                            @if (!$order->dp_amount)
+                                <div class="rounded-xl border border-orange-200 bg-orange-50 p-4">
+                                    <p class="text-sm text-orange-800 mb-3">
+                                        Silakan tetapkan nominal DP yang harus dibayar customer.
+                                    </p>
+                                    <button type="button" wire:click="openDpForm" class="w-full rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700">
+                                        Set Nominal DP
+                                    </button>
+                                </div>
+                            @else
+                                <div class="rounded-xl border border-sky-200 bg-sky-50 p-4">
+                                    <p class="text-sm text-sky-800">
+                                        DP ditetapkan sebesar <strong>Rp {{ number_format($order->dp_amount, 0, ',', '.') }}</strong>.<br>
+                                        Menunggu customer melakukan pembayaran.
+                                    </p>
+                                    <button type="button" wire:click="openDpForm" class="mt-3 w-full rounded-xl border border-sky-300 px-4 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-100">
+                                        Ubah Nominal DP
+                                    </button>
+                                </div>
+                            @endif
+
+                            @if ($showDpForm)
+                                <div class="rounded-xl border border-slate-200 p-4">
+                                    <label class="text-sm font-semibold text-slate-700">Nominal DP (Rp)</label>
+                                    <input type="number" wire:model="dpAmount" class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                                    @error('dpAmount') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                                    
+                                    <div class="mt-3 flex gap-2">
+                                        <button type="button" wire:click="setDpAmount" class="flex-1 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800">Simpan DP</button>
+                                        <button type="button" wire:click="closeDpForm" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                    {{-- 4. Menunggu Bahan --}}
+                    @elseif ($order->status === 'menunggu_bahan')
+                        <div class="space-y-4">
+                            <p class="text-sm text-slate-600">Tetapkan bahan yang akan digunakan.</p>
+                            
+                            <button type="button" wire:click="openMaterialForm" class="w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                                Set / Ubah Bahan
+                            </button>
+
+                            @if ($showMaterialForm)
+                                <div class="rounded-xl border border-slate-200 p-4 space-y-3">
+                                    <div>
+                                        <label class="text-sm font-semibold text-slate-700">Sumber Bahan</label>
+                                        <select wire:model.live="material_source" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                                            <option value="">Pilih sumber</option>
+                                            <option value="customer">Bawa Sendiri</option>
+                                            <option value="jasa">Beli di Penjahit</option>
+                                        </select>
+                                        @error('material_source') <p class="text-xs text-rose-600">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    @if ($material_source === 'jasa')
+                                        <div>
+                                            <label class="text-sm font-semibold text-slate-700">Pilih Kain</label>
+                                            <select wire:model.live="fabric_id" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                                                <option value="">Pilih kain...</option>
+                                                @foreach($fabrics as $fabric)
+                                                    <option value="{{ $fabric->id }}">{{ $fabric->name }} - {{ $fabric->color }} (Rp {{ number_format($fabric->price_per_meter, 0, ',', '.') }}/m)</option>
+                                                @endforeach
+                                            </select>
+                                            @error('fabric_id') <p class="text-xs text-rose-600">{{ $message }}</p> @enderror
+                                        </div>
+                                    @endif
+
+                                    <div>
+                                        <label class="text-sm font-semibold text-slate-700">Status Bahan</label>
+                                        <select wire:model.live="material_status" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                                            <option value="">Pilih status</option>
+                                            <option value="ready">Ready / Tersedia</option>
+                                            <option value="po">Pre-Order (PO)</option>
+                                        </select>
+                                        @error('material_status') <p class="text-xs text-rose-600">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    @if ($material_status === 'po')
+                                        <div>
+                                            <label class="text-sm font-semibold text-slate-700">Durasi PO (Hari)</label>
+                                            <input type="number" wire:model="poDays" min="3" max="7" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                                            @error('poDays') <p class="text-xs text-rose-600">{{ $message }}</p> @enderror
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="mt-3 flex gap-2">
+                                        <button type="button" wire:click="updateMaterial" class="flex-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">Simpan</button>
+                                        <button type="button" wire:click="closeMaterialForm" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if ($order->material_status === 'po')
+                                <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                                    <p class="text-sm text-amber-800 mb-3">
+                                        Bahan sedang di-PO (~{{ $order->po_days }} hari). Klik tombol di bawah jika bahan sudah tiba.
+                                    </p>
+                                    <button type="button" wire:click="markMaterialReady" class="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+                                        Tandai Bahan Ready
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+
+                    {{-- 5. Dalam Antrian --}}
+                    @elseif ($order->status === 'dalam_antrian')
+                        <div class="space-y-4">
+                            <p class="text-sm text-slate-600">Pesanan siap diproduksi.</p>
+                            
+                            <button type="button" wire:click="openProductionForm" class="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                                Mulai Proses Jahit
+                            </button>
+
+                            @if ($showProductionForm)
+                                <div class="rounded-xl border border-slate-200 p-4">
+                                    <label class="text-sm font-semibold text-slate-700">Estimasi Hari Pengerjaan</label>
+                                    <input type="number" wire:model="productionDays" class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                                    @error('productionDays') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                                    
+                                    <div class="mt-3 flex gap-2">
+                                        <button type="button" wire:click="startProduction" class="flex-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">Mulai Produksi</button>
+                                        <button type="button" wire:click="closeProductionForm" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                    {{-- 6. Dijahit --}}
+                    @elseif ($order->status === 'dijahit')
+                        <div class="space-y-4">
+                            <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                                <p class="text-sm text-indigo-800">
+                                    Sedang dikerjakan. Estimasi selesai: <strong>{{ $order->estimated_finish_date ? $order->estimated_finish_date->format('d M Y') : '-' }}</strong>.
+                                </p>
+                            </div>
+                            <button type="button" wire:click="finishProduction" class="w-full rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">
+                                Tandai Selesai Produksi
+                            </button>
+                        </div>
+
+                    {{-- 7. Selesai Produksi --}}
+                    @elseif ($order->status === 'selesai_produksi')
+                        @php
+                            $totalVerified = $order->payments->where('status', 'terverifikasi')->sum('amount');
+                            $isPaid = $totalVerified >= $order->estimated_price;
+                        @endphp
+                        
+                        <div class="space-y-4">
+                            @if ($isPaid)
+                                <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-3">
+                                    <p class="text-sm text-emerald-800 font-semibold">Pelunasan sudah lunas.</p>
+                                </div>
+                                <button type="button" wire:click="markReadyForPickup" class="w-full rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700">
+                                    Tandai Siap Diambil
+                                </button>
+                            @else
+                                <div class="rounded-xl border border-rose-200 bg-rose-50 p-4">
+                                    <p class="text-sm text-rose-800">
+                                        Menunggu customer melakukan pelunasan sisa tagihan sebesar <strong>Rp {{ number_format($order->estimated_price - $totalVerified, 0, ',', '.') }}</strong>.
+                                    </p>
+                                </div>
+                                <button type="button" class="w-full rounded-xl bg-slate-300 px-4 py-2 text-sm font-semibold text-slate-500 cursor-not-allowed" disabled>
+                                    Tandai Siap Diambil (Belum Lunas)
+                                </button>
+                            @endif
+                        </div>
+
+                    {{-- 8. Siap Diambil --}}
+                    @elseif ($order->status === 'siap_diambil')
+                        <div class="space-y-4">
+                            <p class="text-sm text-slate-600">Menunggu customer mengambil pakaian.</p>
+                            <button type="button" wire:click="markComplete" class="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+                                Tandai Pesanan Selesai
+                            </button>
+                        </div>
+
+                    {{-- 9. Selesai / Ditolak / Dibatalkan --}}
+                    @else
+                        <p class="text-sm text-slate-500">Pesanan ini sudah berada di status akhir ({{ str_replace('_', ' ', $order->status) }}) dan tidak dapat diubah lagi.</p>
+                    @endif
                 </div>
             </section>
 
-            {{-- ── Edit Harga Pesanan ── --}}
-            @if ($this->canEditPrice)
+            {{-- ── Edit Harga Pesanan (Khusus sebelum lunas) ── --}}
+            @if (!in_array($order->status, ['siap_diambil', 'selesai', 'ditolak', 'dibatalkan']))
                 <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold">Edit Harga</h2>
+                        <h2 class="text-lg font-semibold">Edit Total Harga</h2>
                         @if (!$showPriceForm)
-                            <button
-                                type="button"
-                                wire:click="openPriceForm"
-                                class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                            >
+                            <button type="button" wire:click="openPriceForm" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50">
                                 Edit
                             </button>
                         @endif
@@ -209,100 +415,17 @@
                         <div class="mt-4 space-y-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
                             <div>
                                 <label class="text-sm font-semibold text-slate-700">Harga Baru (Rp)</label>
-                                <div class="relative mt-2">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <span class="text-sm font-bold text-slate-500">Rp</span>
-                                    </div>
-                                    <input
-                                        type="number"
-                                        min="1000"
-                                        wire:model="editEstimatedPrice"
-                                        class="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-base font-bold text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                        placeholder="Masukkan harga baru"
-                                    />
-                                </div>
-                                @error('editEstimatedPrice')
-                                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                                @enderror
+                                <input type="number" wire:model="editEstimatedPrice" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-bold">
+                                @error('editEstimatedPrice') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                             </div>
                             <div class="flex gap-2">
-                                <button
-                                    type="button"
-                                    wire:click="updatePrice"
-                                    class="flex-1 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                                >
-                                    Simpan & Notif Customer
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="closePriceForm"
-                                    class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
-                                >
-                                    Batal
-                                </button>
+                                <button type="button" wire:click="updatePrice" class="flex-1 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Simpan</button>
+                                <button type="button" wire:click="closePriceForm" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
                             </div>
                         </div>
                     @endif
                 </section>
             @endif
-
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 class="text-lg font-semibold">Update Status Pesanan</h2>
-                <div class="mt-4 space-y-3">
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Status Pesanan</label>
-                        <select
-                            wire:model.live="status"
-                            class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-base"
-                        >
-                            <option value="menunggu_appointment">Menunggu Appointment</option>
-                            <option value="menunggu_bahan">Menunggu Bahan</option>
-                            <option value="diproses">Diproses</option>
-                            <option value="dijahit">Dijahit</option>
-                            <option value="finishing">Finishing</option>
-                            <option value="selesai">Selesai</option>
-                        </select>
-                        @error('status')
-                            <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Catatan Admin</label>
-                        <textarea
-                            rows="3"
-                            wire:model="notes"
-                            class="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-base"
-                        ></textarea>
-                        @error('notes')
-                            <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    @if (! $this->canUpdateStatus)
-                        <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                            <div class="font-semibold">Belum bisa diproses:</div>
-                            <ul class="mt-2 list-disc space-y-1 pl-5">
-                                @foreach ($blockingReasons as $reason)
-                                    <li>{{ $reason }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <button
-                        type="button"
-                        wire:click="updateStatus"
-                        @class([
-                            'w-full rounded-xl px-4 py-2 text-base font-semibold',
-                            'bg-slate-900 text-white hover:bg-slate-800' => $this->canUpdateStatus,
-                            'bg-slate-300 text-slate-600 cursor-not-allowed' => ! $this->canUpdateStatus,
-                        ])
-                        @disabled(! $this->canUpdateStatus)
-                    >
-                        Simpan Status Pesanan
-                    </button>
-                </div>
-            </section>
 
             <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h2 class="text-lg font-semibold">Preview Desain</h2>
