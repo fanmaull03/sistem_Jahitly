@@ -1,6 +1,6 @@
 <div class="page-enter mx-auto max-w-5xl space-y-6 px-4 pb-20 sm:px-6">
     {{-- ── Header ── --}}
-    <div data-reveal class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-3xl font-bold text-stone-900">Pesanan Saya</h1>
             <p class="mt-1 text-sm text-stone-500">Pantau status jahitan Anda secara real-time.</p>
@@ -16,7 +16,7 @@
     </div>
 
     {{-- ── Filter Tabs ── --}}
-    <div data-reveal data-reveal-delay="1" class="flex gap-3">
+    <div class="flex gap-3">
         @foreach ($statuses as $key => $label)
             <button
                 type="button"
@@ -33,7 +33,7 @@
     </div>
 
     {{-- ── Order Cards ── --}}
-    <div data-reveal data-reveal-delay="2" class="space-y-4">
+    <div class="space-y-4">
         @php
             function getOrderStatusBadge($status) {
                 return match(true) {

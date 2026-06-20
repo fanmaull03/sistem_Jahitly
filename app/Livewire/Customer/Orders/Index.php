@@ -33,6 +33,7 @@ class Index extends Component
             'all' => 'Semua',
             'proses' => 'Sedang Proses',
             'selesai' => 'Selesai',
+            'dibatalkan' => 'Dibatalkan',
         ];
     }
 
@@ -47,6 +48,8 @@ class Index extends Component
             $query->whereIn('status', ['menunggu_appointment', 'menunggu_bahan', 'diproses', 'dijahit', 'finishing']);
         } elseif ($this->statusFilter === 'selesai') {
             $query->where('status', 'selesai');
+        } elseif ($this->statusFilter === 'dibatalkan') {
+            $query->where('status', 'dibatalkan');
         }
 
         return $query->paginate(10);

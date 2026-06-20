@@ -1,6 +1,6 @@
 <div class="page-enter space-y-6 pb-32 lg:pb-10">
     <!-- Header -->
-    <div data-reveal class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-stone-900">Batalkan Pesanan</h1>
             <p class="mt-1 text-sm text-stone-600">Pesanan #{{ $order->order_number }} - {{ $order->service->name }}</p>
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Warning Alert -->
-    <div data-reveal data-reveal-delay="1" class="rounded-2xl border-l-4 border-amber-500 bg-amber-50 p-6 shadow-sm">
+    <div class="rounded-2xl border-l-4 border-amber-500 bg-amber-50 p-6 shadow-sm">
         <div class="flex gap-4">
             <div class="flex-shrink-0">
                 <svg class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Order Details -->
-    <div data-reveal data-reveal-delay="2" class="grid gap-6 lg:grid-cols-3">
+    <div class="grid gap-6 lg:grid-cols-3">
         <!-- Left Column -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Order Information -->

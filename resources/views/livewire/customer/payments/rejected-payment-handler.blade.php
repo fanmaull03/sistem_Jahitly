@@ -1,6 +1,6 @@
 <div class="page-enter space-y-6 pb-32 lg:pb-10">
     <!-- Header -->
-    <div data-reveal class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-stone-900">Pembayaran Ditolak</h1>
             <p class="mt-1 text-sm text-stone-600">Pesanan #{{ $payment->order->order_number }}</p>
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Alert Card -->
-    <div data-reveal data-reveal-delay="1" class="rounded-2xl border-l-4 border-red-500 bg-red-50 p-6 shadow-sm">
+    <div class="rounded-2xl border-l-4 border-red-500 bg-red-50 p-6 shadow-sm">
         <div class="flex gap-4">
             <div class="flex-shrink-0">
                 <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Payment Details -->
-    <div data-reveal data-reveal-delay="2" class="grid gap-6 lg:grid-cols-3">
+    <div class="grid gap-6 lg:grid-cols-3">
         <!-- Left Column: Payment Info -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Rejection Reason -->
@@ -165,7 +165,7 @@
     </div>
 
     <!-- Retry Button -->
-    <div data-reveal data-reveal-delay="3" class="flex gap-3">
+    <div class="flex gap-3">
         <a
             href="{{ route('payments.create', $payment->order) }}"
             class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-center font-bold text-white hover:bg-blue-700 transition shadow-md hover:shadow-lg"

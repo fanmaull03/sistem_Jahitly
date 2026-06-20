@@ -1,5 +1,5 @@
 <div class="page-enter mx-auto max-w-6xl space-y-6 px-4 pb-32 sm:px-6 lg:pb-10">
-    <div data-reveal class="flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white/90 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white/90 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
             <p class="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-600">
                 Konfirmasi Pembayaran
@@ -19,7 +19,7 @@
         <div class="space-y-8 lg:col-span-2">
             
             <!-- STEP 1: Metode Pembayaran -->
-            <section data-reveal data-reveal-delay="1">
+            <section>
                 <div class="mb-4 flex items-center gap-2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white shadow-sm">1</span>
                     <h2 class="text-xl font-bold text-stone-900">Metode Pembayaran</h2>
@@ -81,7 +81,7 @@
             </section>
 
             <!-- STEP 2: Nominal Pembayaran -->
-            <section data-reveal data-reveal-delay="2">
+            <section>
                 <div class="mb-4 flex items-center gap-2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white shadow-sm">2</span>
                     <h2 class="text-xl font-bold text-stone-900">Nominal Transfer</h2>
@@ -108,7 +108,7 @@
 
             <!-- STEP 3: Bukti Transfer -->
             @if(in_array($payment_method, ['transfer', 'qris']))
-                <section data-reveal data-reveal-delay="3">
+                <section>
                     <div class="mb-4 flex items-center gap-2">
                         <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white shadow-sm">3</span>
                         <h2 class="text-xl font-bold text-stone-900">Upload Bukti</h2>

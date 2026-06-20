@@ -8,7 +8,7 @@
 
 <div class="page-enter space-y-6 pb-32 lg:pb-10">
     <!-- Header -->
-    <div data-reveal class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-3xl font-bold text-stone-900">Riwayat Pembayaran</h1>
             <p class="mt-1 text-sm text-stone-600">
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Status Filter -->
-    <div data-reveal data-reveal-delay="1" class="flex flex-wrap gap-3">
+    <div class="flex flex-wrap gap-3">
         @foreach ($statuses as $value => $label)
             <button
                 wire:click="$set('statusFilter', '{{ $value }}')"
@@ -48,7 +48,7 @@
     </div>
 
     <!-- Payments Table / List -->
-    <div data-reveal data-reveal-delay="2" class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+    <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         @if ($payments->count() > 0)
             <!-- Desktop Table -->
             <div class="hidden md:block overflow-x-auto">

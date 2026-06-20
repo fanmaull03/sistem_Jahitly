@@ -36,7 +36,7 @@ class CancelOrder extends Component
     public function canCancelOrder(): bool
     {
         // Status yang tidak dapat dibatalkan
-        $nonCancellableStatuses = ['dijahit', 'finishing', 'selesai'];
+        $nonCancellableStatuses = ['dijahit', 'finishing', 'selesai', 'dibatalkan'];
 
         if (in_array($this->order->status, $nonCancellableStatuses)) {
             return false;
@@ -72,7 +72,7 @@ class CancelOrder extends Component
         ];
     }
 
-    public function submitCancellation(): void
+    public function submitCancellation()
     {
         $this->validate();
 
@@ -85,16 +85,15 @@ class CancelOrder extends Component
 
         // Tambahkan log status
         $this->order->statusLogs()->create([
-            'old_status' => $this->order->status,
-            'new_status' => 'dibatalkan',
+            'status' => 'dibatalkan',
             'changed_by' => auth()->id(),
-            'reason' => $this->cancellationReason,
+            'notes' => 'Dibatalkan oleh customer: ' . $this->cancellationReason,
         ]);
 
         // Redirect dengan pesan sukses
         session()->flash('success', 'Pesanan berhasil dibatalkan.');
         
-        $this->redirect(
+        return $this->redirect(
             route('orders.index'),
             navigate: true
         );

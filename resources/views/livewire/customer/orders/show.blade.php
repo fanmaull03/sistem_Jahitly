@@ -1,6 +1,6 @@
 <div class="page-enter mx-auto max-w-6xl space-y-6 px-4 pb-24 sm:px-6 lg:pb-10">
     {{-- ── Header ── --}}
-    <div data-reveal class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
             <a href="{{ route('orders.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-400 transition hover:text-stone-700 mb-3" wire:navigate>
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -61,7 +61,7 @@
     <div class="grid gap-6 lg:grid-cols-5">
         {{-- ── Left: Status Produksi (3 cols) ── --}}
         <div class="lg:col-span-3">
-            <section data-reveal data-reveal-delay="1" class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
                 <h2 class="text-lg font-bold text-stone-900">Status Produksi</h2>
 
                 <div class="mt-8 flow-root">
@@ -150,7 +150,7 @@
         {{-- ── Right: Info Cards (2 cols) ── --}}
         <aside class="space-y-5 lg:col-span-2">
             {{-- ── Informasi Pakaian ── --}}
-            <div data-reveal data-reveal-delay="1" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">Informasi Pakaian</h3>
 
                 <div class="mt-4 flex items-start gap-4">
@@ -237,7 +237,7 @@
             </div>
 
             {{-- ── Total Biaya ── --}}
-            <div data-reveal data-reveal-delay="2" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-stone-500">Total Biaya</span>
                     <span class="text-xl font-bold text-stone-900">Rp {{ number_format((float) $order->estimated_price, 0, ',', '.') }}</span>
@@ -268,7 +268,7 @@
 
             {{-- ── Design Files ── --}}
             @if ($order->designFiles->isNotEmpty())
-                <div data-reveal data-reveal-delay="3" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">File Desain</h3>
                     <div class="mt-3 space-y-2">
                         @foreach ($order->designFiles as $file)
@@ -289,7 +289,7 @@
             @endif
             {{-- ── Appointment Info ── --}}
             @if ($this->needsAppointment)
-                <div data-reveal data-reveal-delay="3" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">Appointment</h3>
 
                     @if ($order->appointment)
@@ -351,7 +351,7 @@
     </div>
 
     {{-- ── Bottom Action Buttons ── --}}
-    <div data-reveal data-reveal-delay="3" class="flex flex-col items-center justify-center gap-3 border-t border-stone-100 pt-6 sm:flex-row">
+    <div class="flex flex-col items-center justify-center gap-3 border-t border-stone-100 pt-6 sm:flex-row">
         <a href="{{ route('payments.history.order', $order) }}"
            class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50"
            wire:navigate>
