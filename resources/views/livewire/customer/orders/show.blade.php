@@ -215,7 +215,7 @@
                     <ul role="list" class="-mb-8">
                         @foreach ($statusSteps as $index => $step)
                             @php
-                                $isCompleted = $index < $currentStepIndex;
+                                $isCompleted = $index < $currentStepIndex || ($step['key'] === 'selesai' && $index === $currentStepIndex);
                                 $isActive    = $index === $currentStepIndex;
                                 $isLast      = $loop->last;
                                 $matchedLog  = $statusLogs->firstWhere('status', $step['key']);
@@ -543,8 +543,7 @@
         @endif
 
         @php
-            $waNumber = config('services.whatsapp.number') ?? null;
-            $waUrl = $waNumber ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $waNumber) . '?text=' . urlencode("Halo CS Jahitly, saya ingin bertanya tentang pesanan #{$order->order_number}") : '#';
+            $waUrl = 'https://wa.me/6281234567890?text=' . urlencode("Halo CS Jahitly, saya ingin bertanya tentang pesanan #{$order->order_number}");
         @endphp
         <a href="{{ $waUrl }}" target="_blank"
            class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 hover:shadow-lg hover-lift">

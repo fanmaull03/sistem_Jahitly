@@ -35,6 +35,83 @@ class Dashboard extends Component
             'monthly_revenue' => Payment::where('status', 'terverifikasi')
                 ->whereBetween('verified_at', [$monthStart, $monthEnd])
                 ->sum('amount'),
+            'completed_orders' => Order::where('status', 'selesai')->count(),
+        ];
+    }
+
+    public string $chartFilter = '6_months';
+
+    public function updatedChartFilter()
+    {
+        $this->dispatch('update-revenue-chart', chartData: $this->getRevenueChartData());
+    }
+
+    private function getRevenueChartData(): array
+    {
+        $labels = collect();
+        $revenues = collect();
+
+        switch ($this->chartFilter) {
+            case '1_week':
+                for ($i = 6; $i >= 0; $i--) {
+                    $date = Carbon::today()->subDays($i);
+                    $labels->push($date->translatedFormat('D, d M'));
+                    
+                    $sum = Payment::where('status', 'terverifikasi')
+                        ->whereDate('verified_at', $date)
+                        ->sum('amount');
+                    $revenues->push($sum);
+                }
+                break;
+                
+            case '1_month':
+                for ($i = 3; $i >= 0; $i--) {
+                    $start = Carbon::today()->subWeeks($i)->startOfWeek();
+                    $end = Carbon::today()->subWeeks($i)->endOfWeek();
+                    $labels->push($start->format('d M') . ' - ' . $end->format('d M'));
+                    
+                    $sum = Payment::where('status', 'terverifikasi')
+                        ->whereBetween('verified_at', [$start->startOfDay(), $end->endOfDay()])
+                        ->sum('amount');
+                    $revenues->push($sum);
+                }
+                break;
+                
+            case '1_year':
+                for ($i = 11; $i >= 0; $i--) {
+                    $date = Carbon::now()->subMonths($i);
+                    $labels->push($date->translatedFormat('M Y'));
+                    
+                    $start = $date->copy()->startOfMonth();
+                    $end = $date->copy()->endOfMonth();
+                    
+                    $sum = Payment::where('status', 'terverifikasi')
+                        ->whereBetween('verified_at', [$start, $end])
+                        ->sum('amount');
+                    $revenues->push($sum);
+                }
+                break;
+                
+            case '6_months':
+            default:
+                for ($i = 5; $i >= 0; $i--) {
+                    $date = Carbon::now()->subMonths($i);
+                    $labels->push($date->translatedFormat('F'));
+                    
+                    $start = $date->copy()->startOfMonth();
+                    $end = $date->copy()->endOfMonth();
+                    
+                    $sum = Payment::where('status', 'terverifikasi')
+                        ->whereBetween('verified_at', [$start, $end])
+                        ->sum('amount');
+                    $revenues->push($sum);
+                }
+                break;
+        }
+
+        return [
+            'labels' => $labels->toArray(),
+            'data' => $revenues->toArray(),
         ];
     }
 
@@ -45,9 +122,16 @@ class Dashboard extends Component
             ->orderBy('appointment_date', 'asc')
             ->get();
 
+        $recentOrders = Order::with(['customer', 'service'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
         return view('livewire.admin.dashboard', [
             'summary' => $this->summary,
             'todayAppointments' => $todayAppointments,
+            'recentOrders' => $recentOrders,
+            'revenueChartData' => $this->getRevenueChartData(),
         ])->layout('layouts.admin');
     }
 }
