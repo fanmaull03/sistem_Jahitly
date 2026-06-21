@@ -243,41 +243,54 @@
                 </div>
 
                 <div class="mt-12 grid gap-6 md:grid-cols-3">
-                    @foreach ([
-                        ['name' => 'Ibu Sari', 'desc' => 'Jahitannya sangat rapi dan tepat waktu. Paling suka karena bisa pantau dari HP!'],
-                        ['name' => 'Pak Budi', 'desc' => 'Vermak jas di sini hasilnya pas banget. Gak kelihatan kalau habis dipermak.'],
-                        ['name' => 'Maya Putri', 'desc' => 'Seragam kantor pesanan kami selesai lebih cepat dari jadwal. Sangat profesional!'],
-                    ] as $testimoni)
-                        <article data-reveal class="rounded-2xl border border-stone-200 bg-white p-6 text-center shadow-sm">
-                            <div class="flex items-center justify-center gap-1 text-amber-500">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
-                                </svg>
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
-                                </svg>
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
-                                </svg>
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
-                                </svg>
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M12 2l2.9 6.1 6.7.6-5 4.4 1.5 6.6L12 16.8 5.9 19.7 7.4 13 2.4 8.7l6.7-.6L12 2z" />
-                                </svg>
-                            </div>
-                            <p class="mt-4 text-sm italic text-stone-600">"{{ $testimoni['desc'] }}"</p>
-                            <div class="mt-6 flex flex-col items-center">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-stone-100 text-stone-500">
-                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11a4 4 0 100-8 4 4 0 000 8z" />
+                    @forelse ($testimonials as $testimoni)
+                        <div data-reveal class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+                            <div class="flex items-center gap-1 text-amber-500">
+                                @for($i = 0; $i < $testimoni->rating; $i++)
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
-                                </div>
-                                <div class="mt-3 text-sm font-semibold text-stone-900">{{ $testimoni['name'] }}</div>
+                                @endfor
                             </div>
-                        </article>
-                    @endforeach
+                            <p class="mt-4 text-sm italic text-stone-600">"{{ $testimoni->comment }}"</p>
+                            <div class="mt-4 flex items-center gap-3 border-t border-stone-100 pt-4">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                                    {{ substr($testimoni->customer->name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-stone-900">{{ $testimoni->customer->name }}</div>
+                                    <div class="text-xs text-stone-500">{{ $testimoni->order->service->name ?? 'Layanan' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        {{-- Fallback Dummy Testimonials --}}
+                        @foreach ([
+                            ['name' => 'Ibu Sari', 'service' => 'Jahit Seragam', 'desc' => 'Jahitannya sangat rapi dan tepat waktu. Paling suka karena bisa pantau dari HP!'],
+                            ['name' => 'Pak Budi', 'service' => 'Vermak Pakaian', 'desc' => 'Vermak jas di sini hasilnya pas banget. Gak kelihatan kalau habis dipermak.'],
+                            ['name' => 'Maya Putri', 'service' => 'Jahit Custom', 'desc' => 'Seragam kantor pesanan kami selesai lebih cepat dari jadwal. Sangat profesional!'],
+                        ] as $dummy)
+                            <div data-reveal class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+                                <div class="flex items-center gap-1 text-amber-500">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                </div>
+                                <p class="mt-4 text-sm italic text-stone-600">"{{ $dummy['desc'] }}"</p>
+                                <div class="mt-4 flex items-center gap-3 border-t border-stone-100 pt-4">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                                        {{ substr($dummy['name'], 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-stone-900">{{ $dummy['name'] }}</div>
+                                        <div class="text-xs text-stone-500">{{ $dummy['service'] }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endforelse
                 </div>
             </div>
         </section>
