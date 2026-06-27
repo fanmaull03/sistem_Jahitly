@@ -1,27 +1,27 @@
 <x-app-layout>
     <div class="page-enter mx-auto max-w-6xl px-4 pb-16 sm:px-6">
         <div class="mb-6">
-            <h2 class="text-xl font-bold text-stone-900">Profil Pelanggan</h2>
-            <p class="mt-1 text-sm text-stone-500">
+            <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">Profil Pelanggan</h2>
+            <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
                 Kelola informasi akun dan bagikan pengalaman Anda bersama kami.
             </p>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-3">
             <div class="space-y-6 lg:col-span-2">
-                <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+                <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                     @include('profile.partials.update-profile-information-form')
                 </div>
 
-                <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+                <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
             <div class="space-y-6">
-                <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
-                    <div class="flex items-center gap-2 text-amber-700">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+                <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm dark:border-amber-800 dark:bg-amber-900/30">
+                    <div class="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50">
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 16h6" />
@@ -30,7 +30,7 @@
                         </span>
                         <h3 class="text-sm font-semibold">Menunggu Ulasan</h3>
                     </div>
-                    <p class="mt-3 text-sm text-amber-900">
+                    <p class="mt-3 text-sm text-amber-900 dark:text-amber-300">
                         Bagaimana hasil jahitan kami untuk pesanan ini?
                     </p>
                     @if ($pendingReview)
@@ -38,7 +38,7 @@
                             @csrf
                             <input type="hidden" name="order_id" value="{{ $pendingReview->id }}" />
 
-                            <div class="mt-3 rounded-xl border border-amber-100 bg-white/70 p-3 text-xs text-amber-900">
+                            <div class="mt-3 rounded-xl border border-amber-100 bg-white/70 p-3 text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">
                                 <div class="font-semibold">Pesanan {{ $pendingReview->order_number }}</div>
                                 <div>{{ $pendingReview->service->name ?? 'Layanan' }}</div>
                                 <div>Selesai: {{ optional($pendingReview->estimated_finish_date)->format('d M Y') ?? $pendingReview->updated_at->format('d M Y') }}</div>
@@ -72,7 +72,7 @@
                             <textarea
                                 name="comment"
                                 rows="3"
-                                class="mt-3 w-full rounded-xl border border-amber-100 bg-white px-3 py-2 text-xs text-stone-700 placeholder:text-stone-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-200"
+                                class="mt-3 w-full rounded-xl border border-amber-100 bg-white px-3 py-2 text-xs text-stone-700 placeholder:text-stone-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-200 dark:bg-stone-900 dark:border-stone-600 dark:text-stone-100 dark:placeholder-stone-500 dark:focus:border-amber-500 dark:focus:ring-amber-500/20"
                                 placeholder="Ceritakan pengalaman Anda..."
                                 required
                             ></textarea>
@@ -84,15 +84,15 @@
                             </button>
                         </form>
                     @else
-                        <div class="mt-3 rounded-xl border border-amber-100 bg-white/70 p-3 text-xs text-amber-900">
+                        <div class="mt-3 rounded-xl border border-amber-100 bg-white/70 p-3 text-xs text-amber-900 dark:bg-amber-900/50 dark:border-amber-700 dark:text-amber-200">
                             Tidak ada pesanan yang perlu diulas saat ini.
                         </div>
                     @endif
                 </div>
 
-                <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-                    <div class="flex items-center gap-2 text-stone-700">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100">
+                <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
+                    <div class="flex items-center gap-2 text-stone-700 dark:text-stone-300">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 dark:bg-stone-700">
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 1016 0 8 8 0 10-16 0" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l2 2" />
@@ -101,22 +101,22 @@
                         <h3 class="text-sm font-semibold">Riwayat Testimoni</h3>
                     </div>
 
-                    <div class="mt-4 space-y-5 border-l border-stone-200 pl-4">
+                    <div class="mt-4 space-y-5 border-l border-stone-200 pl-4 dark:border-stone-700">
                         @forelse ($testimonials as $t)
                             <div class="relative">
                                 <span class="absolute -left-[9px] top-1 h-2 w-2 rounded-full bg-blue-600"></span>
                                 <div class="flex items-center gap-2">
-                                    <div class="h-8 w-8 overflow-hidden rounded-full border bg-stone-50">
+                                    <div class="h-8 w-8 overflow-hidden rounded-full border bg-stone-50 dark:bg-stone-800 dark:border-stone-700">
                                         @if ($t->customer && $t->customer->profile_photo_path)
                                             <img src="{{ asset('storage/' . $t->customer->profile_photo_path) }}" alt="avatar" class="h-full w-full object-cover" />
                                         @else
-                                            <div class="flex h-full w-full items-center justify-center text-xs text-stone-500">{{ strtoupper(substr($t->customer->name ?? 'U',0,1)) }}</div>
+                                            <div class="flex h-full w-full items-center justify-center text-xs text-stone-500 dark:text-stone-400">{{ strtoupper(substr($t->customer->name ?? 'U',0,1)) }}</div>
                                         @endif
                                     </div>
                                     <div class="flex-1">
                                         <div class="flex items-center justify-between text-xs">
-                                            <span class="font-semibold text-stone-900">{{ $t->order->service->name ?? 'Pesanan' }}</span>
-                                            <span class="text-stone-400">{{ $t->created_at->format('d M Y') }}</span>
+                                            <span class="font-semibold text-stone-900 dark:text-stone-100">{{ $t->order->service->name ?? 'Pesanan' }}</span>
+                                            <span class="text-stone-400 dark:text-stone-500">{{ $t->created_at->format('d M Y') }}</span>
                                         </div>
                                         <div class="mt-2 flex items-center gap-1 text-amber-500">
                                             @for ($i = 1; $i <= 5; $i++)
@@ -125,12 +125,12 @@
                                                 </svg>
                                             @endfor
                                         </div>
-                                        <p class="mt-2 text-xs italic text-stone-600">"{{ $t->comment }}"</p>
+                                        <p class="mt-2 text-xs italic text-stone-600 dark:text-stone-400">"{{ $t->comment }}"</p>
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="text-xs text-stone-500">Anda belum mengirim testimoni.</div>
+                            <div class="text-xs text-stone-500 dark:text-stone-400">Anda belum mengirim testimoni.</div>
                         @endforelse
                     </div>
                 </div>

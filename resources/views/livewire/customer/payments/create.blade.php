@@ -1,13 +1,13 @@
 <div class="page-enter mx-auto max-w-6xl space-y-6 px-4 pb-32 sm:px-6 lg:pb-10">
-    <div class="flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white/90 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white/90 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:border-stone-700 dark:bg-stone-800">
         <div>
-            <p class="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-600">
+            <p class="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-500">
                 Konfirmasi Pembayaran
             </p>
-            <h1 class="mt-3 text-3xl font-bold text-stone-900">Pembayaran Tagihan</h1>
-            <p class="mt-1 text-sm text-stone-600">Pesanan #{{ $order->order_number }} - {{ $order->service->name }}</p>
+            <h1 class="mt-3 text-3xl font-bold text-stone-900 dark:text-stone-100">Pembayaran Tagihan</h1>
+            <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">Pesanan #{{ $order->order_number }} - {{ $order->service->name }}</p>
         </div>
-        <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-500 transition hover:text-stone-900 sm:pr-4" wire:navigate>
+        <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-500 transition hover:text-stone-900 sm:pr-4 dark:text-stone-400 dark:hover:text-stone-200" wire:navigate>
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
@@ -22,7 +22,7 @@
             <section>
                 <div class="mb-4 flex items-center gap-2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white shadow-sm">1</span>
-                    <h2 class="text-xl font-bold text-stone-900">Metode Pembayaran</h2>
+                    <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">Metode Pembayaran</h2>
                 </div>
                 
                 <div class="grid gap-4 sm:grid-cols-3">
@@ -30,8 +30,8 @@
                         <label
                             @class([
                                 'relative flex cursor-pointer flex-col rounded-2xl border-2 p-5 text-center transition focus:outline-none',
-                                'border-blue-600 bg-blue-50/50 shadow-sm' => $payment_method === $value,
-                                'border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50' => $payment_method !== $value,
+                                'border-blue-600 bg-blue-50/50 shadow-sm dark:bg-blue-900/20' => $payment_method === $value,
+                                'border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-700 dark:hover:bg-stone-600 dark:hover:border-stone-500' => $payment_method !== $value,
                             ])
                         >
                             <input type="radio" class="sr-only" value="{{ $value }}" wire:model.live="payment_method" />
@@ -42,7 +42,7 @@
                                     </svg>
                                 </div>
                             @endif
-                            <span class="font-bold text-stone-900">{{ $label }}</span>
+                            <span class="font-bold text-stone-900 dark:text-stone-100">{{ $label }}</span>
                         </label>
                     @endforeach
                 </div>
@@ -52,7 +52,7 @@
 
                 <!-- Info Rekening / QRIS -->
                 @if ($payment_method === 'transfer')
-                    <div class="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
+                    <div class="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-800 dark:bg-blue-900/20">
                         <div class="flex items-center gap-3">
                             <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                 @elseif ($payment_method === 'qris')
-                    <div class="mt-6 flex flex-col items-center rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-sm">
+                    <div class="mt-6 flex flex-col items-center rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                         <p class="mb-4 text-sm font-bold text-stone-900">Scan QR Code di bawah ini</p>
                         <div class="rounded-2xl border-4 border-stone-100 p-2">
                             <img src="{{ asset('images/qris-sample.svg') }}" alt="QRIS Code" class="w-48 rounded-xl object-contain" />
@@ -84,20 +84,20 @@
             <section>
                 <div class="mb-4 flex items-center gap-2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white shadow-sm">2</span>
-                    <h2 class="text-xl font-bold text-stone-900">Nominal Transfer</h2>
+                    <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">Nominal Transfer</h2>
                 </div>
                 
-                <div class="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-sm">
-                    <label class="text-sm font-semibold text-stone-700">Masukkan jumlah yang ditransfer (Rp)</label>
+                <div class="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
+                    <label class="text-sm font-semibold text-stone-700 dark:text-stone-300">Masukkan jumlah yang ditransfer (Rp)</label>
                     <div class="relative mt-2">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                            <span class="text-stone-500 font-bold">Rp</span>
+                            <span class="text-stone-500 font-bold dark:text-stone-400">Rp</span>
                         </div>
                         <input
                             type="number"
                             min="1000"
                             wire:model.live="amount"
-                            class="block w-full rounded-xl border border-stone-300 bg-stone-50 py-3 pl-12 pr-4 text-lg font-bold text-stone-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition"
+                            class="block w-full rounded-xl border border-stone-300 bg-stone-50 py-3 pl-12 pr-4 text-lg font-bold text-stone-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition dark:bg-stone-900 dark:text-stone-100 dark:border-stone-600 dark:focus:bg-stone-800"
                         />
                     </div>
                     @error('amount')
@@ -111,16 +111,16 @@
                 <section>
                     <div class="mb-4 flex items-center gap-2">
                         <span class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white shadow-sm">3</span>
-                        <h2 class="text-xl font-bold text-stone-900">Upload Bukti</h2>
+                        <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">Upload Bukti</h2>
                     </div>
                     
-                    <div class="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-sm">
+                    <div class="rounded-2xl border border-stone-200 bg-white/90 p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                         <div x-data="{ isDropping: false }" 
                              @dragover.prevent="isDropping = true" 
                              @dragleave.prevent="isDropping = false" 
                              @drop.prevent="isDropping = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))"
-                             :class="isDropping ? 'border-blue-500 bg-blue-50' : 'border-stone-300 bg-stone-50'"
-                             class="relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-12 text-center transition hover:border-blue-400 hover:bg-stone-100">
+                             :class="isDropping ? 'border-blue-500 bg-blue-50' : 'border-stone-300 bg-stone-50 dark:border-stone-600 dark:bg-stone-700'"
+                             class="relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-12 text-center transition hover:border-blue-400 hover:bg-stone-100 dark:hover:bg-stone-600">
                             
                             <input
                                 x-ref="fileInput"
@@ -145,15 +145,15 @@
                                             </svg>
                                         </div>
                                     @endif
-                                    <p class="mt-3 text-sm font-semibold text-stone-700">{{ $proof_file->getClientOriginalName() }}</p>
-                                    <p class="text-xs text-stone-500">Klik atau drag untuk mengganti file</p>
+                                    <p class="mt-3 text-sm font-semibold text-stone-700 dark:text-stone-300">{{ $proof_file->getClientOriginalName() }}</p>
+                                    <p class="text-xs text-stone-500 dark:text-stone-400">Klik atau drag untuk mengganti file</p>
                                 </div>
                             @else
-                                <div class="flex flex-col items-center text-stone-500">
+                                <div class="flex flex-col items-center text-stone-500 dark:text-stone-400">
                                     <svg class="mb-3 h-10 w-10 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                                     </svg>
-                                    <span class="text-sm font-bold text-stone-700">Drag & drop struk transfer</span>
+                                    <span class="text-sm font-bold text-stone-700 dark:text-stone-100">Drag & drop struk transfer</span>
                                     <span class="mt-1 text-xs">Atau klik untuk memilih file (JPG/PNG/PDF)</span>
                                 </div>
                             @endif
@@ -171,17 +171,17 @@
         </div>
 
         <!-- Sticky Footer / Side Panel -->
-        <aside class="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white p-4 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] lg:sticky lg:top-6 lg:z-auto lg:rounded-2xl lg:border lg:p-6 lg:shadow-sm">
-            <h3 class="hidden text-xl font-bold text-stone-900 lg:block">Rincian Tagihan</h3>
+        <aside class="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white p-4 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] lg:sticky lg:top-6 lg:z-auto lg:rounded-2xl lg:border lg:p-6 lg:shadow-sm dark:border-stone-700 dark:bg-stone-800">
+            <h3 class="hidden text-xl font-bold text-stone-900 lg:block dark:text-stone-100">Rincian Tagihan</h3>
 
             @php
                 $billAmount = $paymentType === 'dp' ? $dpAmount : $remainingAmount;
             @endphp
 
-            <div class="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-center">
-                <p class="text-xs font-semibold text-blue-700">Total Tagihan</p>
-                <p class="mt-1 text-2xl font-black text-blue-700">Rp {{ number_format($billAmount, 0, ',', '.') }}</p>
-                <p class="mt-1 text-xs text-blue-600">{{ $paymentType === 'dp' ? 'Pembayaran DP' : 'Pelunasan' }}</p>
+            <div class="mt-4 rounded-xl bg-blue-50 p-4 border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800">
+                <p class="text-xs font-semibold text-blue-700 dark:text-blue-400">Total Tagihan</p>
+                <p class="mt-1 text-2xl font-black text-blue-700 dark:text-blue-400">Rp {{ number_format($billAmount, 0, ',', '.') }}</p>
+                <p class="mt-1 text-xs text-blue-600 dark:text-blue-400">{{ $paymentType === 'dp' ? 'Pembayaran DP' : 'Pelunasan' }}</p>
             </div>
             
             <div class="hidden lg:block lg:mt-6 lg:space-y-3 lg:text-sm">

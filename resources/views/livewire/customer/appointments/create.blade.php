@@ -2,26 +2,26 @@
     {{-- Header --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-400 transition hover:text-stone-700 mb-3" wire:navigate>
+            <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-400 transition hover:text-stone-700 mb-3 dark:text-stone-500 dark:hover:text-stone-300" wire:navigate>
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
                 Kembali ke Pesanan
             </a>
-            <h1 class="text-2xl font-bold text-stone-900 sm:text-3xl">Jadwalkan Appointment</h1>
-            <p class="mt-1 text-sm text-stone-600">
+            <h1 class="text-2xl font-bold text-stone-900 sm:text-3xl dark:text-stone-100">Jadwalkan Appointment</h1>
+            <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
                 Pesanan #{{ $order->order_number }} — {{ $order->service->name }}
             </p>
         </div>
     </div>
 
     @if ($hasExistingAppointment)
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center dark:border-amber-800 dark:bg-amber-900/30">
             <svg class="mx-auto h-12 w-12 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
             </svg>
-            <h2 class="mt-4 text-lg font-bold text-amber-800">Appointment Sudah Ada</h2>
-            <p class="mt-2 text-sm text-amber-700">
+            <h2 class="mt-4 text-lg font-bold text-amber-800 dark:text-amber-300">Appointment Sudah Ada</h2>
+            <p class="mt-2 text-sm text-amber-700 dark:text-amber-400">
                 Anda sudah memiliki appointment untuk pesanan ini. Silakan cek status di halaman detail pesanan.
             </p>
             <a href="{{ route('orders.show', $order) }}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-amber-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-amber-700" wire:navigate>
@@ -31,10 +31,10 @@
     @else
         <form wire:submit.prevent="submit" class="space-y-6">
             {{-- Step 1: Pilih Tanggal --}}
-            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8 dark:border-stone-700 dark:bg-stone-800">
                 <div class="mb-4 flex items-center gap-2">
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#003399] text-sm font-semibold text-white shadow-sm">1</span>
-                    <h2 class="text-xl font-bold text-stone-900">Pilih Tanggal</h2>
+                    <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">Pilih Tanggal</h2>
                 </div>
 
                 <div class="max-w-xs">
@@ -43,7 +43,7 @@
                         wire:model.live="selectedDate"
                         min="{{ $minDate }}"
                         max="{{ $maxDate }}"
-                        class="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 text-base font-semibold text-stone-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition"
+                        class="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 text-base font-semibold text-stone-900 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition dark:bg-stone-900 dark:text-stone-100 dark:border-stone-600 dark:focus:bg-stone-800"
                     />
                 </div>
                 @error('selectedDate')
@@ -53,12 +53,12 @@
 
             {{-- Step 2: Pilih Jam --}}
             @if ($selectedDate && count($availableSlots) > 0)
-                <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+                <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8 dark:border-stone-700 dark:bg-stone-800">
                     <div class="mb-2 flex items-center gap-2">
                         <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#003399] text-sm font-semibold text-white shadow-sm">2</span>
-                        <h2 class="text-xl font-bold text-stone-900">Pilih Jam</h2>
+                        <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">Pilih Jam</h2>
                     </div>
-                    <p class="mb-5 text-sm text-stone-500">
+                    <p class="mb-5 text-sm text-stone-500 dark:text-stone-400">
                         Jam operasional: 08:00 - 19:00 · Istirahat: 12:00 - 13:00 · Durasi: ±1 jam
                     </p>
 
@@ -78,15 +78,15 @@
                                 @class([
                                     'relative flex flex-col items-center justify-center rounded-xl px-3 py-4 text-center transition focus:outline-none',
                                     // Selected
-                                    'border-2 border-[#003399] bg-blue-50 text-[#003399] shadow-sm' => $isSelected,
+                                    'border-2 border-[#003399] bg-blue-50 text-[#003399] shadow-sm dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-500' => $isSelected,
                                     // Available
-                                    'border border-stone-200 bg-white text-stone-700 hover:border-[#003399] hover:bg-blue-50/30 cursor-pointer' => !$isDisabled && !$isSelected,
+                                    'border border-stone-200 bg-white text-stone-700 hover:border-[#003399] hover:bg-blue-50/30 cursor-pointer dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300 dark:hover:border-blue-500 dark:hover:bg-blue-900/20' => !$isDisabled && !$isSelected,
                                     // Break
-                                    'border border-stone-100 bg-stone-50 text-stone-300 cursor-not-allowed' => $isBreak,
+                                    'border border-stone-100 bg-stone-50 text-stone-300 cursor-not-allowed dark:border-stone-700 dark:bg-stone-900/50 dark:text-stone-600' => $isBreak,
                                     // Booked
-                                    'border border-red-100 bg-red-50 text-red-300 cursor-not-allowed' => $isBooked,
+                                    'border border-red-100 bg-red-50 text-red-300 cursor-not-allowed dark:border-red-900/50 dark:bg-red-900/10 dark:text-red-800/80' => $isBooked,
                                     // Past
-                                    'border border-stone-100 bg-stone-50 text-stone-300 cursor-not-allowed' => $isPast && !$isBreak && !$isBooked,
+                                    'border border-stone-100 bg-stone-50 text-stone-300 cursor-not-allowed dark:border-stone-700 dark:bg-stone-900/50 dark:text-stone-600' => $isPast && !$isBreak && !$isBooked,
                                 ])
                                 @disabled($isDisabled)
                             >
@@ -94,9 +94,9 @@
                                 <span @class([
                                     'mt-1 text-[10px] font-semibold uppercase tracking-wide',
                                     'text-[#003399]' => $isSelected,
-                                    'text-emerald-600' => $slot['available'] && !$isSelected,
-                                    'text-stone-400' => ($isBreak || $isPast) && !$isBooked,
-                                    'text-red-400' => $isBooked,
+                                    'text-emerald-600 dark:text-emerald-500' => $slot['available'] && !$isSelected,
+                                    'text-stone-400 dark:text-stone-600' => ($isBreak || $isPast) && !$isBooked,
+                                    'text-red-400 dark:text-red-700' => $isBooked,
                                 ])>
                                     @if ($isSelected)
                                         ✓ Dipilih
@@ -121,21 +121,21 @@
                     @enderror
 
                     {{-- Legend --}}
-                    <div class="mt-5 flex flex-wrap items-center gap-4 border-t border-stone-100 pt-4 text-xs text-stone-500">
+                    <div class="mt-5 flex flex-wrap items-center gap-4 border-t border-stone-100 pt-4 text-xs text-stone-500 dark:border-stone-700 dark:text-stone-400">
                         <span class="flex items-center gap-1.5">
-                            <span class="h-3 w-3 rounded-full border border-stone-200 bg-white"></span>
+                            <span class="h-3 w-3 rounded-full border border-stone-200 bg-white dark:bg-stone-800 dark:border-stone-600"></span>
                             Tersedia
                         </span>
                         <span class="flex items-center gap-1.5">
-                            <span class="h-3 w-3 rounded-full bg-red-50 border border-red-200"></span>
+                            <span class="h-3 w-3 rounded-full bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800"></span>
                             Terbooking
                         </span>
                         <span class="flex items-center gap-1.5">
-                            <span class="h-3 w-3 rounded-full bg-stone-100 border border-stone-200"></span>
+                            <span class="h-3 w-3 rounded-full bg-stone-100 border border-stone-200 dark:bg-stone-800 dark:border-stone-700"></span>
                             Istirahat / Lewat
                         </span>
                         <span class="flex items-center gap-1.5">
-                            <span class="h-3 w-3 rounded-full bg-blue-50 border-2 border-[#003399]"></span>
+                            <span class="h-3 w-3 rounded-full bg-blue-50 border-2 border-[#003399] dark:bg-blue-900/30 dark:border-blue-500"></span>
                             Dipilih
                         </span>
                     </div>
@@ -144,15 +144,15 @@
 
             {{-- Step 3: Catatan --}}
             @if ($selectedHour)
-                <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+                <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8 dark:border-stone-700 dark:bg-stone-800">
                     <div class="mb-4 flex items-center gap-2">
                         <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#003399] text-sm font-semibold text-white shadow-sm">3</span>
-                        <h2 class="text-xl font-bold text-stone-900">Catatan (Opsional)</h2>
+                        <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">Catatan (Opsional)</h2>
                     </div>
                     <textarea
                         rows="3"
                         wire:model="notes"
-                        class="w-full rounded-xl border border-stone-300 px-4 py-3 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition"
+                        class="w-full rounded-xl border border-stone-300 px-4 py-3 text-sm focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition dark:bg-stone-900 dark:border-stone-600 dark:text-stone-100 dark:placeholder-stone-500"
                         placeholder="Contoh: Saya akan datang bersama rekan, tolong sediakan ruangan yang lebih luas..."
                     ></textarea>
                     @error('notes')
@@ -161,7 +161,7 @@
                 </section>
 
                 {{-- Summary & Submit --}}
-                <section class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+                <section class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm dark:border-emerald-800 dark:bg-emerald-900/30">
                     <div class="flex items-start gap-4">
                         <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -169,17 +169,17 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-base font-bold text-emerald-900">Konfirmasi Jadwal</h3>
-                            <p class="mt-1 text-sm text-emerald-800">
+                            <h3 class="text-base font-bold text-emerald-900 dark:text-emerald-300">Konfirmasi Jadwal</h3>
+                            <p class="mt-1 text-sm text-emerald-800 dark:text-emerald-400">
                                 <strong>{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}</strong>
                                 pukul <strong>{{ sprintf('%02d:00', $selectedHour) }} - {{ sprintf('%02d:00', $selectedHour + 1) }}</strong> WIB
                             </p>
-                            <p class="mt-1 text-xs text-emerald-600">Appointment akan menunggu konfirmasi admin.</p>
+                            <p class="mt-1 text-xs text-emerald-600 dark:text-emerald-500">Appointment akan menunggu konfirmasi admin.</p>
                         </div>
                     </div>
 
                     <div class="mt-5 flex items-center justify-end gap-4">
-                        <a href="{{ route('orders.show', $order) }}" class="text-sm font-bold text-emerald-700 hover:text-emerald-900 transition" wire:navigate>
+                        <a href="{{ route('orders.show', $order) }}" class="text-sm font-bold text-emerald-700 hover:text-emerald-900 transition dark:text-emerald-400 dark:hover:text-emerald-300" wire:navigate>
                             Nanti Saja
                         </a>
                         <button

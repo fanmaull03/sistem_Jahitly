@@ -13,8 +13,8 @@
 
 <div class="page-enter space-y-6">
     <div>
-        <h1 class="text-2xl font-bold text-stone-900">Halo, Penjahit!</h1>
-        <p class="text-sm text-stone-600">Berikut ringkasan pekerjaan Anda hari ini.</p>
+        <h1 class="text-2xl font-bold text-stone-900 dark:text-stone-100">Halo, Penjahit!</h1>
+        <p class="text-sm text-stone-600 dark:text-stone-400">Berikut ringkasan pekerjaan Anda hari ini.</p>
     </div>
 
     <!-- Summary Cards -->
@@ -48,11 +48,11 @@
     <!-- Middle Section: Chart & Appointments -->
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Revenue Chart -->
-        <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-2 flex flex-col">
+        <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm lg:col-span-2 flex flex-col dark:border-stone-700 dark:bg-stone-800">
             <div class="flex items-start sm:items-center justify-between mb-6 flex-col sm:flex-row gap-3">
                 <div>
-                    <h2 class="text-lg font-bold text-stone-900">Grafik Pendapatan</h2>
-                    <p class="text-sm text-stone-500">Tren pendapatan bisnis Anda.</p>
+                    <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">Grafik Pendapatan</h2>
+                    <p class="text-sm text-stone-500 dark:text-stone-400">Tren pendapatan bisnis Anda.</p>
                 </div>
                 <div>
                     <select wire:model.live="chartFilter" class="rounded-xl border-stone-200 bg-stone-50 px-3 py-1.5 text-sm font-semibold text-stone-700 shadow-sm focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400 cursor-pointer">
@@ -70,11 +70,11 @@
         </div>
 
         <!-- Today's Appointments -->
-        <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm flex flex-col">
+        <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm flex flex-col dark:border-stone-700 dark:bg-stone-800">
             <div class="mb-5 flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-stone-900">Jadwal Fitting</h2>
-                    <p class="text-sm text-stone-500">Hari ini</p>
+                    <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">Jadwal Fitting</h2>
+                    <p class="text-sm text-stone-500 dark:text-stone-400">Hari ini</p>
                 </div>
                 <a href="{{ route('admin.appointments.index') }}" class="text-sm font-semibold text-[#003399] transition hover:text-blue-800" wire:navigate>
                     Lihat &rarr;
@@ -82,20 +82,20 @@
             </div>
             
             @if($todayAppointments->isEmpty())
-                <div class="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 p-6 text-center">
-                    <svg class="h-10 w-10 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <div class="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 p-6 text-center dark:border-stone-600 dark:bg-stone-700/30">
+                    <svg class="h-10 w-10 text-stone-300 dark:text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                     </svg>
-                    <p class="mt-3 text-sm text-stone-500">Tidak ada fitting hari ini.</p>
+                    <p class="mt-3 text-sm text-stone-500 dark:text-stone-400">Tidak ada fitting hari ini.</p>
                 </div>
             @else
                 <div class="flex-1 space-y-4 overflow-y-auto pr-2" style="max-height: 250px;">
                     @foreach($todayAppointments as $appointment)
-                        <div class="flex items-start justify-between gap-4 rounded-xl border border-stone-100 bg-stone-50 p-4 transition hover:bg-stone-100">
+                        <div class="flex items-start justify-between gap-4 rounded-xl border border-stone-100 bg-stone-50 p-4 transition hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-700/30 dark:hover:bg-stone-700">
                             <div>
-                                <div class="font-bold text-stone-900">{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('H:i') }} WIB</div>
-                                <div class="mt-1 text-sm text-stone-700">{{ $appointment->customer->name ?? '-' }}</div>
-                                <div class="mt-0.5 text-xs text-stone-500">{{ $appointment->order->service->name ?? '-' }}</div>
+                                <div class="font-bold text-stone-900 dark:text-stone-100">{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('H:i') }} WIB</div>
+                                <div class="mt-1 text-sm text-stone-700 dark:text-stone-300">{{ $appointment->customer->name ?? '-' }}</div>
+                                <div class="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{{ $appointment->order->service->name ?? '-' }}</div>
                             </div>
                             <div>
                                 @if ($appointment->status === 'menunggu')
@@ -114,11 +114,11 @@
     </div>
 
     <!-- Recent Orders -->
-    <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+    <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
         <div class="mb-5 flex items-center justify-between">
             <div>
-                <h2 class="text-lg font-bold text-stone-900">Pesanan Terbaru</h2>
-                <p class="text-sm text-stone-500">Daftar pesanan yang baru saja masuk ke sistem.</p>
+                <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">Pesanan Terbaru</h2>
+                <p class="text-sm text-stone-500 dark:text-stone-400">Daftar pesanan yang baru saja masuk ke sistem.</p>
             </div>
             <a href="{{ route('admin.orders.index') }}" class="text-sm font-semibold text-[#003399] transition hover:text-blue-800" wire:navigate>
                 Lihat Semua &rarr;
@@ -126,17 +126,17 @@
         </div>
         
         @if($recentOrders->isEmpty())
-            <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 py-10 text-center">
-                <svg class="h-12 w-12 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 py-10 text-center dark:border-stone-600 dark:bg-stone-700/30">
+                <svg class="h-12 w-12 text-stone-300 dark:text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                <p class="mt-4 text-sm font-bold text-stone-900">Belum ada pesanan terbaru.</p>
+                <p class="mt-4 text-sm font-bold text-stone-900 dark:text-stone-100">Belum ada pesanan terbaru.</p>
             </div>
         @else
-            <div class="overflow-hidden rounded-xl border border-stone-200">
+            <div class="overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-stone-600">
-                        <thead class="bg-stone-50 text-xs uppercase text-stone-500 border-b border-stone-200">
+                    <table class="w-full text-left text-sm text-stone-600 dark:text-stone-400">
+                        <thead class="bg-stone-50 text-xs uppercase text-stone-500 border-b border-stone-200 dark:bg-stone-700/50 dark:text-stone-400 dark:border-stone-700">
                             <tr>
                                 <th scope="col" class="px-5 py-4 font-semibold">Pesanan</th>
                                 <th scope="col" class="px-5 py-4 font-semibold">Pelanggan</th>
@@ -145,11 +145,11 @@
                                 <th scope="col" class="px-5 py-4 font-semibold text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-stone-200 bg-white">
+                        <tbody class="divide-y divide-stone-200 bg-white dark:divide-stone-700 dark:bg-stone-800">
                             @foreach($recentOrders as $order)
-                                <tr class="transition hover:bg-stone-50">
+                                <tr class="transition hover:bg-stone-50 dark:hover:bg-stone-700/50">
                                     <td class="whitespace-nowrap px-5 py-4">
-                                        <div class="font-bold text-stone-900">{{ $order->order_number }}</div>
+                                        <div class="font-bold text-stone-900 dark:text-stone-100">{{ $order->order_number }}</div>
                                         <div class="mt-0.5">
                                             @php
                                                 $statusClasses = [
@@ -184,19 +184,19 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="px-5 py-4 font-medium text-stone-800">
+                                    <td class="px-5 py-4 font-medium text-stone-800 dark:text-stone-300">
                                         {{ $order->customer->name ?? '-' }}
                                     </td>
                                     <td class="px-5 py-4">
-                                        <span class="inline-flex items-center rounded-md bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-700">
+                                        <span class="inline-flex items-center rounded-md bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-700 dark:bg-stone-700 dark:text-stone-300">
                                             {{ $order->service->name ?? '-' }}
                                         </span>
                                     </td>
-                                    <td class="px-5 py-4 text-xs text-stone-500">
+                                    <td class="px-5 py-4 text-xs text-stone-500 dark:text-stone-400">
                                         {{ $order->created_at->diffForHumans() }}
                                     </td>
                                     <td class="px-5 py-4 text-right">
-                                        <a href="{{ route('admin.orders.show', $order) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-stone-700 shadow-sm ring-1 ring-inset ring-stone-300 transition hover:bg-stone-50" wire:navigate>
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-stone-700 shadow-sm ring-1 ring-inset ring-stone-300 transition hover:bg-stone-50 dark:bg-stone-700 dark:text-stone-300 dark:ring-stone-600 dark:hover:bg-stone-600" wire:navigate>
                                             Detail
                                         </a>
                                     </td>

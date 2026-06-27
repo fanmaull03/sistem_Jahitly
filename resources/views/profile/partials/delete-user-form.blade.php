@@ -1,10 +1,10 @@
 <section class="space-y-6">
     <header>
-        <h2 class="text-lg font-bold text-stone-900">
+        <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">
             Hapus Akun
         </h2>
 
-        <p class="mt-1 text-sm text-stone-500">
+        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
             Setelah akun Anda dihapus, semua data pesanan dan riwayat jahitan akan dihapus secara permanen. Pastikan Anda tidak memiliki pesanan yang sedang berjalan.
         </p>
     </header>
@@ -13,7 +13,7 @@
         type="button"
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-        class="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:text-red-700"
+        class="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:text-red-700 dark:border-red-900/50 dark:bg-red-900/10 dark:text-red-500 dark:hover:text-red-400"
     >
         Hapus Akun Saya
     </button>
@@ -23,11 +23,11 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-bold text-stone-900">
+            <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">
                 Apakah Anda yakin ingin menghapus akun?
             </h2>
 
-            <p class="mt-1 text-sm text-stone-500">
+            <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
                 Setelah akun dihapus, semua data pesanan dan riwayat jahitan akan hilang permanen. Masukkan kata sandi untuk mengonfirmasi penghapusan akun.
             </p>
 
@@ -38,7 +38,7 @@
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                    class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-red-500 focus:ring-2 focus:ring-red-500/20 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-100 dark:focus:border-red-500"
                     placeholder="Kata sandi"
                 />
 
@@ -49,7 +49,7 @@
                 <button
                     type="button"
                     x-on:click="$dispatch('close')"
-                    class="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
+                    class="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
                 >
                     Batal
                 </button>

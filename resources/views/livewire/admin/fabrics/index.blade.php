@@ -2,12 +2,12 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold">Kelola Bahan</h1>
-            <p class="text-sm text-slate-500">Kelola stok bahan kain yang tersedia di workshop.</p>
+            <p class="text-sm text-slate-500 dark:text-stone-400">Kelola stok bahan kain yang tersedia di workshop.</p>
         </div>
         <button
             type="button"
             wire:click="openCreateModal"
-            class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-stone-600 dark:hover:bg-stone-500"
         >
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -46,7 +46,7 @@
     {{-- Fabric Grid --}}
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @forelse ($fabrics as $fabric)
-            <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="hover-lift rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                 <div class="flex items-start justify-between">
                     <div class="flex items-start gap-4">
                         @if ($fabric->image_path)
@@ -61,13 +61,13 @@
                             </div>
                         @endif
                         <div class="flex-1">
-                            <div class="text-base font-semibold text-slate-900">{{ $fabric->name }}</div>
+                            <div class="text-base font-semibold text-slate-900 dark:text-stone-100">{{ $fabric->name }}</div>
                             <div class="mt-1 flex flex-wrap items-center gap-2">
-                                <span class="inline-flex items-center gap-1.5 text-sm text-slate-500">
+                                <span class="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-stone-400">
                                     <span class="h-3 w-3 rounded-full border border-slate-300" style="background-color: {{ $fabric->color === 'Putih' ? '#fff' : ($fabric->color === 'Hitam' ? '#1a1a1a' : ($fabric->color === 'Navy' ? '#1e3a5f' : ($fabric->color === 'Biru Muda' ? '#87CEEB' : ($fabric->color === 'Khaki' ? '#C3B091' : ($fabric->color === 'Cream' ? '#FFFDD0' : ($fabric->color === 'Gold' ? '#FFD700' : ($fabric->color === 'Biru Tua' ? '#00008B' : ($fabric->color === 'Dusty Pink' ? '#DCAE96' : ($fabric->color === 'Abu-abu' ? '#808080' : ($fabric->color === 'Olive' ? '#808000' : '#ccc')))))))))) }};"></span>
                                     {{ $fabric->color }}
                                 </span>
-                                <span class="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{{ $fabric->category_label }}</span>
+                                <span class="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-stone-700 dark:text-stone-300">{{ $fabric->category_label }}</span>
                             </div>
                         </div>
                     </div>
@@ -81,14 +81,14 @@
                 </div>
 
                 @if ($fabric->description)
-                    <p class="mt-3 text-sm text-slate-500 line-clamp-2">{{ $fabric->description }}</p>
+                    <p class="mt-3 text-sm text-slate-500 dark:text-stone-400 line-clamp-2">{{ $fabric->description }}</p>
                 @endif
 
-                <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+                <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-stone-700">
                     <div>
-                        <div class="text-lg font-bold text-slate-900">
+                        <div class="text-lg font-bold text-slate-900 dark:text-stone-100">
                             Rp {{ number_format((float) $fabric->price_per_meter, 0, ',', '.') }}
-                            <span class="text-xs font-normal text-slate-500">/meter</span>
+                            <span class="text-xs font-normal text-slate-500 dark:text-stone-400">/meter</span>
                         </div>
                         <div class="mt-1 text-xs font-semibold {{ (float)$fabric->stock_meters > 0 ? 'text-emerald-600' : 'text-red-500' }}">
                             Stok: {{ number_format((float) $fabric->stock_meters, 1) }} meter
@@ -109,7 +109,7 @@
                         <button
                             type="button"
                             wire:click="openEditModal({{ $fabric->id }})"
-                            class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300"
+                            class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 dark:border-stone-600 dark:text-stone-300 dark:hover:border-stone-500"
                         >
                             Edit
                         </button>
@@ -124,7 +124,7 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-full rounded-xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm text-slate-500">
+            <div class="col-span-full rounded-xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm text-slate-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-400">
                 Belum ada data bahan. Klik "Tambah Bahan" untuk memulai.
             </div>
         @endforelse

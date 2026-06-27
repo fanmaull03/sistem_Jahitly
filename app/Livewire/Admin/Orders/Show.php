@@ -214,6 +214,21 @@ class Show extends Component
         $this->resetValidation();
     }
 
+    public function updatedFabricId($value): void
+    {
+        if ($this->material_source === 'jasa' && $value) {
+            $fabric = Fabric::find($value);
+            if ($fabric) {
+                if ($fabric->stock_status === 'tersedia') {
+                    $this->material_status = 'ready';
+                } elseif ($fabric->stock_status === 'po') {
+                    $this->material_status = 'po';
+                    $this->poDays = (string) $fabric->po_days;
+                }
+            }
+        }
+    }
+
     public function updateMaterial(): void
     {
         $rules = [

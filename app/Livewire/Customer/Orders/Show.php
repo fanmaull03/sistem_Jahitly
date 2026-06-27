@@ -253,11 +253,10 @@ class Show extends Component
             'order_id' => $this->order->id,
             'customer_id' => auth()->id(),
             'rating' => $this->rating,
-            'review' => $this->review,
-            'is_featured' => false,
+            'comment' => $this->review,
         ]);
 
         $this->order->load('testimonial');
-        session()->flash('success', 'Terima kasih atas ulasan Anda!');
+        session()->flash('success', 'Rating dan feedback Anda telah berhasil dikirim!');
     }
 }

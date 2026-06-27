@@ -15,7 +15,7 @@
 
         <style>[x-cloak]{display:none !important;}</style>
     </head>
-    <body class="font-sans text-stone-900 bg-stone-100">
+    <body class="font-sans text-stone-900 bg-stone-100 dark:bg-stone-900 dark:text-stone-100">
         <div x-data="{ open: false, logoutConfirm: false, logoutTarget: null }" class="min-h-screen">
             <!-- Mobile Drawer -->
             <div x-cloak x-show="open" class="fixed inset-0 z-40 bg-stone-900/60 lg:hidden" @click="open = false"></div>
@@ -157,17 +157,17 @@
 
                 <!-- Content Area -->
                 <div class="flex-1">
-                    <header class="sticky top-0 z-30 border-b border-stone-200 bg-white shadow-sm">
+                    <header class="sticky top-0 z-30 border-b border-stone-200 bg-white shadow-sm dark:border-stone-700 dark:bg-stone-800">
                         <div class="flex items-center justify-between px-4 py-4 sm:px-6">
                             <div class="flex items-center gap-3">
                                 <button
                                     type="button"
-                                    class="rounded-lg border border-stone-200 px-3 py-2 text-sm font-semibold text-stone-700 lg:hidden"
+                                    class="rounded-lg border border-stone-200 px-3 py-2 text-sm font-semibold text-stone-700 dark:border-stone-600 dark:text-stone-300 lg:hidden"
                                     @click="open = true"
                                 >
                                     Menu
                                 </button>
-                                <div class="text-lg font-bold text-stone-900">
+                                <div class="text-lg font-bold text-stone-900 dark:text-stone-100">
                                     @isset($header)
                                         {{ $header }}
                                     @else
@@ -175,17 +175,34 @@
                                     @endisset
                                 </div>
                             </div>
-                            <div class="hidden sm:block text-xs text-stone-500">
-                                @isset($actions)
-                                    {{ $actions }}
-                                @else
-                                    Admin Panel
-                                @endisset
+                            <div class="flex items-center gap-3">
+                                <!-- Dark Mode Toggle -->
+                                <button
+                                    type="button"
+                                    @click="$store.darkMode.toggle()"
+                                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 text-stone-600 transition hover:bg-stone-100 dark:border-stone-600 dark:text-stone-400 dark:hover:bg-stone-700"
+                                    :aria-label="$store.darkMode.on ? 'Mode Terang' : 'Mode Gelap'"
+                                    :title="$store.darkMode.on ? 'Mode Terang' : 'Mode Gelap'"
+                                >
+                                    <svg x-show="$store.darkMode.on" x-cloak class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                    <svg x-show="!$store.darkMode.on" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                    </svg>
+                                </button>
+                                <div class="hidden sm:block text-xs text-stone-500 dark:text-stone-400">
+                                    @isset($actions)
+                                        {{ $actions }}
+                                    @else
+                                        Admin Panel
+                                    @endisset
+                                </div>
                             </div>
                         </div>
                     </header>
 
-                    <main class="bg-stone-100 px-4 py-6 sm:px-6">
+                    <main class="bg-stone-100 px-4 py-6 sm:px-6 dark:bg-stone-900">
                         {{ $slot }}
                     </main>
                 </div>
@@ -197,13 +214,13 @@
                 x-transition
                 class="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 px-4"
             >
-                <div class="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-6 shadow-xl">
-                    <h3 class="text-lg font-bold text-stone-900">Konfirmasi Logout</h3>
-                    <p class="mt-2 text-sm text-stone-600">Anda yakin ingin keluar dari akun admin?</p>
+                <div class="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-700 dark:bg-stone-800">
+                    <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Konfirmasi Logout</h3>
+                    <p class="mt-2 text-sm text-stone-600 dark:text-stone-400">Anda yakin ingin keluar dari akun admin?</p>
                     <div class="mt-6 flex items-center justify-end gap-3">
                         <button
                             type="button"
-                            class="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
+                            class="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-700"
                             @click="logoutConfirm = false; logoutTarget = null"
                         >
                             Batal
@@ -226,7 +243,7 @@
                 x-init="setTimeout(() => show = false, 3500)"
                 x-show="show"
                 x-cloak
-                class="slide-in-right fixed right-4 top-4 z-50 w-full max-w-sm rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900 shadow-lg"
+                class="slide-in-right fixed right-4 top-4 z-50 w-full max-w-sm rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900 shadow-lg dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
             >
                 {{ session('success') }}
             </div>
@@ -238,7 +255,7 @@
                 x-init="setTimeout(() => show = false, 4000)"
                 x-show="show"
                 x-cloak
-                class="slide-in-right fixed right-4 top-4 z-50 w-full max-w-sm rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-900 shadow-lg"
+                class="slide-in-right fixed right-4 top-4 z-50 w-full max-w-sm rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-900 shadow-lg dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-300"
             >
                 {{ session('error') }}
             </div>

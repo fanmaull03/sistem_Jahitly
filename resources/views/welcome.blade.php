@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth scroll-pt-24">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,13 @@
                         <a href="#faq" class="hover:text-stone-900">FAQ</a>
                     </nav>
                     <div class="hidden items-center gap-4 md:flex">
-                        <a href="{{ route('login') }}" class="text-sm font-semibold text-stone-700 hover:text-stone-900">Masuk</a>
+                        @auth
+                            <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('orders.index') }}" class="text-sm font-semibold text-stone-700 hover:text-stone-900">
+                                {{ auth()->user()->name }}
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="text-sm font-semibold text-stone-700 hover:text-stone-900">Masuk</a>
+                        @endauth
                         <a
                             href="{{ route('orders.create') }}"
                             class="rounded-full border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-600 hover:text-white"
@@ -44,12 +50,18 @@
                 </div>
                 <div x-cloak x-show="open" x-transition class="mt-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm md:hidden">
                     <nav class="flex flex-col gap-3 text-sm font-semibold text-stone-700">
-                        <a href="#layanan" class="hover:text-stone-900">Layanan</a>
-                        <a href="#cara-kerja" class="hover:text-stone-900">Cara Kerja</a>
-                        <a href="#testimoni" class="hover:text-stone-900">Testimoni</a>
-                        <a href="#faq" class="hover:text-stone-900">FAQ</a>
+                        <a href="#layanan" @click="open = false" class="hover:text-stone-900">Layanan</a>
+                        <a href="#cara-kerja" @click="open = false" class="hover:text-stone-900">Cara Kerja</a>
+                        <a href="#testimoni" @click="open = false" class="hover:text-stone-900">Testimoni</a>
+                        <a href="#faq" @click="open = false" class="hover:text-stone-900">FAQ</a>
                         <div class="flex items-center gap-3 pt-2">
-                            <a href="{{ route('login') }}" class="text-sm font-semibold text-stone-700 hover:text-stone-900">Masuk</a>
+                            @auth
+                                <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('orders.index') }}" class="text-sm font-semibold text-stone-700 hover:text-stone-900">
+                                    {{ auth()->user()->name }}
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}" class="text-sm font-semibold text-stone-700 hover:text-stone-900">Masuk</a>
+                            @endauth
                             <a
                                 href="{{ route('orders.create') }}"
                                 class="rounded-full border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-600 hover:text-white"

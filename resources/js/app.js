@@ -1,4 +1,35 @@
+/* ── Dark Mode: apply class before paint to prevent flash ── */
+(function () {
+	const saved = localStorage.getItem('darkMode');
+	if (saved === 'true' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+		document.documentElement.classList.add('dark');
+	}
+})();
+
 import './bootstrap';
+
+/* ── Dark Mode Alpine Store ── */
+document.addEventListener('alpine:init', () => {
+	Alpine.store('darkMode', {
+		on: document.documentElement.classList.contains('dark'),
+
+		toggle() {
+			this.on = !this.on;
+			document.documentElement.classList.toggle('dark', this.on);
+			localStorage.setItem('darkMode', this.on);
+		},
+
+		init() {
+			// Sync across tabs
+			window.addEventListener('storage', (e) => {
+				if (e.key === 'darkMode') {
+					this.on = e.newValue === 'true';
+					document.documentElement.classList.toggle('dark', this.on);
+				}
+			});
+		},
+	});
+});
 
 /* 
  * AlpineJS is automatically injected and initialized by Livewire 3. 

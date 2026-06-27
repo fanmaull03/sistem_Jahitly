@@ -8,11 +8,11 @@
                 </svg>
                 Kembali ke Pesanan
             </a>
-            <h1 class="text-2xl font-bold text-stone-900 sm:text-3xl">Lacak Pesanan</h1>
+            <h1 class="text-2xl font-bold text-stone-900 dark:text-stone-100 sm:text-3xl">Lacak Pesanan</h1>
             <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-                <span class="font-semibold text-orange-600">ID: #{{ $order->order_number }}</span>
-                <span class="text-stone-300">•</span>
-                <span class="text-stone-500">Estimasi Selesai: <strong class="text-stone-700">{{ $order->estimated_finish_date ? $order->estimated_finish_date->format('d M Y') : 'Menunggu' }}</strong></span>
+                <span class="font-semibold text-orange-600 dark:text-orange-400">ID: #{{ $order->order_number }}</span>
+                <span class="text-stone-300 dark:text-stone-600">•</span>
+                <span class="text-stone-500 dark:text-stone-400">Estimasi Selesai: <strong class="text-stone-700 dark:text-stone-300">{{ $order->estimated_finish_date ? $order->estimated_finish_date->format('d M Y') : 'Menunggu' }}</strong></span>
             </div>
         </div>
 
@@ -117,7 +117,7 @@
             >
                 <div 
                     @click.outside="showConfirmModal = false"
-                    class="w-full max-w-md transform overflow-hidden rounded-3xl bg-white p-6 shadow-2xl transition-all"
+                    class="w-full max-w-md transform overflow-hidden rounded-3xl bg-white p-6 shadow-2xl transition-all dark:bg-stone-800 dark:border dark:border-stone-700"
                     x-transition:enter="ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
@@ -140,7 +140,7 @@
                         <button 
                             type="button" 
                             @click="showConfirmModal = false"
-                            class="w-full rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors"
+                            class="w-full rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors dark:bg-stone-700 dark:text-stone-300 dark:ring-stone-600 dark:hover:bg-stone-600"
                         >
                             Batal
                         </button>
@@ -190,7 +190,7 @@
                     <textarea 
                         wire:model="review" 
                         rows="3" 
-                        class="w-full rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                        class="w-full rounded-xl border border-orange-200 bg-white px-4 py-2.5 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 dark:bg-stone-800 dark:border-orange-800/50"
                         placeholder="Ceritakan pengalaman Anda dengan layanan kami..."
                     ></textarea>
                     @error('review') <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span> @enderror
@@ -208,17 +208,25 @@
             </div>
         </div>
     @elseif ($order->testimonial)
-        <div class="mb-6 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h2 class="text-sm font-bold text-stone-900 mb-3">Penilaian Anda</h2>
-            <div class="flex items-center gap-1 mb-2">
+        <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm dark:border-emerald-800 dark:bg-emerald-900/20 text-center">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4 dark:bg-emerald-900/40 dark:text-emerald-400">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold text-emerald-900 mb-2 dark:text-emerald-100">Rating Berhasil Dikirim!</h2>
+            <p class="text-sm text-emerald-700 dark:text-emerald-300">
+                Terima kasih sudah memberikan kepercayaan pada Jahitly! Semoga pakaian barunya pas, nyaman, dan menambah kepercayaan diri Anda di setiap momen berharga. Kami tunggu pesanan Anda selanjutnya!
+            </p>
+            <div class="flex items-center justify-center gap-1 mt-4">
                 @for ($i = 1; $i <= 5; $i++)
-                    <svg class="h-4 w-4 {{ $order->testimonial->rating >= $i ? 'text-amber-400' : 'text-stone-200' }}" viewBox="0 0 20 20" fill="currentColor">
+                    <svg class="h-5 w-5 {{ $order->testimonial->rating >= $i ? 'text-amber-400' : 'text-stone-300 dark:text-stone-600' }}" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                 @endfor
             </div>
-            @if ($order->testimonial->review)
-                <p class="text-sm text-stone-600 italic">"{{ $order->testimonial->review }}"</p>
+            @if ($order->testimonial->comment)
+                <p class="text-sm text-stone-600 italic mt-3 dark:text-stone-400">"{{ $order->testimonial->comment }}"</p>
             @endif
         </div>
     @endif
@@ -227,7 +235,7 @@
     <div class="grid gap-6 lg:grid-cols-5">
         {{-- ── Left: Status Produksi (3 cols) ── --}}
         <div class="lg:col-span-3">
-            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+            <section class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800 sm:p-8">
                 <h2 class="text-lg font-bold text-stone-900">Status Produksi</h2>
 
                 <div class="mt-8 flow-root">
@@ -257,10 +265,10 @@
                                                 </span>
                                             @elseif ($isActive)
                                                 <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-md shadow-blue-200 ring-4 ring-blue-50">
-                                                    <span class="h-2 w-2 rounded-full bg-white"></span>
+                                                    <span class="h-2 w-2 rounded-full bg-white dark:bg-stone-900"></span>
                                                 </span>
                                             @else
-                                                <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-stone-200 bg-white">
+                                                <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-stone-200 bg-white dark:border-stone-600 dark:bg-stone-800">
                                                     <span class="h-2 w-2 rounded-full bg-stone-300"></span>
                                                 </span>
                                             @endif
@@ -316,7 +324,7 @@
         {{-- ── Right: Info Cards (2 cols) ── --}}
         <aside class="space-y-5 lg:col-span-2">
             {{-- ── Informasi Pakaian ── --}}
-            <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">Informasi Pakaian</h3>
 
                 <div class="mt-4 flex items-start gap-4">
@@ -439,7 +447,7 @@
             </div>
 
             {{-- ── Total Biaya ── --}}
-            <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-stone-500">Total Biaya Keseluruhan</span>
                     <span class="text-xl font-bold text-stone-900">Rp {{ number_format((float) $order->estimated_price, 0, ',', '.') }}</span>
@@ -454,13 +462,21 @@
                 
                 @php
                     $totalPaid = $order->payments->where('status', 'terverifikasi')->sum('amount');
-                    $remaining = max(0, (float) $order->estimated_price - $totalPaid);
+                    $pendingPayment = $order->payments->where('status', 'menunggu_verifikasi')->sum('amount');
+                    $remaining = max(0, (float) $order->estimated_price - $totalPaid - $pendingPayment);
                 @endphp
 
                 @if ($totalPaid > 0)
                     <div class="mt-2 flex items-center justify-between">
                         <span class="text-sm font-medium text-stone-500">Sudah Dibayar</span>
                         <span class="text-base font-semibold text-emerald-600">Rp {{ number_format($totalPaid, 0, ',', '.') }}</span>
+                    </div>
+                @endif
+                
+                @if ($pendingPayment > 0)
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="text-sm font-medium text-amber-600">Sedang Diverifikasi</span>
+                        <span class="text-base font-semibold text-amber-600">Rp {{ number_format($pendingPayment, 0, ',', '.') }}</span>
                     </div>
                 @endif
                 
@@ -496,7 +512,7 @@
 
             {{-- ── Design Files ── --}}
             @if ($order->designFiles->isNotEmpty())
-                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">File Desain</h3>
                     <div class="mt-3 space-y-2">
                         @foreach ($order->designFiles as $file)
@@ -517,7 +533,7 @@
             @endif
             {{-- ── Appointment Info ── --}}
             @if ($this->needsAppointment)
-                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-stone-400">Appointment</h3>
 
                     @if ($order->appointment)
@@ -582,7 +598,7 @@
     <div class="flex flex-col items-center justify-center gap-3 border-t border-stone-100 pt-6 sm:flex-row">
         @if ($order->status === 'selesai')
             <a href="{{ route('orders.invoice', $order) }}"
-               class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50"
+               class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300 dark:hover:border-stone-500 dark:hover:bg-stone-700"
                target="_blank">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -605,7 +621,7 @@
 
     {{-- ── Floating Payment Bar ── --}}
     @if ($order->payment_status !== 'lunas' && $this->canPay)
-        <div class="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 p-4 shadow-[0_-4px_16px_rgb(0,0,0,0.06)] backdrop-blur-sm lg:sticky lg:bottom-6 lg:mt-6 lg:rounded-2xl lg:border lg:p-6 lg:shadow-sm lg:backdrop-blur-0">
+        <div class="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 p-4 shadow-[0_-4px_16px_rgb(0,0,0,0.06)] backdrop-blur-sm lg:sticky lg:bottom-6 lg:mt-6 lg:rounded-2xl lg:border lg:p-6 lg:shadow-sm lg:backdrop-blur-0 dark:border-stone-700 dark:bg-stone-800/95">
             <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
                 <div class="text-center sm:text-left">
                     <p class="text-sm font-bold text-stone-900">Tagihan Pembayaran</p>

@@ -78,6 +78,12 @@ class Create extends Component
         ];
     }
 
+    public function selectService(int $id): void
+    {
+        $this->service_id = $id;
+        $this->updatedServiceId();
+    }
+
     public function updatedServiceId(): void
     {
         if (!$this->requiresDesignFile()) {

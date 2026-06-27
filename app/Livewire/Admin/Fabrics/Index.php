@@ -147,7 +147,8 @@ class Index extends Component
         // Handle image upload
         if ($this->image) {
             $validated['image_path'] = $this->image->store('fabrics', 'public');
-            // Hapus image dari array agar tidak error jika tidak ada di fillable (jika belum diupdate fillable-nya, tapi sudah kita update)
+            // Hapus image dari array agar tidak error jika tidak ada di fillable
+            unset($validated['image']);
         } else {
             // Remove image from validated array so it doesn't overwrite existing with null unintentionally
             unset($validated['image']);

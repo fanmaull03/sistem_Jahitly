@@ -1,8 +1,8 @@
 <div>
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">Kelola Layanan Vermak</h1>
-            <p class="text-sm text-slate-500">Atur opsi layanan vermak yang tersedia beserta harganya.</p>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-stone-100">Kelola Layanan Vermak</h1>
+            <p class="text-sm text-slate-500 dark:text-stone-400">Atur opsi layanan vermak yang tersedia beserta harganya.</p>
         </div>
         <button wire:click="openModal" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2">
             <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,10 +18,10 @@
         </div>
     @endif
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-stone-700 dark:bg-stone-800">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-slate-50 text-slate-900">
+            <table class="w-full text-left text-sm text-slate-600 dark:text-stone-400">
+                <thead class="bg-slate-50 text-slate-900 dark:bg-stone-700/50 dark:text-stone-300">
                     <tr>
                         <th class="whitespace-nowrap px-6 py-4 font-semibold">Nama Layanan</th>
                         <th class="whitespace-nowrap px-6 py-4 font-semibold">Deskripsi</th>
@@ -29,10 +29,10 @@
                         <th class="whitespace-nowrap px-6 py-4 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200">
+                <tbody class="divide-y divide-slate-200 dark:divide-stone-700">
                     @forelse ($vermaks as $vermak)
-                        <tr class="hover:bg-slate-50">
-                            <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900">
+                        <tr class="hover:bg-slate-50 dark:hover:bg-stone-700/50">
+                            <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900 dark:text-stone-100">
                                 {{ $vermak->name }}
                             </td>
                             <td class="px-6 py-4">
@@ -52,7 +52,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-10 text-center text-slate-500">
+                            <td colspan="4" class="px-6 py-10 text-center text-slate-500 dark:text-stone-400">
                                 Belum ada opsi layanan vermak yang ditambahkan.
                             </td>
                         </tr>
@@ -65,9 +65,9 @@
     <!-- Modal Form -->
     @if ($showModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-slate-900/50 backdrop-blur-sm p-4">
-            <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-stone-800">
                 <div class="mb-5 flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-slate-900">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-stone-100">
                         {{ $editMode ? 'Edit Layanan Vermak' : 'Tambah Layanan Vermak' }}
                     </h3>
                     <button wire:click="closeModal" class="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
