@@ -10,7 +10,7 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+        @livewireStyles
         <style>[x-cloak]{display:none !important;}</style>
     </head>
     <body class="bg-stone-50 text-stone-900 antialiased">
@@ -380,5 +380,6 @@
                 setTimeout(checkReveal, 500);
             });
         </script>
+        @livewireScripts
     </body>
 </html>
