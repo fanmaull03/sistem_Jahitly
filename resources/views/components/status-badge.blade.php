@@ -75,13 +75,53 @@
         ],
     ];
 
+    $dotMaps = [
+        'order' => [
+            'menunggu_konfirmasi' => 'bg-yellow-500',
+            'ditolak' => 'bg-rose-500',
+            'menunggu_fitting' => 'bg-amber-500',
+            'menunggu_dp' => 'bg-orange-500',
+            'menunggu_bahan' => 'bg-sky-500',
+            'dalam_antrian' => 'bg-blue-500',
+            'dijahit' => 'bg-indigo-500',
+            'selesai_produksi' => 'bg-purple-500',
+            'siap_diambil' => 'bg-teal-500',
+            'selesai' => 'bg-green-500',
+            'dibatalkan' => 'bg-slate-400',
+        ],
+        'payment' => [
+            'menunggu_verifikasi' => 'bg-amber-500',
+            'terverifikasi' => 'bg-emerald-500',
+            'ditolak' => 'bg-rose-500',
+        ],
+        'payment_status' => [
+            'belum_bayar' => 'bg-slate-400',
+            'menunggu' => 'bg-amber-500',
+            'dp' => 'bg-sky-500',
+            'lunas' => 'bg-emerald-500',
+        ],
+        'appointment' => [
+            'menunggu' => 'bg-amber-500',
+            'terkonfirmasi' => 'bg-blue-500',
+            'selesai' => 'bg-emerald-500',
+            'dibatalkan' => 'bg-slate-400',
+        ],
+        'material' => [
+            'ready' => 'bg-emerald-500',
+            'po' => 'bg-amber-500',
+        ],
+    ];
+
     $labelMap = $labelMaps[$type] ?? [];
     $classMap = $classMaps[$type] ?? [];
+    $dotMap = $dotMaps[$type] ?? [];
 
-    $label = $label ?? ($labelMap[$status] ?? ucwords(str_replace('_', ' ', (string) $status)));
+    $displayLabel = $label ?? ($labelMap[$status] ?? ucwords(str_replace('_', ' ', (string) $status)));
     $classes = $classMap[$status] ?? 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
+    $dotClass = $dotMap[$status] ?? 'bg-slate-400';
 @endphp
 
-<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $classes }}">
-    {{ $label }}
+<span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold {{ $classes }}">
+    <span class="h-1.5 w-1.5 rounded-full {{ $dotClass }}"></span>
+    {{ $displayLabel }}
 </span>

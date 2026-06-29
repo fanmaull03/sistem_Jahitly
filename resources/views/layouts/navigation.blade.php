@@ -25,29 +25,28 @@
 
 <nav x-data="{ open: false, menuOpen: false, logoutConfirm: false, logoutTarget: null, notifOpen: false }" class="fixed inset-x-0 top-0 z-50">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
-        <div class="mt-4 flex items-center justify-between rounded-2xl border border-white/20 bg-white/80 px-4 py-3 shadow-sm backdrop-blur dark:bg-stone-800/80 dark:border-stone-700">
-            <a href="{{ route($homeRoute) }}" class="text-lg font-bold tracking-tight text-stone-900 dark:text-white">
-                Jahitly
+        <div class="mt-4 flex items-center justify-between rounded-2xl bg-white px-5 py-3.5 shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08)] ring-1 ring-black/5 dark:bg-stone-800/90 dark:ring-stone-700">
+            <a href="{{ route($homeRoute) }}" class="font-display text-xl font-bold tracking-tight text-ink dark:text-white">
+                Jahit<span class="text-primary">ly</span>
             </a>
 
-            <div class="hidden items-center gap-6 text-sm font-semibold md:flex">
+            <div class="hidden items-center gap-6 text-sm font-medium md:flex">
                 @foreach ($navItems as $item)
                     <a
                         href="{{ route($item['route']) }}"
-                        class="{{ request()->routeIs($item['active']) ? 'text-stone-900 dark:text-white' : 'text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white' }}"
-                    >
+                        class="{{ request()->routeIs($item['active']) ? 'text-primary font-semibold' : 'text-ink/60 hover:text-ink transition dark:text-stone-400 dark:hover:text-white' }}"
                     >
                         {{ $item['label'] }}
                     </a>
                 @endforeach
             </div>
 
-            <div class="hidden items-center gap-3 md:flex">
+            <div class="hidden items-center gap-2 md:flex">
                 <!-- Dark Mode Toggle -->
                 <button
                     type="button"
                     @click="$store.darkMode.toggle()"
-                    class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 transition hover:text-stone-900 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-400 dark:hover:text-white"
+                    class="flex h-9 w-9 items-center justify-center rounded-full text-ink/50 transition hover:bg-surface hover:text-ink ring-1 ring-transparent hover:ring-border dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white dark:hover:ring-stone-600"
                     :aria-label="$store.darkMode.on ? 'Mode Terang' : 'Mode Gelap'"
                     :title="$store.darkMode.on ? 'Mode Terang' : 'Mode Gelap'"
                 >
@@ -63,7 +62,7 @@
                     <button
                         type="button"
                         @click="notifOpen = !notifOpen"
-                        class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 transition hover:text-stone-900 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-300 dark:hover:text-white"
+                        class="relative flex h-9 w-9 items-center justify-center rounded-full text-ink/50 transition hover:bg-surface hover:text-ink ring-1 ring-transparent hover:ring-border dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white dark:hover:ring-stone-600"
                         aria-label="Notifikasi"
                     >
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -71,7 +70,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a3 3 0 006 0" />
                         </svg>
                         @if ($notificationCount > 0)
-                            <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-amber-500"></span>
+                            <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent"></span>
                         @endif
                     </button>
 
@@ -79,30 +78,30 @@
                         x-cloak
                         x-show="notifOpen"
                         x-transition
-                        class="absolute right-0 mt-2 w-72 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-700 dark:bg-stone-800"
+                        class="absolute right-0 mt-2 w-72 rounded-2xl border border-border bg-white p-4 shadow-lg dark:border-stone-700 dark:bg-stone-800"
                     >
-                        <div class="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">Notifikasi</div>
+                        <div class="text-xs font-semibold uppercase tracking-wide text-muted dark:text-stone-400">Notifikasi</div>
                         <div class="mt-3 space-y-2">
                             @forelse ($latestNotifications as $notification)
                                 @php
                                     $url = $notification->data['url'] ?? null;
                                 @endphp
-                                <div class="rounded-xl border border-stone-100 bg-stone-50 p-3 text-xs text-stone-700 dark:border-stone-700 dark:bg-stone-700/50 dark:text-stone-300">
+                                <div class="rounded-xl border border-border bg-surface p-3 text-xs text-ink/70 dark:border-stone-700 dark:bg-stone-700/50 dark:text-stone-300">
                                     @if ($url)
-                                        <a href="{{ $url }}" class="font-semibold text-stone-900 hover:text-blue-700 dark:text-stone-100 dark:hover:text-blue-400">
+                                        <a href="{{ $url }}" class="font-semibold text-ink hover:text-primary dark:text-stone-100 dark:hover:text-primary">
                                             {{ $notification->data['message'] ?? 'Notifikasi baru' }}
                                         </a>
                                     @else
-                                        <div class="font-semibold text-stone-900 dark:text-stone-100">
+                                        <div class="font-semibold text-ink dark:text-stone-100">
                                             {{ $notification->data['message'] ?? 'Notifikasi baru' }}
                                         </div>
                                     @endif
-                                    <div class="mt-1 text-[11px] text-stone-400">
+                                    <div class="mt-1 text-[11px] text-muted">
                                         {{ $notification->created_at->diffForHumans() }}
                                     </div>
                                 </div>
                             @empty
-                                <div class="rounded-xl border border-stone-100 bg-stone-50 p-3 text-xs text-stone-600 dark:border-stone-700 dark:bg-stone-700/50 dark:text-stone-400">
+                                <div class="rounded-xl border border-border bg-surface p-3 text-xs text-muted dark:border-stone-700 dark:bg-stone-700/50 dark:text-stone-400">
                                     Belum ada notifikasi baru.
                                 </div>
                             @endforelse
@@ -114,7 +113,7 @@
                     <button
                         type="button"
                         @click="menuOpen = !menuOpen"
-                        class="inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-blue-600 text-blue-600 transition hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                        class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-sm font-bold text-primary ring-2 ring-transparent transition hover:ring-primary/30 dark:bg-primary/20 dark:text-blue-300"
                         aria-label="User menu"
                     >
                         @if ($profilePhotoUrl)
@@ -131,16 +130,16 @@
                         x-cloak
                         x-show="menuOpen"
                         x-transition
-                        class="absolute right-0 mt-2 w-48 rounded-2xl border border-stone-200 bg-white p-2 shadow-sm dark:border-stone-700 dark:bg-stone-800"
+                        class="absolute right-0 mt-2 w-48 rounded-2xl border border-border bg-white p-2 shadow-lg dark:border-stone-700 dark:bg-stone-800"
                     >
-                        <a href="{{ route('profile.edit') }}" class="block rounded-xl px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:text-stone-300 dark:hover:bg-stone-700">
+                        <a href="{{ route('profile.edit') }}" class="block rounded-xl px-3 py-2 text-sm font-semibold text-ink/70 hover:bg-surface hover:text-ink dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-white">
                             Profil
                         </a>
                         <form method="POST" action="{{ route('logout') }}" x-ref="logoutDesktopForm">
                             @csrf
                             <button
                                 type="button"
-                                class="block w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:text-stone-300 dark:hover:bg-stone-700"
+                                class="block w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-ink/70 hover:bg-surface hover:text-ink dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-white"
                                 @click="logoutTarget = 'logoutDesktopForm'; logoutConfirm = true; menuOpen = false"
                             >
                                 Keluar
@@ -153,35 +152,35 @@
             <button
                 type="button"
                 @click="open = !open"
-                class="inline-flex items-center justify-center rounded-full border border-stone-200 bg-white px-3 py-2 text-sm font-semibold text-stone-700 md:hidden dark:border-stone-600 dark:bg-stone-700 dark:text-stone-300"
+                class="inline-flex items-center justify-center rounded-full border border-border bg-white px-3 py-2 text-sm font-semibold text-ink md:hidden dark:border-stone-600 dark:bg-stone-700 dark:text-stone-300"
                 aria-label="Toggle menu"
             >
                 Menu
             </button>
         </div>
 
-        <div x-cloak x-show="open" x-transition class="mt-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm md:hidden dark:border-stone-700 dark:bg-stone-800">
-            <nav class="flex flex-col gap-3 text-sm font-semibold text-stone-700 dark:text-stone-300">
+        <div x-cloak x-show="open" x-transition class="mt-3 rounded-2xl border border-border bg-white p-4 shadow-lg md:hidden dark:border-stone-700 dark:bg-stone-800">
+            <nav class="flex flex-col gap-3 text-sm font-medium text-ink/70 dark:text-stone-300">
                 @foreach ($navItems as $item)
                     <a
                         href="{{ route($item['route']) }}"
-                        class="{{ request()->routeIs($item['active']) ? 'text-stone-900' : 'text-stone-600 hover:text-stone-900' }}"
+                        class="{{ request()->routeIs($item['active']) ? 'text-primary font-semibold' : 'text-ink/60 hover:text-ink dark:text-stone-400 dark:hover:text-white' }}"
                     >
                         {{ $item['label'] }}
                     </a>
                 @endforeach
-                <div class="mt-2 rounded-2xl border border-stone-200 bg-stone-50 p-3 dark:border-stone-700 dark:bg-stone-700/50">
-                    <div class="text-sm font-semibold text-stone-900 dark:text-stone-100">{{ $user->name }}</div>
-                    <div class="text-xs text-stone-500 dark:text-stone-400">{{ $user->email }}</div>
+                <div class="mt-2 rounded-2xl border border-border bg-surface p-3 dark:border-stone-700 dark:bg-stone-700/50">
+                    <div class="text-sm font-semibold text-ink dark:text-stone-100">{{ $user->name }}</div>
+                    <div class="text-xs text-muted dark:text-stone-400">{{ $user->email }}</div>
                     <div class="mt-3 flex flex-col gap-2">
-                        <a href="{{ route('profile.edit') }}" class="rounded-xl border border-stone-200 px-3 py-2 text-sm font-semibold text-stone-700 dark:border-stone-600 dark:text-stone-300">
+                        <a href="{{ route('profile.edit') }}" class="rounded-xl border border-border px-3 py-2 text-sm font-semibold text-ink/70 dark:border-stone-600 dark:text-stone-300">
                             Profil
                         </a>
                         <form method="POST" action="{{ route('logout') }}" x-ref="logoutMobileForm">
                             @csrf
                             <button
                                 type="button"
-                                class="w-full rounded-xl border border-stone-200 px-3 py-2 text-left text-sm font-semibold text-stone-700 dark:border-stone-600 dark:text-stone-300"
+                                class="w-full rounded-xl border border-border px-3 py-2 text-left text-sm font-semibold text-ink/70 dark:border-stone-600 dark:text-stone-300"
                                 @click="logoutTarget = 'logoutMobileForm'; logoutConfirm = true; open = false"
                             >
                                 Keluar
@@ -197,22 +196,22 @@
         x-cloak
         x-show="logoutConfirm"
         x-transition
-        class="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 px-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 px-4"
     >
-        <div class="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-700 dark:bg-stone-800">
-            <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Konfirmasi Keluar</h3>
-            <p class="mt-2 text-sm text-stone-600 dark:text-stone-400">Anda yakin ingin keluar dari akun?</p>
+        <div class="w-full max-w-sm rounded-2xl border border-border bg-white p-6 shadow-xl dark:border-stone-700 dark:bg-stone-800">
+            <h3 class="text-lg font-bold text-ink dark:text-stone-100">Konfirmasi Keluar</h3>
+            <p class="mt-2 text-sm text-muted dark:text-stone-400">Anda yakin ingin keluar dari akun?</p>
             <div class="mt-6 flex items-center justify-end gap-3">
                 <button
                     type="button"
-                    class="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-700"
+                    class="rounded-xl border border-border px-4 py-2 text-sm font-semibold text-ink/70 hover:bg-surface dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-700"
                     @click="logoutConfirm = false; logoutTarget = null"
                 >
                     Batal
                 </button>
                 <button
                     type="button"
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                    class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
                     @click="if ($refs[logoutTarget]) { $refs[logoutTarget].submit(); }"
                 >
                     Keluar

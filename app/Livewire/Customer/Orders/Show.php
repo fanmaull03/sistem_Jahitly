@@ -253,7 +253,7 @@ class Show extends Component
             'order_id' => $this->order->id,
             'customer_id' => auth()->id(),
             'rating' => $this->rating,
-            'comment' => $this->review,
+            'comment' => $this->review ?? '',
         ]);
 
         $this->order->load('testimonial');

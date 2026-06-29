@@ -8,21 +8,22 @@
         <title>{{ config('app.name', 'Jahitly') }}</title>
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="font-sans antialiased bg-stone-50 text-stone-900 dark:bg-stone-900 dark:text-stone-100">
-        <div class="min-h-screen bg-stone-50 dark:bg-stone-900">
+    <body class="font-sans antialiased bg-surface text-ink dark:bg-stone-900 dark:text-stone-100">
+        <div class="min-h-screen bg-surface dark:bg-stone-900">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
                 <header class="mx-auto mt-6 max-w-6xl px-4 sm:px-6">
-                    <div class="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-700 dark:bg-stone-800">
+                    <div class="rounded-2xl border border-border bg-white p-4 shadow-sm dark:border-stone-700 dark:bg-stone-800">
                         {{ $header }}
                     </div>
                 </header>

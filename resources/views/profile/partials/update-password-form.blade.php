@@ -1,6 +1,6 @@
 <section>
     <header>
-        <h2 class="text-base font-semibold text-stone-900 dark:text-stone-100">
+        <h2 class="text-base font-bold text-ink dark:text-stone-100">
             Keamanan
         </h2>
     </header>
@@ -10,36 +10,36 @@
         @method('put')
 
         <div class="sm:col-span-2">
-            <x-input-label for="update_password_current_password" :value="__('Password Saat Ini')" class="text-sm font-semibold text-stone-700 dark:text-stone-300" />
+            <x-input-label for="update_password_current_password" :value="__('Password Saat Ini')" />
             <x-text-input
                 id="update_password_current_password"
                 name="current_password"
                 type="password"
-                class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-100 dark:focus:border-blue-500"
+                class="mt-1.5 block w-full"
                 autocomplete="current-password"
             />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
 
         <div>
-            <x-input-label for="update_password_password" :value="__('Password Baru')" class="text-sm font-semibold text-stone-700 dark:text-stone-300" />
+            <x-input-label for="update_password_password" :value="__('Password Baru')" />
             <x-text-input
                 id="update_password_password"
                 name="password"
                 type="password"
-                class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-100 dark:focus:border-blue-500"
+                class="mt-1.5 block w-full"
                 autocomplete="new-password"
             />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
 
         <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Konfirmasi Password')" class="text-sm font-semibold text-stone-700 dark:text-stone-300" />
+            <x-input-label for="update_password_password_confirmation" :value="__('Konfirmasi Password')" />
             <x-text-input
                 id="update_password_password_confirmation"
                 name="password_confirmation"
                 type="password"
-                class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-100 dark:focus:border-blue-500"
+                class="mt-1.5 block w-full"
                 autocomplete="new-password"
             />
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
@@ -52,16 +52,13 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-xs text-stone-500 dark:text-stone-400"
-                >Berhasil disimpan.</p>
+                    class="text-sm font-medium text-emerald-600 dark:text-emerald-400"
+                >Kata sandi berhasil diperbarui.</p>
             @endif
 
-            <button
-                type="submit"
-                class="rounded-lg bg-stone-100 px-5 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-300"
-            >
+            <x-primary-button>
                 Perbarui Password
-            </button>
+            </x-primary-button>
         </div>
     </form>
 </section>

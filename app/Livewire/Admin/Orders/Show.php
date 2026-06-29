@@ -214,6 +214,15 @@ class Show extends Component
         $this->resetValidation();
     }
 
+    public function updatedMaterialSource($value): void
+    {
+        if ($value === 'jasa' && $this->fabric_id) {
+            $this->updatedFabricId($this->fabric_id);
+        } else {
+            $this->material_status = '';
+        }
+    }
+
     public function updatedFabricId($value): void
     {
         if ($this->material_source === 'jasa' && $value) {

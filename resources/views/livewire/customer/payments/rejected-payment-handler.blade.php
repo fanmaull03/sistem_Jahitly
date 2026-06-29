@@ -1,12 +1,12 @@
 <div class="page-enter space-y-6 pb-32 lg:pb-10">
     <!-- Header -->
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-stone-900 dark:text-stone-100">Pembayaran Ditolak</h1>
-            <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">Pesanan #{{ $payment->order->order_number }}</p>
+            <h1 class="font-display text-3xl font-bold text-ink dark:text-stone-100">Pembayaran Ditolak</h1>
+            <p class="mt-1 text-sm text-muted dark:text-stone-400">Pesanan #{{ $payment->order->order_number }}</p>
         </div>
-        <a href="{{ route('payments.history', $payment->order) }}" class="text-sm font-semibold text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100" wire:navigate>
-            &larr; Kembali
+        <a href="{{ route('payments.history', $payment->order) }}" class="inline-flex items-center gap-2 text-xs font-semibold text-muted transition hover:text-primary mb-3 dark:text-stone-400 dark:hover:text-stone-300" wire:navigate>
+            ← Kembali
         </a>
     </div>
 
@@ -33,7 +33,7 @@
         <div class="lg:col-span-2 space-y-6">
             <!-- Rejection Reason -->
             <div class="rounded-2xl border border-red-200 bg-white p-6 shadow-sm dark:border-red-900/50 dark:bg-stone-800">
-                <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-stone-900 dark:text-stone-100">
+                <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-ink dark:text-stone-100">
                     <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -47,13 +47,13 @@
             </div>
 
             <!-- Payment Information -->
-            <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
-                <h2 class="mb-4 text-lg font-bold text-stone-900 dark:text-stone-100">Informasi Pembayaran</h2>
+            <div class="rounded-2xl border border-border bg-white p-6 shadow-sm dark:border-stone-700 dark:bg-stone-800">
+                <h2 class="mb-4 text-lg font-bold text-ink dark:text-stone-100">Informasi Pembayaran</h2>
                 
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between border-b border-stone-100 pb-4 dark:border-stone-700">
-                        <span class="text-stone-600 dark:text-stone-400">Tipe Pembayaran</span>
-                        <span class="font-bold text-stone-900 dark:text-stone-100">
+                    <div class="flex items-center justify-between border-b border-border pb-4 dark:border-stone-700">
+                        <span class="text-muted dark:text-stone-400">Tipe Pembayaran</span>
+                        <span class="font-bold text-ink dark:text-stone-100">
                             @if ($payment->payment_type === 'dp')
                                 Down Payment (DP)
                             @else
@@ -62,9 +62,9 @@
                         </span>
                     </div>
 
-                    <div class="flex items-center justify-between border-b border-stone-100 pb-4 dark:border-stone-700">
-                        <span class="text-stone-600 dark:text-stone-400">Metode Pembayaran</span>
-                        <span class="font-bold text-stone-900 dark:text-stone-100">
+                    <div class="flex items-center justify-between border-b border-border pb-4 dark:border-stone-700">
+                        <span class="text-muted dark:text-stone-400">Metode Pembayaran</span>
+                        <span class="font-bold text-ink dark:text-stone-100">
                             @switch($payment->payment_method)
                                 @case('transfer')
                                     Transfer Bank
@@ -81,16 +81,16 @@
                         </span>
                     </div>
 
-                    <div class="flex items-center justify-between border-b border-stone-100 pb-4 dark:border-stone-700">
-                        <span class="text-stone-600 dark:text-stone-400">Jumlah Pembayaran</span>
-                        <span class="font-bold text-lg text-stone-900 dark:text-stone-100">
+                    <div class="flex items-center justify-between border-b border-border pb-4 dark:border-stone-700">
+                        <span class="text-muted dark:text-stone-400">Jumlah Pembayaran</span>
+                        <span class="font-bold text-lg text-ink dark:text-stone-100">
                             Rp{{ number_format($payment->amount, 0, ',', '.') }}
                         </span>
                     </div>
 
                     <div class="flex items-center justify-between">
-                        <span class="text-stone-600 dark:text-stone-400">Tanggal Pengajuan</span>
-                        <span class="font-bold text-stone-900 dark:text-stone-100">
+                        <span class="text-muted dark:text-stone-400">Tanggal Pengajuan</span>
+                        <span class="font-bold text-ink dark:text-stone-100">
                             {{ $payment->created_at->format('d F Y H:i') }}
                         </span>
                     </div>
@@ -98,29 +98,29 @@
             </div>
 
             <!-- What to do next -->
-            <div class="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm dark:border-blue-900/50 dark:bg-blue-900/10">
-                <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-blue-900 dark:text-blue-300">
-                    <svg class="h-5 w-5 text-blue-600 dark:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-sm dark:border-blue-900/50 dark:bg-blue-900/10">
+                <h2 class="mb-4 flex items-center gap-2 text-lg font-bold text-primary dark:text-blue-300">
+                    <svg class="h-5 w-5 text-primary dark:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Langkah Selanjutnya
                 </h2>
                 
-                <ol class="space-y-3 text-sm text-blue-900 dark:text-blue-300">
+                <ol class="space-y-3 text-sm text-primary dark:text-blue-300">
                     <li class="flex gap-3">
-                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">1</span>
+                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">1</span>
                         <span>Periksa kembali alasan penolakan di atas</span>
                     </li>
                     <li class="flex gap-3">
-                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">2</span>
+                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">2</span>
                         <span>Pastikan bukti pembayaran Anda jelas dan sesuai dengan aturan yang berlaku</span>
                     </li>
                     <li class="flex gap-3">
-                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">3</span>
+                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">3</span>
                         <span>Klik tombol "Bayar Ulang" untuk membuat pembayaran baru</span>
                     </li>
                     <li class="flex gap-3">
-                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">4</span>
+                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">4</span>
                         <span>Tunggu admin untuk memverifikasi pembayaran Anda</span>
                     </li>
                 </ol>
@@ -128,29 +128,29 @@
         </div>
 
         <!-- Right Column: Order Summary -->
-        <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm h-fit dark:border-stone-700 dark:bg-stone-800">
-            <h2 class="mb-4 text-lg font-bold text-stone-900 dark:text-stone-100">Ringkasan Pesanan</h2>
+        <div class="rounded-2xl border border-border bg-white p-6 shadow-sm h-fit dark:border-stone-700 dark:bg-stone-800">
+            <h2 class="mb-4 text-lg font-bold text-ink dark:text-stone-100">Ringkasan Pesanan</h2>
             
             <div class="space-y-4 text-sm">
                 <div>
-                    <p class="text-stone-600 dark:text-stone-400">Nomor Pesanan</p>
-                    <p class="font-bold text-stone-900 dark:text-stone-100">#{{ $payment->order->order_number }}</p>
+                    <p class="text-muted dark:text-stone-400">Nomor Pesanan</p>
+                    <p class="font-bold text-ink dark:text-stone-100">#{{ $payment->order->order_number }}</p>
                 </div>
 
                 <div>
-                    <p class="text-stone-600 dark:text-stone-400">Layanan</p>
-                    <p class="font-bold text-stone-900 dark:text-stone-100">{{ $payment->order->service->name }}</p>
+                    <p class="text-muted dark:text-stone-400">Layanan</p>
+                    <p class="font-bold text-ink dark:text-stone-100">{{ $payment->order->service->name }}</p>
                 </div>
 
                 <div>
-                    <p class="text-stone-600 dark:text-stone-400">Harga Pesanan</p>
-                    <p class="font-bold text-stone-900 dark:text-stone-100">Rp{{ number_format($payment->order->estimated_price, 0, ',', '.') }}</p>
+                    <p class="text-muted dark:text-stone-400">Harga Pesanan</p>
+                    <p class="font-bold text-ink dark:text-stone-100">Rp{{ number_format($payment->order->estimated_price, 0, ',', '.') }}</p>
                 </div>
 
-                <div class="border-t border-stone-200 pt-4 dark:border-stone-700">
+                <div class="border-t border-border pt-4 dark:border-stone-700">
                     <a 
                         href="{{ route('orders.show', $payment->order) }}" 
-                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-center font-bold text-white hover:bg-stone-800 transition dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-200"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-4 py-3 text-center font-bold text-white hover:bg-ink/90 transition dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-stone-200"
                         wire:navigate
                     >
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,7 +168,7 @@
     <div class="flex gap-3">
         <a
             href="{{ route('payments.create', $payment->order) }}"
-            class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-center font-bold text-white hover:bg-blue-700 transition shadow-md hover:shadow-lg"
+            class="flex-1 flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-center font-bold text-white hover:bg-primary-hover transition shadow-md shadow-primary/25"
             wire:navigate
         >
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,7 +178,7 @@
         </a>
         <a
             href="{{ route('payments.history', $payment->order) }}"
-            class="flex-1 flex items-center justify-center gap-2 rounded-xl border-2 border-stone-300 px-6 py-4 text-center font-bold text-stone-700 hover:bg-stone-50 transition dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
+            class="flex-1 flex items-center justify-center gap-2 rounded-full border-2 border-border px-6 py-4 text-center font-bold text-ink hover:bg-surface transition dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
             wire:navigate
         >
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

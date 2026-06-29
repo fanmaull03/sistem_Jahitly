@@ -1,11 +1,11 @@
 <x-guest-layout>
     <div class="space-y-6">
-        <div class="text-center">
-            <p class="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-600">
+        <div>
+            <p class="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent">
                 Akses Pelanggan
             </p>
-            <h1 class="mt-3 text-2xl font-bold text-stone-900">Masuk ke Jahitly</h1>
-            <p class="mt-1 text-sm text-stone-500">Kelola pesanan dan pantau progres jahitan Anda.</p>
+            <h1 class="mt-3 text-2xl font-bold text-ink">Masuk ke Jahitly</h1>
+            <p class="mt-1 text-sm text-muted">Kelola pesanan dan pantau progres jahitan Anda.</p>
         </div>
 
         <x-auth-session-status
@@ -17,10 +17,10 @@
             @csrf
 
             <div>
-                <x-input-label for="email" :value="__('Alamat Email')" class="text-sm font-semibold text-stone-700" />
+                <x-input-label for="email" :value="__('Alamat Email')" class="text-xs font-bold uppercase tracking-wide text-ink/60" />
                 <x-text-input
                     id="email"
-                    class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    class="mt-2 block w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder-muted/50 transition focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                     type="email"
                     name="email"
                     :value="old('email')"
@@ -33,12 +33,12 @@
             </div>
 
             <div x-data="{ showPassword: false }">
-                <x-input-label for="password" :value="__('Kata Sandi')" class="text-sm font-semibold text-stone-700" />
+                <x-input-label for="password" :value="__('Kata Sandi')" class="text-xs font-bold uppercase tracking-wide text-ink/60" />
                 <div class="relative mt-2">
                     <x-text-input
                         id="password"
                         type="password"
-                        class="block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 pr-11 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        class="block w-full rounded-xl border border-border bg-surface px-4 py-3 pr-11 text-sm text-ink placeholder-muted/50 transition focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                         x-bind:type="showPassword ? 'text' : 'password'"
                         name="password"
                         required
@@ -47,7 +47,7 @@
                     />
                     <button
                         type="button"
-                        class="absolute inset-y-0 right-0 z-10 flex items-center px-3 text-stone-400 hover:text-stone-700 focus:outline-none"
+                        class="absolute inset-y-0 right-0 z-10 flex items-center px-3 text-muted hover:text-ink focus:outline-none"
                         @click="showPassword = !showPassword"
                         aria-label="Tampilkan kata sandi"
                     >
@@ -66,18 +66,18 @@
             </div>
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <label for="remember_me" class="inline-flex items-center gap-2 text-sm text-stone-600">
+                <label for="remember_me" class="inline-flex items-center gap-2 text-sm text-muted">
                     <input
                         id="remember_me"
                         type="checkbox"
-                        class="rounded border-stone-300 text-blue-600 focus:ring-blue-500/30"
+                        class="rounded border-border text-primary focus:ring-primary/30"
                         name="remember"
                     >
                     Ingat saya
                 </label>
 
                 @if (Route::has('password.request'))
-                    <a class="text-sm font-semibold text-blue-600 hover:text-blue-700" href="{{ route('password.request') }}">
+                    <a class="text-sm font-semibold text-primary hover:text-primary-hover" href="{{ route('password.request') }}">
                         Lupa kata sandi?
                     </a>
                 @endif
@@ -85,15 +85,15 @@
 
             <button
                 type="submit"
-                class="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                class="w-full rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-white transition hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
-                Masuk
+                Masuk ke Jahitly
             </button>
         </form>
 
-        <p class="text-center text-sm text-stone-500">
+        <p class="text-center text-sm text-muted">
             Belum punya akun?
-            <a href="{{ route('register') }}" class="font-semibold text-blue-600 hover:text-blue-700">Daftar sekarang</a>
+            <a href="{{ route('register') }}" class="font-semibold text-primary hover:text-primary-hover">Daftar sekarang</a>
         </p>
     </div>
 </x-guest-layout>

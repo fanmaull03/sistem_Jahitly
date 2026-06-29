@@ -22,8 +22,28 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                ink: '#1A1A2E',
+                surface: '#F7F5F2',
+                primary: {
+                    DEFAULT: '#2B4FFF',
+                    hover: '#1A3DE0',
+                    light: '#EEF1FF',
+                },
+                accent: {
+                    DEFAULT: '#FF6B35',
+                    soft: '#FFF1EB',
+                },
+                muted: '#6B7280',
+                border: '#E8E4DF',
+                sidebar: '#0F1729',
+            },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
+                display: ['Playfair Display', ...defaultTheme.fontFamily.serif],
+            },
+            borderRadius: {
+                '3xl': '1.5rem',
             },
         },
     },

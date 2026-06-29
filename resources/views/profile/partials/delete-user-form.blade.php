@@ -1,11 +1,10 @@
 <section class="space-y-6">
     <header>
-        <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">
+        <h2 class="text-base font-bold text-ink dark:text-stone-100">
             Hapus Akun
         </h2>
-
-        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            Setelah akun Anda dihapus, semua data pesanan dan riwayat jahitan akan dihapus secara permanen. Pastikan Anda tidak memiliki pesanan yang sedang berjalan.
+        <p class="mt-1 text-sm text-muted dark:text-stone-400">
+            Akun yang dihapus tidak dapat dipulihkan. Pastikan tidak ada pesanan yang masih berjalan.
         </p>
     </header>
 
@@ -13,7 +12,9 @@
         type="button"
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-        class="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:text-red-700 dark:border-red-900/50 dark:bg-red-900/10 dark:text-red-500 dark:hover:text-red-400"
+        class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold
+               text-rose-600 transition hover:bg-rose-100
+               dark:border-rose-800 dark:bg-rose-900/10 dark:text-rose-400"
     >
         Hapus Akun Saya
     </button>
@@ -23,12 +24,12 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">
-                Apakah Anda yakin ingin menghapus akun?
+            <h2 class="text-lg font-bold text-ink dark:text-stone-100">
+                Apakah Anda yakin?
             </h2>
 
-            <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
-                Setelah akun dihapus, semua data pesanan dan riwayat jahitan akan hilang permanen. Masukkan kata sandi untuk mengonfirmasi penghapusan akun.
+            <p class="mt-1 text-sm text-muted dark:text-stone-400">
+                Setelah akun dihapus, semua data pesanan dan riwayat jahitan akan hilang permanen. Masukkan kata sandi untuk konfirmasi.
             </p>
 
             <div class="mt-6">
@@ -38,28 +39,21 @@
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-red-500 focus:ring-2 focus:ring-red-500/20 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-100 dark:focus:border-red-500"
-                    placeholder="Kata sandi"
+                    class="mt-1.5 block w-full"
+                    placeholder="Masukkan kata sandi"
                 />
 
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
             </div>
 
-            <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <button
-                    type="button"
-                    x-on:click="$dispatch('close')"
-                    class="rounded-lg border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:border-stone-600 dark:text-stone-300 dark:hover:bg-stone-800"
-                >
+            <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <x-secondary-button x-on:click="$dispatch('close')">
                     Batal
-                </button>
+                </x-secondary-button>
 
-                <button
-                    type="submit"
-                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
-                >
+                <x-danger-button>
                     Hapus Akun
-                </button>
+                </x-danger-button>
             </div>
         </form>
     </x-modal>

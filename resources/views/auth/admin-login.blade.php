@@ -1,29 +1,27 @@
 <x-guest-layout>
     <div class="space-y-6">
         <div class="text-center">
-            <p class="inline-flex items-center gap-2 rounded-full bg-stone-900 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+            <p class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10
+                      px-3 py-1 text-xs font-bold uppercase tracking-widest text-ink/60 backdrop-blur-sm">
                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 Admin Portal
             </p>
-            <h1 class="mt-4 text-2xl font-bold text-stone-900">Login Administrator</h1>
-            <p class="mt-1 text-sm text-stone-500">Masuk untuk mengelola pesanan & sistem Jahitly.</p>
+            <h1 class="mt-4 font-display text-2xl font-bold text-ink dark:text-stone-100">Login Administrator</h1>
+            <p class="mt-1 text-sm text-muted">Masuk untuk mengelola pesanan &amp; sistem Jahitly.</p>
         </div>
 
-        <x-auth-session-status
-            class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
-            :status="session('status')"
-        />
+        <x-auth-session-status :status="session('status')" />
 
         <form method="POST" action="{{ route('admin.login') }}" class="space-y-5">
             @csrf
 
             <div>
-                <x-input-label for="email" :value="__('Alamat Email')" class="text-sm font-semibold text-stone-700" />
+                <x-input-label for="email" :value="__('Alamat Email')" />
                 <x-text-input
                     id="email"
-                    class="mt-2 block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    class="mt-1.5 block w-full"
                     type="email"
                     name="email"
                     :value="old('email')"
@@ -32,16 +30,15 @@
                     autocomplete="username"
                     placeholder="admin@jahitly.com"
                 />
-                <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs text-red-600" />
+                <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
             <div x-data="{ showPassword: false }">
-                <x-input-label for="password" :value="__('Kata Sandi')" class="text-sm font-semibold text-stone-700" />
-                <div class="relative mt-2">
+                <x-input-label for="password" :value="__('Kata Sandi')" />
+                <div class="relative mt-1.5">
                     <x-text-input
                         id="password"
-                        type="password"
-                        class="block w-full rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 pr-11 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        class="block w-full pr-11"
                         x-bind:type="showPassword ? 'text' : 'password'"
                         name="password"
                         required
@@ -50,7 +47,7 @@
                     />
                     <button
                         type="button"
-                        class="absolute inset-y-0 right-0 z-10 flex items-center px-3 text-stone-400 hover:text-stone-700 focus:outline-none"
+                        class="absolute inset-y-0 right-0 z-10 flex items-center px-3 text-muted hover:text-primary transition focus:outline-none"
                         @click="showPassword = !showPassword"
                         aria-label="Tampilkan kata sandi"
                     >
@@ -65,15 +62,15 @@
                         </svg>
                     </button>
                 </div>
-                <x-input-error :messages="$errors->get('password')" class="mt-2 text-xs text-red-600" />
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
-            <div class="flex items-center justify-between">
-                <label for="remember_me" class="inline-flex items-center gap-2 text-sm text-stone-600">
+            <div class="flex items-center">
+                <label for="remember_me" class="inline-flex items-center gap-2 text-sm text-muted">
                     <input
                         id="remember_me"
                         type="checkbox"
-                        class="rounded border-stone-300 text-stone-900 focus:ring-stone-900/30"
+                        class="h-4 w-4 rounded border-border text-primary focus:ring-primary/20"
                         name="remember"
                     >
                     Ingat sesi saya
@@ -82,7 +79,9 @@
 
             <button
                 type="submit"
-                class="flex w-full items-center justify-center gap-2 rounded-lg bg-stone-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-900/30"
+                class="flex w-full items-center justify-center gap-2 rounded-xl bg-sidebar px-4 py-3
+                       text-sm font-bold text-white shadow-md transition hover:bg-sidebar/90
+                       focus:outline-none focus:ring-2 focus:ring-sidebar/30"
             >
                 Masuk Dashboard
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -91,8 +90,6 @@
             </button>
         </form>
 
-        <p class="text-center text-sm text-stone-500">
-            Hanya untuk staf resmi Jahitly.
-        </p>
+        <p class="text-center text-xs text-muted">Hanya untuk staf resmi Jahitly.</p>
     </div>
 </x-guest-layout>

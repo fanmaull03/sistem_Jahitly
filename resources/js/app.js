@@ -90,8 +90,18 @@ if (document.readyState === 'loading') {
 }
 
 /* Re-init after Livewire SPA navigation (wire:navigate) */
-document.addEventListener('livewire:navigated', runInit);
-
+document.addEventListener('livewire:navigated', () => {
+	runInit();
+	
+	// Restore dark mode class as Livewire DOM morphing might wipe it from <html>
+	const saved = localStorage.getItem('darkMode');
+	const isDark = saved === 'true' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+	document.documentElement.classList.toggle('dark', isDark);
+	
+	if (window.Alpine && window.Alpine.store('darkMode')) {
+		window.Alpine.store('darkMode').on = isDark;
+	}
+});
 /* Re-init after Livewire re-renders a component */
 document.addEventListener('livewire:update', () => {
 	/* Small delay so the DOM has settled after morphing */
