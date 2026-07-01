@@ -7,9 +7,27 @@ use App\Models\Order;
 use App\Models\OrderStatusLog;
 use App\Notifications\OrderStatusUpdated;
 use App\Services\OrderBusinessRulesService;
+use App\Services\OrderStatusTransitionService;
+use App\Services\OrderRejectionService;
+use App\Services\OrderPricingService;
+use App\Services\OrderMaterialService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
+/**
+ * AdminOrdersShow Component - Halaman detail pesanan untuk admin
+ * 
+ * Komponen ini menampilkan informasi lengkap pesanan dan menyediakan
+ * berbagai action yang dapat dilakukan admin:
+ * - Terima/tolak pesanan baru
+ * - Atur DP dan harga
+ * - Manage status bahan (ready/po)
+ * - Track produksi
+ * - Lihat riwayat status
+ * 
+ * Catatan: Komponen ini mengelola 5 berbagai concern (rejection, DP, material, price, production).
+ * Untuk peningkatan maintainability, pertimbangkan memisahkan menjadi sub-components.
+ */
 class Show extends Component
 {
     public Order $order;
@@ -66,36 +84,15 @@ class Show extends Component
             return;
         }
 
-        $serviceType = $this->order->service->type;
-        if ($serviceType === 'vermak') {
-            $newStatus = 'menunggu_pakaian_dikirim';
+        $service = app(OrderStatusTransitionService::class);
+        $result = $service->acceptOrder($this->order, auth()->id());
+
+        if ($result['success']) {
+            $this->refreshOrder();
+            session()->flash('success', $result['message']);
         } else {
-            $newStatus = app(OrderBusinessRulesService::class)->requiresFitting($serviceType)
-                ? 'menunggu_fitting'
-                : 'menunggu_dp';
+            session()->flash('error', $result['message']);
         }
-
-        $this->order->update(['status' => $newStatus]);
-
-        OrderStatusLog::create([
-            'order_id' => $this->order->id,
-            'status' => $newStatus,
-            'changed_by' => auth()->id(),
-            'notes' => 'Pesanan diterima oleh admin.',
-        ]);
-
-        $customer = $this->order->customer;
-        if ($customer) {
-            $msg = match($newStatus) {
-                'menunggu_fitting' => 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan atur jadwal fitting.',
-                'menunggu_pakaian_dikirim' => 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan kirim/antar pakaian Anda ke workshop kami.',
-                default => 'Pesanan #' . $this->order->order_number . ' telah diterima. Silakan lakukan pembayaran DP.'
-            };
-            $customer->notify(new OrderStatusUpdated($this->order, $msg));
-        }
-
-        $this->refreshOrder();
-        session()->flash('success', 'Pesanan berhasil diterima.');
     }
 
     // ──────────────────────────────────────────────────────────
@@ -123,34 +120,16 @@ class Show extends Component
             'rejectionReason.min' => 'Alasan penolakan minimal 10 karakter.',
         ]);
 
-        if ($this->order->status !== 'menunggu_konfirmasi') {
-            session()->flash('error', 'Pesanan ini tidak sedang menunggu konfirmasi.');
-            return;
+        $service = app(OrderRejectionService::class);
+        $result = $service->rejectOrder($this->order, $this->rejectionReason, auth()->id());
+
+        if ($result['success']) {
+            $this->closeRejectForm();
+            $this->refreshOrder();
+            session()->flash('success', $result['message']);
+        } else {
+            session()->flash('error', $result['message']);
         }
-
-        $this->order->update([
-            'status' => 'ditolak',
-            'rejection_reason' => $this->rejectionReason,
-        ]);
-
-        OrderStatusLog::create([
-            'order_id' => $this->order->id,
-            'status' => 'ditolak',
-            'changed_by' => auth()->id(),
-            'notes' => 'Pesanan ditolak: ' . $this->rejectionReason,
-        ]);
-
-        $customer = $this->order->customer;
-        if ($customer) {
-            $customer->notify(new OrderStatusUpdated(
-                $this->order,
-                'Pesanan #' . $this->order->order_number . ' ditolak. Alasan: ' . $this->rejectionReason
-            ));
-        }
-
-        $this->closeRejectForm();
-        $this->refreshOrder();
-        session()->flash('success', 'Pesanan berhasil ditolak.');
     }
 
     // ──────────────────────────────────────────────────────────
@@ -180,19 +159,16 @@ class Show extends Component
             'dpAmount.min' => 'Nominal DP minimal Rp 1.000.',
         ]);
 
-        $this->order->update(['dp_amount' => (float) $this->dpAmount]);
+        $service = app(OrderPricingService::class);
+        $result = $service->setDpAmount($this->order, (float) $this->dpAmount, auth()->id());
 
-        $customer = $this->order->customer;
-        if ($customer) {
-            $customer->notify(new OrderStatusUpdated(
-                $this->order,
-                'Admin telah menetapkan DP pesanan #' . $this->order->order_number . ' sebesar Rp ' . number_format((float) $this->dpAmount, 0, ',', '.') . '. Silakan lakukan pembayaran.'
-            ));
+        if ($result['success']) {
+            $this->closeDpForm();
+            $this->refreshOrder();
+            session()->flash('success', $result['message']);
+        } else {
+            session()->flash('error', $result['message']);
         }
-
-        $this->closeDpForm();
-        $this->refreshOrder();
-        session()->flash('success', 'Nominal DP berhasil ditetapkan dan notifikasi dikirim ke customer.');
     }
 
     // ──────────────────────────────────────────────────────────
@@ -250,7 +226,7 @@ class Show extends Component
         }
 
         if ($this->material_status === 'po') {
-            $rules['poDays'] = ['required', 'integer', 'min:3', 'max:7'];
+            $rules['poDays'] = ['required', 'integer', 'min:3', 'max:30'];
         }
 
         $this->validate($rules, [
@@ -259,76 +235,55 @@ class Show extends Component
             'fabric_id.required' => 'Pilih bahan kain.',
             'poDays.required' => 'Durasi PO harus diisi.',
             'poDays.min' => 'PO minimal 3 hari.',
-            'poDays.max' => 'PO maksimal 7 hari.',
+            'poDays.max' => 'PO maksimal 30 hari.',
         ]);
 
-        $updateData = [
-            'material_source' => $this->material_source,
-            'material_status' => $this->material_status,
-            'fabric_id' => $this->material_source === 'jasa' ? $this->fabric_id : null,
-            'po_days' => $this->material_status === 'po' ? (int) $this->poDays : null,
-        ];
+        $service = app(OrderMaterialService::class);
+        $result = $service->setMaterialSource(
+            $this->order,
+            $this->material_source,
+            $this->material_source === 'jasa' ? $this->fabric_id : null,
+            $this->material_status === 'po' ? (int) $this->poDays : null,
+            auth()->id()
+        );
 
-        $this->order->update($updateData);
-
-        // Recalculate estimation
-        $estimation = app(OrderBusinessRulesService::class)->calculateEstimation($this->order);
-        $this->order->update([
-            'estimated_price' => $estimation['estimated_price'],
-            'estimated_finish_date' => $estimation['estimated_finish_date'],
-        ]);
-
-        if ($this->order->status === 'menunggu_bahan' && $this->material_status === 'ready') {
-            $this->processMoveToQueue('Bahan diatur menjadi Ready. Pesanan masuk antrian produksi otomatis.', 'Bahan untuk pesanan #%s sudah dikonfirmasi (Tersedia). Pesanan masuk antrian produksi.');
+        if ($result['success']) {
+            $this->closeMaterialForm();
+            $this->refreshOrder();
+            session()->flash('success', $result['message']);
+        } else {
+            session()->flash('error', $result['message'] ?? 'Gagal update material.');
         }
-
-        $this->closeMaterialForm();
-        $this->refreshOrder();
-        session()->flash('success', 'Data bahan berhasil diperbarui.');
     }
 
     public function markMaterialReady(): void
     {
-        if ($this->order->material_status !== 'po') {
-            return;
-        }
+        $service = app(OrderMaterialService::class);
+        $result = $service->markMaterialReady($this->order, auth()->id());
 
-        $this->order->update(['material_status' => 'ready']);
-        $this->processMoveToQueue('Bahan ditandai tersedia. Pesanan masuk antrian produksi.', 'Bahan untuk pesanan #%s sudah tersedia. Pesanan masuk antrian produksi.');
-        $this->refreshOrder();
-        session()->flash('success', 'Bahan ditandai tersedia.');
+        if ($result['success']) {
+            $this->refreshOrder();
+            session()->flash('success', $result['message']);
+        } else {
+            session()->flash('error', $result['message']);
+        }
     }
 
     public function forceMoveToQueue(): void
     {
-        if ($this->order->status !== 'menunggu_bahan' || $this->order->material_status !== 'ready') {
+        if ($this->order->status !== 'menunggu_bahan') {
+            session()->flash('error', 'Pesanan tidak sedang menunggu bahan.');
             return;
         }
-        $this->processMoveToQueue('Bahan sudah ready. Memasukkan pesanan ke antrian produksi secara manual.', 'Bahan untuk pesanan #%s sudah dikonfirmasi. Pesanan masuk antrian produksi.');
-        $this->refreshOrder();
-        session()->flash('success', 'Pesanan berhasil dimasukkan ke antrian produksi.');
-    }
 
-    private function processMoveToQueue(string $adminNote, string $customerMsgTemplate): void
-    {
-        $check = app(OrderBusinessRulesService::class)->canMoveToQueue($this->order->fresh(['service', 'appointment', 'payments']));
+        $service = app(OrderStatusTransitionService::class);
+        $result = $service->moveToQueue($this->order, auth()->id());
 
-        if ($check['can_proceed'] && $this->order->status === 'menunggu_bahan') {
-            $this->order->update(['status' => 'dalam_antrian']);
-
-            OrderStatusLog::create([
-                'order_id' => $this->order->id,
-                'status' => 'dalam_antrian',
-                'changed_by' => auth()->id(),
-                'notes' => $adminNote,
-            ]);
-
-            if ($this->order->customer) {
-                $this->order->customer->notify(new OrderStatusUpdated(
-                    $this->order,
-                    sprintf($customerMsgTemplate, $this->order->order_number)
-                ));
-            }
+        if ($result['success']) {
+            $this->refreshOrder();
+            session()->flash('success', 'Pesanan berhasil dimasukkan ke antrian produksi.');
+        } else {
+            session()->flash('error', implode(', ', $result['errors'] ?? [$result['message']]));
         }
     }
 
@@ -359,22 +314,16 @@ class Show extends Component
             'editEstimatedPrice.min' => 'Harga minimal Rp 1.000.',
         ]);
 
-        $oldPrice = (float) $this->order->estimated_price;
-        $newPrice = (float) $this->editEstimatedPrice;
+        $service = app(OrderPricingService::class);
+        $result = $service->setEstimatedPrice($this->order, (float) $this->editEstimatedPrice, auth()->id());
 
-        $this->order->update(['estimated_price' => $newPrice]);
-
-        $customer = $this->order->customer;
-        if ($customer) {
-            $customer->notify(new OrderStatusUpdated(
-                $this->order,
-                'Harga pesanan #' . $this->order->order_number . ' diperbarui dari Rp ' . number_format($oldPrice, 0, ',', '.') . ' menjadi Rp ' . number_format($newPrice, 0, ',', '.') . '.'
-            ));
+        if ($result['success']) {
+            $this->closePriceForm();
+            $this->refreshOrder();
+            session()->flash('success', $result['message']);
+        } else {
+            session()->flash('error', $result['message']);
         }
-
-        $this->closePriceForm();
-        $this->refreshOrder();
-        session()->flash('success', 'Harga pesanan berhasil diperbarui.');
     }
 
     // ──────────────────────────────────────────────────────────

@@ -128,7 +128,7 @@
                 <!-- RIGHT: Image -->
                 <div data-reveal data-reveal-delay="2" class="relative hidden lg:block">
                     <div class="relative h-[520px] overflow-hidden rounded-3xl">
-                        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Jahitly" class="h-full w-full object-cover">
+                        <img src="{{ asset('images/tailor_prof.png') }}" alt="Jahitly" class="h-full w-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent"></div>
                     </div>
                     <!-- Floating card — stat -->
@@ -145,74 +145,324 @@
         </section>
 
         {{-- ── LAYANAN ── --}}
-        <section id="layanan" class="bg-surface py-24">
-            <div class="mx-auto max-w-6xl px-4 sm:px-6">
-                <div data-reveal class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                        <p class="text-sm font-semibold uppercase tracking-widest text-primary">Layanan</p>
-                        <h2 class="mt-1 font-display text-4xl font-bold text-ink">Yang Kami Kerjakan</h2>
-                    </div>
-                    <p class="max-w-xs text-sm text-muted">Semua pesanan tercatat dan bisa dipantau kapan saja.</p>
+        <section id="layanan" class="relative bg-white py-24 sm:py-32 overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute top-0 right-0 -mr-20 -mt-20 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 -ml-20 -mb-20 h-[400px] w-[400px] rounded-full bg-accent/5 blur-3xl"></div>
+            
+            <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
+
+                {{-- Section header --}}
+                <div data-reveal class="max-w-xl">
+                    <p class="text-xs font-bold uppercase tracking-widest text-primary">Yang Kami Kerjakan</p>
+                    <h2 class="mt-2 font-display text-4xl font-bold text-ink leading-tight sm:text-5xl">
+                        Layanan Kami
+                    </h2>
+                    <p class="mt-4 text-base leading-relaxed text-muted">
+                        Pilih layanan sesuai kebutuhan. Semua pesanan tercatat rapi dan bisa dipantau kapan saja.
+                    </p>
                 </div>
 
-                <div class="mt-14 grid gap-6 md:grid-cols-3">
-                    <!-- Card 1: Vermak -->
-                    <div data-reveal class="group relative overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-border transition hover:shadow-lg hover:-translate-y-1 duration-300">
-                        <div class="h-1.5 w-full bg-primary"></div>
-                        <div class="h-52 overflow-hidden">
-                            <div class="h-full w-full bg-stone-200 bg-cover bg-center transition duration-500 group-hover:scale-105" style="background-image: url('{{ asset('images/service-vermak.jpg') }}');"></div>
+                {{-- ============================================================ --}}
+                {{-- ITEM 1: Vermak Harian — Gambar KIRI, Teks KANAN              --}}
+                {{-- ============================================================ --}}
+                <div data-reveal class="mt-20 grid items-center gap-12 lg:grid-cols-2">
+
+                    {{-- Gambar kiri dengan floating badge --}}
+                    <div class="relative group">
+                        <div class="overflow-hidden rounded-3xl shadow-xl shadow-ink/10 transition duration-300 group-hover:shadow-2xl group-hover:shadow-ink/20">
+                            <img
+                                src="{{ asset('images/service-vermak.jpg') }}"
+                                alt="Vermak Harian"
+                                class="h-72 w-full object-cover sm:h-96 transition duration-700 hover:scale-105"
+                            />
+                            {{-- Overlay gradient bawah --}}
+                            <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-ink/30 via-transparent to-transparent"></div>
                         </div>
-                        <div class="p-6 space-y-3">
-                            <span class="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary">Vermak Harian</span>
-                            <h3 class="text-xl font-bold text-ink">Perbaikan cepat untuk baju favorit.</h3>
-                            <p class="text-sm text-muted leading-relaxed">Proses cepat tanpa antre panjang. Hasil rapi dan kuat.</p>
-                            <ul class="space-y-1.5 text-sm text-ink/70">
-                                <li class="flex items-center gap-2"><span class="text-primary">✓</span> Tanpa DP</li>
-                                <li class="flex items-center gap-2"><span class="text-primary">✓</span> Jahitan kuat & rapi</li>
-                            </ul>
+
+                        {{-- Hover overlay label — muncul saat gambar di-hover --}}
+                        <div class="absolute inset-0 flex items-center justify-center rounded-3xl
+                                    bg-ink/50 backdrop-blur-[2px] opacity-0 transition duration-300
+                                    group-hover:opacity-100">
+                            <div class="text-center">
+                                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Layanan</p>
+                                <p class="mt-1 font-display text-2xl font-bold text-white">Vermak Harian</p>
+                            </div>
+                        </div>
+
+                        {{-- Floating badge pojok kanan bawah --}}
+                        <div class="absolute -bottom-4 -right-4 flex items-center gap-2 rounded-2xl
+                    bg-ink px-4 py-2.5 shadow-lg">
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/30">
+                                <svg class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <p class="text-xs font-bold text-white">Proses Cepat</p>
+                                <p class="text-[10px] text-white/60">Tanpa DP</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Card 2: Seragam -->
-                    <div data-reveal data-reveal-delay="1" class="group relative overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-border transition hover:shadow-lg hover:-translate-y-1 duration-300">
-                        <div class="h-1.5 w-full bg-accent"></div>
-                        <div class="h-52 overflow-hidden">
-                            <div class="h-full w-full bg-stone-200 bg-cover bg-center transition duration-500 group-hover:scale-105" style="background-image: url('{{ asset('images/service-seragam.jpg') }}');"></div>
+                    {{-- Teks kanan --}}
+                    <div class="space-y-6">
+                        {{-- Eyebrow pill --}}
+                        <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1
+                     text-xs font-bold uppercase tracking-widest text-primary">
+                            Layanan Cepat
+                        </span>
+
+                        <div class="space-y-3">
+                            <h3 class="font-display text-3xl font-bold text-ink leading-tight sm:text-4xl">
+                                Vermak Harian
+                            </h3>
+                            <p class="text-base leading-relaxed text-muted">
+                                Cocok untuk perbaikan kecil hingga penyesuaian ukuran. Proses cepat dan hasil rapi.
+                                <strong class="text-ink">Khusus vermak ringan</strong>, tidak perlu fitting berkali-kali.
+                                Tinggalkan pakaian Anda, kami langsung kerjakan.
+                            </p>
                         </div>
-                        <div class="p-6 space-y-3">
-                            <span class="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-accent">Jahit Seragam</span>
-                            <h3 class="text-xl font-bold text-ink">Pesanan partai untuk keluarga & instansi.</h3>
-                            <p class="text-sm text-muted leading-relaxed">Cocok untuk seragam instansi, acara keluarga, atau kelompok.</p>
-                            <ul class="space-y-1.5 text-sm text-ink/70">
-                                <li class="flex items-center gap-2"><span class="text-accent">✓</span> Ukuran seragam per individu</li>
-                                <li class="flex items-center gap-2"><span class="text-accent">✓</span> Membutuhkan DP sebelum produksi</li>
-                            </ul>
+
+                        {{-- Bullet list dengan icon --}}
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                                    <svg class="h-3.5 w-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Cepat selesai tanpa antre panjang</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                                    <svg class="h-3.5 w-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Hasil jahitan rapi dan kuat</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                                    <svg class="h-3.5 w-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Tanpa DP, langsung proses</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                {{-- Divider antar item --}}
+                <div class="my-20 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+
+                {{-- ============================================================ --}}
+                {{-- ITEM 2: Seragam — Teks KIRI, Gambar KANAN                   --}}
+                {{-- ============================================================ --}}
+                <div data-reveal class="grid items-center gap-12 lg:grid-cols-2">
+
+                    {{-- Teks kiri --}}
+                    <div class="space-y-6">
+                        {{-- Eyebrow pill: warna accent (oranye) --}}
+                        <span class="inline-flex items-center rounded-full bg-accent/10 px-3 py-1
+                     text-xs font-bold uppercase tracking-widest text-accent">
+                            Pesanan Massal
+                        </span>
+
+                        <div class="space-y-3">
+                            <h3 class="font-display text-3xl font-bold text-ink leading-tight sm:text-4xl">
+                                Seragam Keluarga &amp; Kantor
+                            </h3>
+                            <p class="text-base leading-relaxed text-muted">
+                                Kami menerima pembuatan seragam dalam jumlah besar dengan jaminan kerapian jahitan yang konsisten. Tersedia untuk pengadaan di kantor maupun tempat usaha.
+                            </p>
                         </div>
+
+                        {{-- Bullet list dengan icon: warna accent --}}
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                                    <svg class="h-3.5 w-3.5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Seragam keluarga/komunitas</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                                    <svg class="h-3.5 w-3.5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Seragam kantor/komunitas</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                                    <svg class="h-3.5 w-3.5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Layanan ukur di tempat (min. 10 pcs)</span>
+                            </li>
+                        </ul>
                     </div>
 
-                    <!-- Card 3: Custom -->
-                    <div data-reveal data-reveal-delay="2" class="group relative overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-border transition hover:shadow-lg hover:-translate-y-1 duration-300">
-                        <div class="h-1.5 w-full bg-emerald-500"></div>
-                        <div class="h-52 overflow-hidden">
-                            <div class="h-full w-full bg-stone-200 bg-cover bg-center transition duration-500 group-hover:scale-105" style="background-image: url('{{ asset('images/service-custom.jpg') }}');"></div>
+                    {{-- Gambar kanan --}}
+                    <div class="relative group">
+                        <div class="overflow-hidden rounded-3xl shadow-xl shadow-ink/10 transition duration-300 group-hover:shadow-2xl group-hover:shadow-ink/20">
+                            <img
+                                src="{{ asset('images/service-seragam.jpg') }}"
+                                alt="Seragam"
+                                class="h-72 w-full object-cover sm:h-96 transition duration-700 hover:scale-105"
+                            />
+                            <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-ink/30 via-transparent to-transparent"></div>
                         </div>
-                        <div class="p-6 space-y-3">
-                            <span class="inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-emerald-600">Custom</span>
-                            <h3 class="text-xl font-bold text-ink">Desain eksklusif sesuai bentuk tubuh.</h3>
-                            <p class="text-sm text-muted leading-relaxed">Konsultasi detail, penyesuaian ukuran, dan proses fitting terjadwal.</p>
-                            <ul class="space-y-1.5 text-sm text-ink/70">
-                                <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Ukuran pas sesuai bentuk badan</li>
-                                <li class="flex items-center gap-2"><span class="text-emerald-500">✓</span> Perlu appointment sebelum jahit</li>
-                            </ul>
+
+                        {{-- Hover overlay label — muncul saat gambar di-hover --}}
+                        <div class="absolute inset-0 flex items-center justify-center rounded-3xl
+                                    bg-ink/50 backdrop-blur-[2px] opacity-0 transition duration-300
+                                    group-hover:opacity-100">
+                            <div class="text-center">
+                                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Layanan</p>
+                                <p class="mt-1 font-display text-2xl font-bold text-white">Seragam Keluarga &amp; Kantor</p>
+                            </div>
+                        </div>
+
+                        {{-- Floating badge pojok kiri bawah --}}
+                        <div class="absolute -bottom-4 -left-4 flex items-center gap-2 rounded-2xl
+                    bg-ink px-4 py-2.5 shadow-lg">
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent/30">
+                                <svg class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <p class="text-xs font-bold text-white">Min. 10 pcs</p>
+                                <p class="text-[10px] text-white/60">Pesanan Massal</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                {{-- Divider --}}
+                <div class="my-20 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+
+                {{-- ============================================================ --}}
+                {{-- ITEM 3: Custom Fit — Gambar KIRI, Teks KANAN                 --}}
+                {{-- ============================================================ --}}
+                <div data-reveal class="grid items-center gap-12 lg:grid-cols-2">
+
+                    {{-- Gambar kiri --}}
+                    <div class="relative group">
+                        <div class="overflow-hidden rounded-3xl shadow-xl shadow-ink/10 transition duration-300 group-hover:shadow-2xl group-hover:shadow-ink/20">
+                            <img
+                                src="{{ asset('images/service-custom.jpg') }}"
+                                alt="Custom Fit"
+                                class="h-72 w-full object-cover sm:h-96 transition duration-700 hover:scale-105"
+                            />
+                            <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-ink/30 via-transparent to-transparent"></div>
+                        </div>
+
+                        {{-- Hover overlay label — muncul saat gambar di-hover --}}
+                        <div class="absolute inset-0 flex items-center justify-center rounded-3xl
+                                    bg-ink/50 backdrop-blur-[2px] opacity-0 transition duration-300
+                                    group-hover:opacity-100">
+                            <div class="text-center">
+                                <p class="text-xs font-bold uppercase tracking-widest text-white/70">Layanan</p>
+                                <p class="mt-1 font-display text-2xl font-bold text-white">Custom Fit</p>
+                            </div>
+                        </div>
+
+                        {{-- Floating badge pojok kanan bawah --}}
+                        <div class="absolute -bottom-4 -right-4 flex items-center gap-2 rounded-2xl
+                    bg-ink px-4 py-2.5 shadow-lg">
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/30">
+                                <svg class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <p class="text-xs font-bold text-white">Jadwalkan</p>
+                                <p class="text-[10px] text-white/60">Fitting Privat</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Teks kanan --}}
+                    <div class="space-y-6">
+                        {{-- Eyebrow pill: warna emerald --}}
+                        <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1
+                     text-xs font-bold uppercase tracking-widest text-emerald-700">
+                            Handmade
+                        </span>
+
+                        <div class="space-y-3">
+                            <h3 class="font-display text-3xl font-bold text-ink leading-tight sm:text-4xl">
+                                Custom Fit
+                            </h3>
+                            <p class="text-base leading-relaxed text-muted">
+                                Wujudkan desain pakaian impian. Anda dirancang ukuran yang pas dan kain yang sempurna di tangan. Layanan Custom Fit kami membutuhkan beberapa kali fitting, pemilihan bahan, hingga hasil akhir yang sempurna sesuai bayangan Anda.
+                            </p>
+                        </div>
+
+                        {{-- Bullet list dengan icon: warna emerald --}}
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                                    <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Konsultasi ukuran personal</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                                    <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Pemilihan pilih bahan</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                                    <svg class="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                                    </svg>
+                                </span>
+                                <span class="text-sm font-medium text-ink">Sesi fitting terjadwal privat</span>
+                            </li>
+                        </ul>
+
+                        {{-- CTA button — hanya di Custom karena paling premium --}}
+                        <div class="pt-2">
+                            <a href="{{ route('orders.create') }}"
+                               class="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3
+                    text-sm font-bold text-white shadow-md transition
+                    hover:bg-ink/80 hover:shadow-lg">
+                                Buat Janji Temu
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
         {{-- ── CARA KERJA ── --}}
-        <section id="cara-kerja" class="bg-white py-24">
-            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <section id="cara-kerja" class="relative bg-gradient-to-b from-white to-surface py-24 overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute top-40 left-10 opacity-20 hidden lg:block">
+                <svg class="h-24 w-24 text-primary" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2"><circle cx="50" cy="50" r="40" stroke-dasharray="10 10"/></svg>
+            </div>
+            <div class="absolute bottom-10 right-20 opacity-20 hidden lg:block">
+                <svg class="h-32 w-32 text-accent" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 90 L50 10 L90 90 Z" stroke-dasharray="10 10"/></svg>
+            </div>
+
+            <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
                 <div data-reveal class="text-center">
                     <p class="text-sm font-semibold uppercase tracking-widest text-primary">Proses</p>
                     <h2 class="mt-1 font-display text-4xl font-bold text-ink">Bagaimana Cara Kerjanya?</h2>
@@ -244,8 +494,12 @@
         </section>
 
         {{-- ── MENGAPA MEMILIH ── --}}
-        <section class="bg-surface py-24">
-            <div data-reveal class="mx-auto max-w-6xl px-4 sm:px-6">
+        <section class="relative bg-surface py-24 overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+            <div class="absolute left-1/2 top-0 -translate-x-1/2 h-96 w-full max-w-2xl rounded-full bg-primary/5 blur-3xl"></div>
+
+            <div data-reveal class="relative mx-auto max-w-6xl px-4 sm:px-6">
                 <div class="max-w-2xl">
                     <p class="text-sm font-semibold uppercase tracking-widest text-primary">Keunggulan</p>
                     <h2 class="mt-1 font-display text-4xl font-bold text-ink">Mengapa Memilih Jahitly?</h2>
@@ -288,8 +542,12 @@
         </section>
 
         {{-- ── TESTIMONI ── --}}
-        <section id="testimoni" class="bg-white py-24">
-            <div data-reveal class="mx-auto max-w-6xl px-4 sm:px-6">
+        <section id="testimoni" class="relative bg-gradient-to-b from-surface to-white py-24 overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-emerald-500/5 blur-3xl"></div>
+            <div class="absolute -bottom-40 -left-40 h-[600px] w-[600px] rounded-full bg-accent/5 blur-3xl"></div>
+
+            <div data-reveal class="relative mx-auto max-w-6xl px-4 sm:px-6">
                 <div class="text-center">
                     <p class="text-sm font-semibold uppercase tracking-widest text-primary">Testimoni</p>
                     <h2 class="mt-1 font-display text-4xl font-bold text-ink">Apa Kata Pelanggan Kami?</h2>
@@ -347,8 +605,13 @@
         </section>
 
         {{-- ── FAQ ── --}}
-        <section id="faq" class="bg-surface py-24">
-            <div data-reveal class="mx-auto max-w-4xl px-4 sm:px-6">
+        <section id="faq" class="relative bg-white py-24 overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute top-20 right-1/4 opacity-10 hidden md:block">
+                <svg class="h-32 w-32 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
+            </div>
+
+            <div data-reveal class="relative mx-auto max-w-4xl px-4 sm:px-6">
                 <div class="text-center">
                     <p class="text-sm font-semibold uppercase tracking-widest text-primary">FAQ</p>
                     <h2 class="mt-1 font-display text-4xl font-bold text-ink">Pertanyaan Umum</h2>

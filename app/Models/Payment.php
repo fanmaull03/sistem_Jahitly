@@ -5,6 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Payment Model - Merepresentasikan satu transaksi pembayaran
+ * 
+ * Model ini menangani:
+ * - Informasi pembayaran (jumlah, metode, tipe: dp/pelunasan)
+ * - Status pembayaran (belum_bayar, menunggu_verifikasi, terverifikasi, ditolak)
+ * - Bukti pembayaran (file path)
+ * - Verifikasi oleh admin (verified_by, verified_at, rejection_note)
+ * 
+ * Catatan: Untuk logika pembayaran kompleks, lihat PaymentService
+ */
 class Payment extends Model
 {
     /**

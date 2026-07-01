@@ -7,6 +7,21 @@ use App\Models\Order;
 use App\Models\Service;
 use Carbon\Carbon;
 
+/**
+ * OrderBusinessRulesService - Layanan untuk logika bisnis order
+ * 
+ * Service ini mengenkapsulasi semua aturan bisnis yang berkaitan dengan order:
+ * - Validasi transisi status yang diperbolehkan
+ * - Cek kondisi untuk menggerakkan order ke antrian produksi
+ * - Cek kondisi untuk menandai order siap diambil
+ * - Hitung estimasi harga dan tanggal selesai
+ * - Manajemen appointment slots dan checking ketersediaan
+ * 
+ * Prinsip Design:
+ * - Centralize business logic (DRY principle)
+ * - Return array dengan status dan blocking reasons untuk better UX
+ * - Immutable: method tidak mengubah data, hanya mengembalikan hasil
+ */
 class OrderBusinessRulesService
 {
     /**

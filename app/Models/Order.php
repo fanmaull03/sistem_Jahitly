@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * Order Model - Merepresentasikan satu order/pesanan penjahitan
+ * 
+ * Model ini menangani data order termasuk:
+ * - Informasi pesanan (service, bahan, jumlah, harga estimasi)
+ * - Status order (menunggu_potong, diukur, dimulai, dijahit, finishing, selesai, dll)
+ * - Status material (bawa_sendiri, po, ready)
+ * - Hubungan dengan customer, pembayaran, appointment, dan design files
+ * 
+ * Catatan: Untuk logika pembayaran yang kompleks, gunakan PaymentService
+ */
 class Order extends Model
 {
     /**
@@ -189,5 +200,83 @@ class Order extends Model
     public function isActive(): bool
     {
         return !in_array($this->status, ['selesai', 'ditolak', 'dibatalkan'], true);
+    }
+
+    // ──────────────────────────────────────────────
+    // Cancellation Methods (KISS Principle)
+    // ──────────────────────────────────────────────
+
+    /**
+     * Cek apakah order bisa dibatalkan
+     * 
+     * Aturan pembatalan:
+     * - Order belum selesai/ditolak/dibatalkan
+     * - Tidak ada pembayaran terverifikasi
+     * 
+     * @return bool true jika order bisa dibatalkan
+     */
+    public function canBeCancelled(): bool
+    {
+        // Status order harus masih aktif
+        if (!$this->isActive()) {
+            return false;
+        }
+
+        // Tidak boleh ada pembayaran yang sudah terverifikasi
+        return !$this->payments()
+            ->where('status', 'terverifikasi')
+            ->exists();
+    }
+
+    /**
+     * Membatalkan order dengan alasan
+     * 
+     * Method ini mengenkapsulasi logika pembatalan order.
+     * Sebelum memanggil method ini, pastikan sudah validasi dengan canBeCancelled()
+     * 
+     * @param string $reason Alasan pembatalan (minimal 10 karakter, maksimal 500)
+     * @return bool true jika berhasil dibatalkan
+     */
+    public function cancel(string $reason): bool
+    {
+        if (!$this->canBeCancelled()) {
+            return false;
+        }
+
+        $this->update([
+            'status' => 'dibatalkan',
+            'cancelled_at' => now(),
+            'cancellation_reason' => $reason,
+        ]);
+
+        // Log status transition
+        OrderStatusLog::create([
+            'order_id' => $this->id,
+            'from_status' => 'dibatalkan',
+            'to_status' => 'dibatalkan',
+            'notes' => 'Order dibatalkan oleh customer: ' . $reason,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Cek apakah order sudah dibatalkan
+     * 
+     * @return bool
+     */
+    public function isCancelled(): bool
+    {
+        return $this->status === 'dibatalkan' && $this->cancelled_at !== null;
+    }
+
+    /**
+     * Mendapatkan alasan pembatalan (jika ada)
+     * 
+     * @return string|null Alasan pembatalan atau null jika tidak ada
+     */
+    public function getCancellationReason(): ?string
+    {
+        return $this->cancellation_reason;
     }
 }
